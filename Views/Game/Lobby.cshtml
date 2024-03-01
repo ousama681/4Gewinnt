@@ -1,5 +1,51 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<div class="container">
+    <div class="row mt-4">
+        <div class="col text-center">
+            <h2>Choose Game Mode</h2>
+            <div class="d-flex justify-content-between mt-4">
+                <a type="button" asp-action="PvP" asp-controller="Game" class="btn btn-primary">Player vs Player</a>
+                <a type="button" asp-action="PvE" asp-controller="Game" class="btn btn-primary">Player vs Robot</a>
+                <a type="button" asp-action="EvE" asp-controller="Game" class="btn btn-primary">Robot vs Robot</a>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <h2>Player Lobby</h2>
+            <div class="lobby-container" style="max-width: 300px;">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Player 1</a> <span class="dot bg-success"></span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Player 2</a> <span class="dot bg-danger"></span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Player 3</a> <span class="dot bg-success"></span></li>
+                    <!-- Add more list items as needed -->
+                </ul>
+            </div>
+        </div>
+        <div class="col">
+            <h2>Robot Lobby</h2>
+            <div class="lobby-container" style="max-width: 300px;">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Robot 1</a> <span class="dot bg-danger"></span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Robot 2</a> <span class="dot bg-success"></span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Robot 3</a> <span class="dot bg-success"></span></li>
+                    <!-- Add more list items as needed -->
+                </ul>
+            </div>
+        </div>
+        <div class="col">
+            <h2>Game Rules</h2>
+            <p>Here are the rules of the game:</p>
+            <ul>
+                <li>Rule 1: This is rule 1</li>
+                <li>Rule 2: This is rule 2</li>
+                <li>Rule 3: This is rule 3</li>
+                <!-- Add more rules as needed -->
+            </ul>
+        </div>
+    </div>
+</div>

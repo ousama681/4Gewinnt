@@ -1,5 +1,55 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Player vs Robot";
 }
+
+<div class="text-center">
+    <h1 class="display-4">Player vs Roboking</h1>
+</div>
+
+<div class="container mt-5">
+    <h2 class="text-center">Turn 1: Player 1</h2>
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <div class="connect4-board">
+                @for (int row = 0; row < 6; row++)
+                {
+                    <div class="connect4-row">
+                        @for (int col = 0; col < 7; col++)
+                        {
+                            <div class="connect4-cell" data-col="@col"></div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .connect4-board {
+        display: inline-block;
+        background-color: #3f51b5; /* Blue background */
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .connect4-row {
+        display: flex;
+    }
+
+    .connect4-cell {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 3px solid blue;
+        background-color: #fff;
+        margin: 5px;
+        cursor: pointer;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3); /* Add lens-like shadow effect */
+    }
+
+        .connect4-cell:hover {
+            background-color: yellow; /* Gray hover effect */
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.6); /* Increase shadow intensity on hover */
+        }
+</style>

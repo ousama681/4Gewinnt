@@ -2,6 +2,7 @@ html {
     font-size: 14px;
 }
 
+/* Background Color */
 body {
     background-color: hsla(216, 6%, 20%, 1);
 }
@@ -12,17 +13,12 @@ body {
   }
 }
 
+/* Standard button function from asp.net */
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-.btn {
-    border-radius: 25% 10%;
-    color: white;
-    background-color: rgb(50, 50, 100);
-    border-color: rgb(70, 70, 100);
-    margin: 0px 0px 0px 10px;
-}
+/* Login background */
 .background-container {
     position: fixed;
     top: 50%;
@@ -31,6 +27,7 @@ body {
     z-index: 1;
 }
 
+/* Login background */
 .background-content {
     background-color: rgba(100, 100, 120, 0.85);
     padding: 50px;
@@ -40,27 +37,39 @@ body {
     height: 80vh;
     overflow: hidden;
 }
-
+/* Login Labels */
 .form-group label {
     margin-bottom: 3px; /* Add margin to the labels */
     font-size: larger;
     font-weight: bold;
 }
-
+/* Login input */
 .form-control {
     width: 100%; /* Make the input fields smaller */
 }
+
+/* General size */
 .form-control, .btn, label {
     font-size: 1.2em;
 }
 
-
+/* customised button submit */
 .success-btn {
     background-color: rgb(65, 54, 138);
     border-color: rgb(70, 70, 100);
     margin: 0px 0px 0px 10px;
 }
 
+/* customised button */
+.btn {
+    border-radius: 25% 10%;
+    color: white;
+    background-color: rgb(50, 50, 100);
+    border-color: rgb(70, 70, 100);
+    margin: 0px 0px 0px 10px;
+}
+
+/* general button hover effect */
 .btn:hover {
     box-shadow: 0px 3px 8px #9ac0ff;
 }
@@ -77,6 +86,7 @@ body {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
 }
 
+/* Homepage loading bar */
 #progress-container {
     width: 100%;
     height: 100%;
@@ -84,6 +94,7 @@ body {
     justify-content: center;
 }
 
+/* Homepage loading bar */
 #progress {
     font-family: 'Code';
     font-size: 24px;

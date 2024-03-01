@@ -316,39 +316,7 @@ namespace VierGewinnt.Controllers
             return View();
         }
 
-        [Route("account/signup")]
-        [HttpPost]
-        public async Task<IActionResult> SignUp(SignUpUserModel userModel)
-        {
-            if (ModelState.IsValid)
-            {
-                // write your code
-                var result = await _accountRepository.CreateUserAsync(userModel);
-                if (!result.Succeeded)
-                {
-                    foreach (var errorMessage in result.Errors)
-                    {
-                        ModelState.AddModelError("", errorMessage.Description);
-                    }
-
-                    return View(userModel);
-                }
-
-                ModelState.Clear();
-                return RedirectToAction("ConfirmEmailTest", new { email = userModel.Email });
-            }
-
-            return View(userModel);
-        }
-
-
-        //[Route("login")]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        //[Route("login")]
+        [Route("account/signin")]
         [HttpPost]
         public async Task<IActionResult> SignIn(SignInModel signInModel)
         {
@@ -380,6 +348,38 @@ namespace VierGewinnt.Controllers
             }
 
             return View(signInModel);
+        }
+
+        [Route("account/signup")]
+        [HttpPost]
+        public async Task<IActionResult> SignUp(SignUpUserModel userModel)
+        {
+            if (ModelState.IsValid)
+            {
+                // write your code
+                var result = await _accountRepository.CreateUserAsync(userModel);
+                if (!result.Succeeded)
+                {
+                    foreach (var errorMessage in result.Errors)
+                    {
+                        ModelState.AddModelError("", errorMessage.Description);
+                    }
+
+                    return RedirectToAction("SignIn"); ;
+                }
+
+                ModelState.Clear();
+                return RedirectToAction("ConfirmEmailTest", new { email = userModel.Email });
+            }
+
+            return RedirectToAction("SignIn", userModel);
+        }
+
+
+        //[Route("login")]
+        public IActionResult Login()
+        {
+            return View();
         }
 
         //[Route("logout")]
