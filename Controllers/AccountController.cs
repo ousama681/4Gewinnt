@@ -350,7 +350,7 @@ namespace VierGewinnt.Controllers
 
         //[Route("login")]
         [HttpPost]
-        public async Task<IActionResult> Login(SignInModel signInModel)
+        public async Task<IActionResult> SignIn(SignInModel signInModel)
         {
             //returnUrl = "localhost:5155/Account/Login";
             if (ModelState.IsValid)

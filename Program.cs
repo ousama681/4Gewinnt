@@ -4,6 +4,8 @@ using VierGewinnt.Repositories;
 using VierGewinnt.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 
 namespace VierGewinnt
 {
@@ -99,6 +101,23 @@ namespace VierGewinnt
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseStaticFiles();
+
+            app.UseStaticFiles(); // For 3D Homepage,  Set up custom content types - associating file extension to MIME type
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+
+            // The MIME type for .GLB and .GLTF files are registered with IANA under the 'model' heading
+            // https://www.iana.org/assignments/media-types/media-types.xhtml#model
+            provider.Mappings[".glb"] = "model/gltf+binary";
+            provider.Mappings[".gltf"] = "model/gltf+json";
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                   Path.Combine(Directory.GetCurrentDirectory(), "Assets/millennium_falcon")),
+                RequestPath = "/Assets/millennium_falcon",
+                ContentTypeProvider = provider
+            });
+
             app.UseAuthentication();
 
             app.UseAuthorization();
