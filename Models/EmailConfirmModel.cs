@@ -6,5 +6,7 @@
         public bool IsConfirmed { get; set; }
         public bool EmailSent { get; set; }
         public bool EmailVerified { get; set; }
+        public string Token { get; set; }
+
     }
 }
