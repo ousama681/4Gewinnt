@@ -21,7 +21,7 @@ namespace VierGewinnt
             //    .AddEntityFrameworkStores<AppDbContext>()
             //    .AddDefaultTokenProviders();
 
-            builder.Services.AddIdentity<Account, IdentityRole>()
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
             //.AddUserManager<UserManager<ApplicationUser>>()
@@ -39,7 +39,7 @@ namespace VierGewinnt
                 options.SignIn.RequireConfirmedEmail = true;
 
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
-                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Lockout.MaxFailedAccessAttempts = 10;
             });
 
             builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
@@ -122,12 +122,10 @@ namespace VierGewinnt
 
             app.UseAuthorization();
 
-
             app.UseRouting();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}");
-
             app.Run();
         }
     }
