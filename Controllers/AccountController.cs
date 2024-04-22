@@ -37,7 +37,7 @@ namespace VierGewinnt.Controllers
                 var result = await _accountRepository.PasswordSignInAsync(signInModel);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Lobby", "Game");
                 }
                 if (result.IsNotAllowed)
                 {
