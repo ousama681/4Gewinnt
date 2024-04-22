@@ -4,11 +4,12 @@ namespace VierGewinnt.Controllers
 {
     public class GameController : Controller
     {
-        public IActionResult PvP()
+        public IActionResult Lobby()
         {
             return View();
         }
-        public IActionResult PvE()
+
+        public IActionResult Board()
         {
             return View();
         }
