@@ -4,7 +4,7 @@ html {
 
 /* Background Color */
 body {
-    background-color: hsla(216, 6%, 20%, 1);
+    background-color: hsla(216, 6%, 20%, 0.95);
 }
 
 @media (min-width: 768px) {
@@ -15,7 +15,6 @@ body {
 
 nav {
     background-color: hsla(216, 6%, 20%, 1);
-
 }
 
 /* Login background */
@@ -23,13 +22,13 @@ nav {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -48%);
     z-index: 1;
 }
 
 /* Login background */
 .background-content {
-    background-color: rgba(100, 100, 120, 0.85);
+    background-color: hsla(216, 6%, 20%, 0.8);
     padding: 50px;
     border-radius: 15%;
     width: auto;
@@ -37,11 +36,12 @@ nav {
     height: 80vh;
     overflow: hidden;
 }
+
 /* Login Labels */
 .form-group label {
     margin-bottom: 3px; /* Add margin to the labels */
     font-size: larger;
-    font-weight: bold;
+
 }
 
 /* Standard button function from asp.net */
@@ -56,7 +56,7 @@ nav {
 
 /* General size */
 .form-control, .btn, label {
-    font-size: 1.2em;
+    font-size: 1.1em;
 }
 
 /* customised button submit */

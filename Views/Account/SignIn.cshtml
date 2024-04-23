@@ -12,66 +12,66 @@
         <div class="container-fluid d-flex justify-content-center align-items-center">
             <div class="row">
                 <div class="col-md-12 text-center mb-4">
-                    <h1>Welcome to Roboking</h1>
-                    <h3>The leading specialists when it comes to playing Connect 4 online</h3>
+                    <h1 class="text-light">Welcome to Roboking</h1>
+                    <h3 class="text-light">The leading specialists when it comes to playing Connect 4 online</h3>
                 </div>
                 <div class="col-md-6 d-flex flex-column justify-content-center align-items-center">
                     <div class="text-center mb-4">
-                        <h1>Sign In</h1>
+                        <h1 class="text-light">Sign In</h1>
                     </div>
                     <div class="col-md-8">
                         <form asp-action="SignIn">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group">
-                                <label asp-for="SignInModel.Email" class="control-label"></label>
+                                <label asp-for="SignInModel.Email" class="control-label text-light"></label>
                                 <span asp-validation-for="SignInModel.Email" class="text-danger"></span>
                                 <input asp-for="SignInModel.Email" class="form-control" type="text" id="email" name="Email" />
                             </div>
                             <div class="form-group">
-                                <label asp-for="SignInModel.Password" class="control-label"></label>
+                                <label asp-for="SignInModel.Password" class="control-label text-light"></label>
                                 <span asp-validation-for="SignInModel.Password" class="text-danger"></span>
                                 <input asp-for="SignInModel.Password" class="form-control" type="password" id="password" name="Password" />
                             </div>
                             <div class="form-group">
-                                <input type="submit" class="success-btn btn btn-primary mt-2" value="SignIn" />
+                                <input type="submit" class="success-btn btn btn-primary mt-2" value="Sign In" />
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="col-md-6 d-flex flex-column justify-content-center align-items-center">
                     <div class="text-center mb-4">
-                        <h1>Sign Up</h1>
+                        <h1 class="text-light">Sign Up</h1>
                     </div>
                     <div class="col-md-8">
                         <form asp-action="SignUp">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group">
-                                <label asp-for="SignUpModel.FirstName" class="control-label"></label>
+                                <label asp-for="SignUpModel.FirstName" class="control-label text-light"></label>
                                 <input asp-for="SignUpModel.FirstName" class="form-control" type="text" id="firstName" name="FirstName"/>
                                 <span asp-validation-for="SignUpModel.FirstName" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="SignUpModel.LastName" class="control-label"></label>
+                                <label asp-for="SignUpModel.LastName" class="control-label text-light"></label>
                                 <input asp-for="SignUpModel.LastName" class="form-control" type="text" id="lastName" name="LastName" />
                                 <span asp-validation-for="SignUpModel.LastName" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="SignUpModel.Email" class="control-label"></label>
+                                <label asp-for="SignUpModel.Email" class="control-label text-light"></label>
                                 <input asp-for="SignUpModel.Email" class="form-control" type="text" id="email" name="Email" />
                                 <span asp-validation-for="SignUpModel.Email" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="SignUpModel.Password" class="control-label"></label>
+                                <label asp-for="SignUpModel.Password" class="control-label text-light"></label>
                                 <input asp-for="SignUpModel.Password" class="form-control" type="password" id="password" name="Password" />
                                 <span asp-validation-for="SignUpModel.Password" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="SignUpModel.ConfirmPassword" class="control-label"></label>
+                                <label asp-for="SignUpModel.ConfirmPassword" class="control-label text-light"></label>
                                 <input asp-for="SignUpModel.ConfirmPassword" class="form-control" type="password" id="confirmPassword" name="ConfirmPassword" />
                                 <span asp-validation-for="SignUpModel.ConfirmPassword" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <input type="submit" value="SignUp" class="btn btn-primary mt-2 btn-register" />
+                                <input type="submit" value="Sign Up" class="btn btn-primary mt-2 btn-register" />
                             </div>
 
                         </form>
