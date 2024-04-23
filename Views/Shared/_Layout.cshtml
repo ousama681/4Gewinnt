@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - R0b0K1ng</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
@@ -15,7 +15,6 @@
             <div class="container-fluid">
                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @* Merge your colleague's functionality here *@
                     @if (SignInManager.IsSignedIn(User))
                     {
                         <ul class="navbar-nav align-items-center">
@@ -38,7 +37,7 @@
                             </li>
                             <li class="nav-item">
                                 <form method="post" asp-controller="account" asp-action="logout">
-                                    <button type="submit" style="width: 5vw;" class="nav-link btn btn-link text-light py-0">Logout</button>
+                                    <button type="submit" style="width: 5vw;" class="nav-link btn btn-link text-light py-0">Sign out</button>
                                 </form>
                             </li>
                         </ul>
@@ -50,11 +49,21 @@
                                 <h2 class="nav-link text-light" asp-area="">Roboking</h2>
                             </li>
                         </ul>
-                        <ul class="navbar-nav justify-content-end">
-                            <li class="nav-item">
-                                <a class="nav-link btn btn-link text-light py-0" asp-controller="Account" asp-action="SignIn" style="font-size: 20px; width: 5vw;">Login</a>
-                            </li>
-                        </ul>
+                        @if (ViewData["Title"].ToString() != "Login"){
+                            <ul class="navbar-nav justify-content-end">
+                                <li class="nav-item">
+                                    <a class="nav-link btn btn-link text-light py-0" asp-controller="Account" asp-action="SignIn" style="font-size: 20px; width: 5vw;">Sign In</a>
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul class="navbar-nav justify-content-end">
+                                <li class="nav-item">
+                                    <a class="nav-link text-light py-0" style="font-size: 20px; width: 5vw; margin: 0px 0px 0px 10px;"></a>
+                                </li>
+                            </ul>
+                        }
                     }
                 </div>
             </div>
