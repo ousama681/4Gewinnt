@@ -13,9 +13,9 @@ body {
   }
 }
 
-/* Standard button function from asp.net */
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+nav {
+    background-color: hsla(216, 6%, 20%, 1);
+
 }
 
 /* Login background */
@@ -43,9 +43,15 @@ body {
     font-size: larger;
     font-weight: bold;
 }
+
+/* Standard button function from asp.net */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
 /* Login input */
 .form-control {
-    width: 100%; /* Make the input fields smaller */
+    width: 100%;
 }
 
 /* General size */
