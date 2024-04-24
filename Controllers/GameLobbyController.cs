@@ -6,7 +6,7 @@ using VierGewinnt.ViewModels.GameLobby;
 
 namespace VierGewinnt.Controllers
 {
-    public class GameController : Controller
+    public class GameLobbyController : Controller
     {
         private readonly IAccountRepository _accountRepository;
 
@@ -15,7 +15,7 @@ namespace VierGewinnt.Controllers
         // Achtung. Die Liste wird für die jeweiligen Viewer nur dann geupdatet wenn sie ihre Seite refreshen. 
         private readonly List<string> _users;
 
-        public GameController(IAccountRepository accountRepository)
+        public GameLobbyController(IAccountRepository accountRepository)
         {
             this._accountRepository = accountRepository;
             _users = new List<string>();
