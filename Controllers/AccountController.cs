@@ -45,7 +45,7 @@ namespace VierGewinnt.Controllers
                 }
                 else if (result.IsLockedOut)
                 {
-                    ModelState.AddModelError("", "Account blocked. Try after some time.");
+                    ModelState.AddModelError("", "User blocked. Try after some time.");
                 }
                 else
                 {
@@ -78,7 +78,8 @@ namespace VierGewinnt.Controllers
                 }
 
                 ModelState.Clear();
-                return RedirectToAction("ConfirmEmail", new { email = userModel.Email });
+                //return RedirectToAction("ConfirmEmail", new { email = userModel.Email });
+                return RedirectToAction("ConfirmEmail", new EmailConfirmModel() { Email = userModel.Email, IsConfirmed = false, EmailSent=true});
             }
 
             return RedirectToAction("SignIn", new SignInUpModel() { SignUpModel = userModel });
@@ -124,14 +125,13 @@ namespace VierGewinnt.Controllers
         }
 
         [Route("account/confirm-email")]
-        [HttpPost]
-        public async Task<IActionResult> ConfirmEmail(string email, string token)
+        public async Task<IActionResult> ConfirmEmail(string uid, string token)
         {
-            EmailConfirmModel model = new EmailConfirmModel() { Email = email, Token = token };
-            if (!string.IsNullOrEmpty(model.Email) && !string.IsNullOrEmpty(model.Token))
+            EmailConfirmModel model = new EmailConfirmModel() {Uid = uid, Token = token };
+            if (!string.IsNullOrEmpty(model.Uid) && !string.IsNullOrEmpty(model.Token))
             {
                 token = token.Replace(' ', '+');
-                var result = await _accountRepository.ConfirmEmailAsync(email, token);
+                var result = await _accountRepository.ConfirmEmailAsync(uid, token);
                 if (result.Succeeded)
                 {
                     model.EmailVerified = true;
@@ -140,7 +140,6 @@ namespace VierGewinnt.Controllers
 
             return View(model);
         }
-
 
         [AllowAnonymous, HttpGet("reset-password")]
         public IActionResult ResetPassword(string uid, string token)
