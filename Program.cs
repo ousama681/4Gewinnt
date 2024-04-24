@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
+using VierGewinnt.ViewModels.GameLobby;
+using System.Net;
 
 namespace VierGewinnt
 {
@@ -55,43 +57,15 @@ namespace VierGewinnt
 
             builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
 
-
-
-
-            //builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-            //{
-            //    options.Password.RequiredLength = 10;
-            //    options.Password.RequiredUniqueChars = 3;
-            //    options.SignUp.RequireConfirmedEmail = true;
-            //}).AddEntityFrameworkStores<AppDbContext>()
-            //.AddDefaultTokenProviders();
-
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-            //builder.Services.AddScoped<IUserClaimsPrincipalFactory<Account>, AccountClaimsPrincipalFactory>();
-
-
-
-
-            //Add services to the container.
-            //builder.Services.AddControllersWithViews(config =>
-            //{
-            //    var policy = new AuthorizationPolicyBuilder()
-            //                    .RequireAuthenticatedUser()
-            //                    .Build();
-            //    config.Filters.Add(new AuthorizeFilter(policy));
-            //});           
-
             builder.Services.AddControllersWithViews();
 
-            //builder.Services.AddMvc(config => {
-            //    var policy = new AuthorizationPolicyBuilder()
-            //                    .RequireAuthenticatedUser()
-            //                    .Build();
-            //    config.Filters.Add(new AuthorizeFilter(policy));
-            //});
+            builder.Services.AddRazorPages();
+            builder.Services.AddSignalR();
+
 
             var app = builder.Build();
 
@@ -119,10 +93,14 @@ namespace VierGewinnt
             });
 
             app.UseAuthentication();
-
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            app.UseRouting();
             app.UseAuthorization();
 
-            app.UseRouting();
+            app.MapRazorPages();
+
+            app.MapHub<GameLobbyViewModel>("/GameLobby/SignalRTest");
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}");

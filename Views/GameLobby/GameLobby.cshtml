@@ -1,4 +1,7 @@
-﻿@{
+﻿@model GameLobbyViewModel
+@inject SignInManager<IdentityUser> signInManager
+
+@{
     ViewData["Title"] = "Home";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -17,15 +20,14 @@
     <div class="row mt-4">
         <div class="col">
             <h2>Player Lobby</h2>
-            <div class="lobby-container" style="max-width: 300px;">
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Player 1</a> <span class="dot bg-success"></span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Player 2</a> <span class="dot bg-danger"></span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Player 3</a> <span class="dot bg-success"></span></li>
-                    <!-- Add more list items as needed -->
-                </ul>
+
+            <div class="form-group">
+                <label>Welcome Player One</label>
+                @*Normal List*@
+                @Model.PlayerOne
+                @Html.ListBox("UserNames", new SelectList(Model.Playernames))
             </div>
-        </div>
+
         <div class="col">
             <h2>Robot Lobby</h2>
             <div class="lobby-container" style="max-width: 300px;">
@@ -48,4 +50,5 @@
             </ul>
         </div>
     </div>
+
 </div>

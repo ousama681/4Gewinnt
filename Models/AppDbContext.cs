@@ -31,31 +31,39 @@ namespace VierGewinnt.Models
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<Account>().HasData(
-            //    new Account
-            //    {
-            //        Id = "1",
-            //        UserName = "TheLegend27",
-            //        Email = "abc@abc.com",
-            //        PasswordHash = "passwort123",
-                    
-            //    },
-            //                    new Account
-            //                    {
-            //                        Id = "2",
-            //                        UserName = "DjBobo1337",
-            //                        Email = "bobo@abc.com",
-            //                        PasswordHash = "wertwert"
-            //                    },
-            //                    new Account
-            //                    {
-            //                        Id = "3",
-            //                        UserName = "FBeutlin69",
-            //                        Email = "Frodo@abc.com",
-            //                        PasswordHash
-            //                        = "qwert789"
-            //                    }
-            //    );
+            modelBuilder.Entity<IdentityUser>().HasData(
+                new IdentityUser
+                {
+                    Id = "1",
+                    UserName = "TheLegend27",
+                    Email = "abc@abc.com",
+                    PasswordHash = "passwort123",
+
+                },
+                                new IdentityUser
+                                {
+                                    Id = "2",
+                                    UserName = "DjBobo1337",
+                                    Email = "bobo@abc.com",
+                                    PasswordHash = "wertwert"
+                                },
+                                new IdentityUser
+                                {
+                                    Id = "3",
+                                    UserName = "FBeutlin69",
+                                    Email = "Frodo@abc.com",
+                                    PasswordHash
+                                    = "qwert789"
+                                },
+                                new IdentityUser
+                                {
+                                    Id = "4",
+                                    UserName = "Son_Goku",
+                                    Email = "Frodo@abc.com",
+                                    PasswordHash
+                                    = "afasfwafafa"
+                                }
+                );
         }
     }
 }

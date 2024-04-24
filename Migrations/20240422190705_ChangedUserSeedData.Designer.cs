@@ -12,8 +12,8 @@ using VierGewinnt.Models;
 namespace VierGewinnt.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240229203928_Init")]
-    partial class Init
+    [Migration("20240422190705_ChangedUserSeedData")]
+    partial class ChangedUserSeedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,11 +89,6 @@ namespace VierGewinnt.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -146,9 +141,63 @@ namespace VierGewinnt.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
-
-                    b.UseTphMappingStrategy();
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "dc738904-5800-48fe-84da-0c182e1d1765",
+                            Email = "abc@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "passwort123",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "6b87ea83-9695-4d69-9bee-276870e3ad30",
+                            TwoFactorEnabled = false,
+                            UserName = "TheLegend27"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "06715f6a-f5e8-4c0f-b10b-08e29f0d1384",
+                            Email = "bobo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "wertwert",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "a99deb1b-26db-4b25-9164-dec641d13cbb",
+                            TwoFactorEnabled = false,
+                            UserName = "DjBobo1337"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "fa2574f3-10db-4c7f-9430-85aaffdc36ee",
+                            Email = "Frodo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "qwert789",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "a5f6f1b1-26cc-42ec-a308-32303be76669",
+                            TwoFactorEnabled = false,
+                            UserName = "FBeutlin69"
+                        },
+                        new
+                        {
+                            Id = "4",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "1c5507ad-5ad2-4625-8ca2-877f83e6bd2b",
+                            Email = "Frodo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "afasfwafafa",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c3324e99-865b-46d5-bc87-4735d3b11783",
+                            TwoFactorEnabled = false,
+                            UserName = "Son_Goku"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -230,71 +279,6 @@ namespace VierGewinnt.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("VierGewinnt.Models.User", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PlayerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "cb784bdc-c972-4147-ae72-f1df7f3c7a9f",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "8cad4789-2336-40de-b163-a1e9c765c8de",
-                            TwoFactorEnabled = false,
-                            Password = "passwort123",
-                            PlayerName = "TheLegend27"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "3dcd17e6-d2c7-480a-b371-5845a50e91c9",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "f7eaacfb-6177-413e-985d-15b5d0692c19",
-                            TwoFactorEnabled = false,
-                            Password = "wertwert",
-                            PlayerName = "DjBobo1337"
-                        },
-                        new
-                        {
-                            Id = "3",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "caee6d76-6df7-487e-b8bc-75204fd26d80",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "e18876d1-ab23-417c-ac96-f151f0eaf298",
-                            TwoFactorEnabled = false,
-                            Password = "qwert789",
-                            PlayerName = "FBeutlin69"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

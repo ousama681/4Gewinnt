@@ -169,9 +169,9 @@ namespace VierGewinnt.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "DateOfBirth", "Discriminator", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "Password", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "PlayerName", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "1", 0, "cb784bdc-c972-4147-ae72-f1df7f3c7a9f", null, "Account", null, false, null, null, false, null, null, null, "passwort123", null, null, false, "TheLegend27", "8cad4789-2336-40de-b163-a1e9c765c8de", false, null },
-                    { "2", 0, "3dcd17e6-d2c7-480a-b371-5845a50e91c9", null, "Account", null, false, null, null, false, null, null, null, "wertwert", null, null, false, "DjBobo1337", "f7eaacfb-6177-413e-985d-15b5d0692c19", false, null },
-                    { "3", 0, "caee6d76-6df7-487e-b8bc-75204fd26d80", null, "Account", null, false, null, null, false, null, null, null, "qwert789", null, null, false, "FBeutlin69", "e18876d1-ab23-417c-ac96-f151f0eaf298", false, null }
+                    { "1", 0, "cb784bdc-c972-4147-ae72-f1df7f3c7a9f", null, "User", null, false, null, null, false, null, null, null, "passwort123", null, null, false, "TheLegend27", "8cad4789-2336-40de-b163-a1e9c765c8de", false, null },
+                    { "2", 0, "3dcd17e6-d2c7-480a-b371-5845a50e91c9", null, "User", null, false, null, null, false, null, null, null, "wertwert", null, null, false, "DjBobo1337", "f7eaacfb-6177-413e-985d-15b5d0692c19", false, null },
+                    { "3", 0, "caee6d76-6df7-487e-b8bc-75204fd26d80", null, "User", null, false, null, null, false, null, null, null, "qwert789", null, null, false, "FBeutlin69", "e18876d1-ab23-417c-ac96-f151f0eaf298", false, null }
                 });
 
             migrationBuilder.CreateIndex(

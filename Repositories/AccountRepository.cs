@@ -82,9 +82,9 @@ namespace VierGewinnt.Repositories
         }
 
 
-        public async Task<IdentityResult> ConfirmEmailAsync(string email, string token)
+        public async Task<IdentityResult> ConfirmEmailAsync(string uid, string token)
         {
-            return await _userManager.ConfirmEmailAsync(await _userManager.FindByIdAsync(email), token);
+            return await _userManager.ConfirmEmailAsync(await _userManager.FindByIdAsync(uid), token);
         }
 
         private async Task SendEmailConfirmationEmail(IdentityUser user, string token)
@@ -99,7 +99,7 @@ namespace VierGewinnt.Repositories
                 {
                     new KeyValuePair<string, string>("{{UserName}}", user.UserName),
                     new KeyValuePair<string, string>("{{Link}}",
-                        string.Format(appDomain + confirmationLink, user.Email, token))
+                        string.Format(appDomain + confirmationLink, user.Id, token))
                 }
             };
 
