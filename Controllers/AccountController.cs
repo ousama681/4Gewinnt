@@ -141,6 +141,7 @@ namespace VierGewinnt.Controllers
             return View(model);
         }
 
+
         [AllowAnonymous, HttpGet("reset-password")]
         public IActionResult ResetPassword(string uid, string token)
         {
