@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace VierGewinnt.ViewModels.GameLobby
 {
     public class GameLobbyViewModel
     {
-        public IEnumerable<string> Playernames { get; set; }
+        public IEnumerable<string> Playernames {  get; set; }
         public IdentityUser PlayerOne { get; set; }
 
 

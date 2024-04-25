@@ -137,6 +137,64 @@ namespace VierGewinnt.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "dc738904-5800-48fe-84da-0c182e1d1765",
+                            Email = "abc@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "passwort123",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "6b87ea83-9695-4d69-9bee-276870e3ad30",
+                            TwoFactorEnabled = false,
+                            UserName = "TheLegend27"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "06715f6a-f5e8-4c0f-b10b-08e29f0d1384",
+                            Email = "bobo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "wertwert",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "a99deb1b-26db-4b25-9164-dec641d13cbb",
+                            TwoFactorEnabled = false,
+                            UserName = "DjBobo1337"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "fa2574f3-10db-4c7f-9430-85aaffdc36ee",
+                            Email = "Frodo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "qwert789",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "a5f6f1b1-26cc-42ec-a308-32303be76669",
+                            TwoFactorEnabled = false,
+                            UserName = "FBeutlin69"
+                        },
+                        new
+                        {
+                            Id = "4",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "1c5507ad-5ad2-4625-8ca2-877f83e6bd2b",
+                            Email = "Frodo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "afasfwafafa",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c3324e99-865b-46d5-bc87-4735d3b11783",
+                            TwoFactorEnabled = false,
+                            UserName = "Son_Goku"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
