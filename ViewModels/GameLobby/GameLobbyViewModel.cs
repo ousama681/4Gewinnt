@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace VierGewinnt.ViewModels
+namespace VierGewinnt.ViewModels.GameLobby
 {
     public class GameLobbyViewModel
     {
