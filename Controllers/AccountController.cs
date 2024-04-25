@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VierGewinnt.Models;
 using VierGewinnt.Repositories.Interfaces;
@@ -37,7 +36,7 @@ namespace VierGewinnt.Controllers
                 var result = await _accountRepository.PasswordSignInAsync(signInModel);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Lobby", "Game");
                 }
                 if (result.IsNotAllowed)
                 {

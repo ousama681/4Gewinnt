@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VierGewinnt.Models;
 using VierGewinnt.Repositories.Interfaces;
@@ -50,7 +50,6 @@ namespace VierGewinnt.Controllers
             // Hier noch eine Methode bauen die nur Spielernamen anzeigt die in keinem Spiel sind
             return View(vm);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Challenge(string userName, string playerTwoUsername)

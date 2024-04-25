@@ -17,7 +17,9 @@ namespace VierGewinnt
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
+            // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
+            // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
+            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
 
             //builder.Services.AddIdentity<IdentityUser, IdentityRole>()
             //    .AddEntityFrameworkStores<AppDbContext>()

@@ -18,6 +18,16 @@ namespace VierGewinnt.Controllers
             return View();
         }
 
+        public IActionResult Leaderboard()
+        {
+            return View();
+        }
+
+        public IActionResult MatchHistory()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

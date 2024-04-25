@@ -5,29 +5,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - R0b0K1ng</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm  border-bottom ">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">R0b0K1ng</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @* Merge your colleague's functionality here *@
                     @if (SignInManager.IsSignedIn(User))
                     {
-                        <ul class="navbar-nav flex-grow-1">
+                        <ul class="navbar-nav align-items-center">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="LeaderBoard" asp-action="Index">Bestenliste</a>
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="Game" asp-action="Lobby">Lobby</a>
+                            </li>
+                            <li class="navbar-item">
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Leaderboard">Bestenliste</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="MatchHistory" asp-action="Index">Spielrückblick</a>
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="MatchHistory">Spielrückblick</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="GameLobby" asp-route-username="@User.Identity.Name">GameLobby</a>
@@ -36,24 +34,42 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="SignalRTest">SignalRTest</a>
                             </li>
                         </ul>
-                        <ul class="navbar-nav flex-grow-1 justify-content-end">
+                        <ul class="navbar-nav justify-content-end align-items-center">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change Password</a>
+                                <label class="navbar-brand text-light" asp-area="">@User.Identity.Name</label>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change Password</a>
                             </li>
                             <li class="nav-item">
                                 <form method="post" asp-controller="account" asp-action="logout">
-                                    <button type="submit" style="width:auto" class="nav-link btn btn-link py-0">Logout @User.Identity.Name</button>
+                                    <button type="submit" style="width: 5vw;" class="nav-link btn btn-link text-light py-0">Sign out</button>
                                 </form>
                             </li>
                         </ul>
                     }
                     else
                     {
-                        <ul class="navbar-nav flex-grow-1 justify-content-center">
+                        <ul class="navbar-nav flex-grow-1 justify-content-center align-items-center">
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="SignIn" style="font-size: 20px;">Login</a>
+                                <label class="navbar-brand text-light" asp-area="">Roboking</label>
                             </li>
                         </ul>
+                        @if (ViewData["Title"].ToString() != "Login"){
+                            <ul class="navbar-nav justify-content-end">
+                                <li class="nav-item">
+                                    <a class="nav-link btn btn-link text-light py-0" asp-controller="Account" asp-action="SignIn" style="width: 5vw;">Sign In</a>
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul class="navbar-nav justify-content-end">
+                                <li class="nav-item">
+                                    <a class="nav-link text-light py-0" style="font-size: 20px; width: 5vw; margin: 0px 0px 0px 10px;"></a>
+                                </li>
+                            </ul>
+                        }
                     }
                 </div>
             </div>
