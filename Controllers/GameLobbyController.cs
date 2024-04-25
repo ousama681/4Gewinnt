@@ -2,7 +2,7 @@
 
 namespace VierGewinnt.Controllers
 {
-    public class GameController : Controller
+    public class GameLobbyController : Controller
     {
         public IActionResult Lobby()
         {
