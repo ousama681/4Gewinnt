@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VierGewinnt.Repositories.Interfaces;
+using VierGewinnt.ViewModels.GameLobby;
 
 namespace VierGewinnt.Controllers
 {
