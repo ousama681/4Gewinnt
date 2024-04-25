@@ -51,11 +51,6 @@ namespace VierGewinnt.Controllers
             return View(vm);
         }
 
-        public async Task<IActionResult> SignalRTest()
-        {
-            return View();
-        }
-
 
         [HttpPost]
         public async Task<IActionResult> Challenge(string userName, string playerTwoUsername)

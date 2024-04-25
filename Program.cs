@@ -64,7 +64,6 @@ namespace VierGewinnt
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddRazorPages();
-            builder.Services.AddSignalR();
 
 
             var app = builder.Build();
@@ -97,9 +96,6 @@ namespace VierGewinnt
             app.UseRouting();
             app.UseAuthorization();
 
-            app.MapRazorPages();
-
-            app.MapHub<GameLobbyViewModel>("/GameLobby/SignalRTest");
 
             app.MapControllerRoute(
                 name: "default",
