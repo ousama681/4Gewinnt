@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VierGewinnt.Models;
 using VierGewinnt.Repositories.Interfaces;
+using VierGewinnt.ViewModels;
 using VierGewinnt.ViewModels.GameLobby;
 
 namespace VierGewinnt.Controllers
@@ -34,6 +35,11 @@ namespace VierGewinnt.Controllers
             return View();
         }
 
+        //public async Task<IActionResult> GameLobby()
+        //{
+        //    return View();
+        //}
+
         public async Task<IActionResult> GameLobby(string username)
         {
             GameLobbyViewModel vm = new GameLobbyViewModel();
@@ -65,6 +71,25 @@ namespace VierGewinnt.Controllers
             _users.Remove(userName);
             // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Game(string playerOne, string playerTwo)
+        {
+            GameViewModel vm = new GameViewModel(playerOne, playerTwo);
+
+            // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+            return View("Board", vm);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Game(string playerTwo)
+        {
+            GameViewModel vm = new GameViewModel() {PlayerTwo = playerTwo };
+
+            // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+            return View("Board", vm);
         }
     }
 }

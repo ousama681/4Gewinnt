@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using VierGewinnt.ViewModels.GameLobby;
 using System.Net;
+using VierGewinnt.Hubs;
 
 namespace VierGewinnt
 {
@@ -19,17 +20,12 @@ namespace VierGewinnt
 
             // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
             // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
+            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
 
-            //builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-            //    .AddEntityFrameworkStores<AppDbContext>()
-            //    .AddDefaultTokenProviders();
 
             builder.Services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
-            //.AddUserManager<UserManager<ApplicationUser>>()
-            //.AddSignInManager<SignInManager<ApplicationUser>>();
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -63,9 +59,9 @@ namespace VierGewinnt
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-            builder.Services.AddControllersWithViews();
 
-            builder.Services.AddRazorPages();
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddSignalR();
 
 
             var app = builder.Build();
@@ -74,27 +70,32 @@ namespace VierGewinnt
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
             }
+
+            app.UseHttpsRedirection();
+
+
+            // Vorerst auskommentiert da das Laden damit viel länger dauert und das testen so auch länger.
+            //------------
+            //// For 3D Homepage,  Set up custom content types - associating file extension to MIME type
+            //FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+
+            //// The MIME type for .GLB and .GLTF files are registered with IANA under the 'model' heading
+            //// https://www.iana.org/assignments/media-types/media-types.xhtml#model
+            //provider.Mappings[".glb"] = "model/gltf+binary";
+            //provider.Mappings[".gltf"] = "model/gltf+json";
+
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(
+            //       Path.Combine(Directory.GetCurrentDirectory(), "Assets/millennium_falcon")),
+            //    RequestPath = "/Assets/millennium_falcon",
+            //    ContentTypeProvider = provider
+            //});
+
             app.UseStaticFiles();
-
-            app.UseStaticFiles(); // For 3D Homepage,  Set up custom content types - associating file extension to MIME type
-            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
-
-            // The MIME type for .GLB and .GLTF files are registered with IANA under the 'model' heading
-            // https://www.iana.org/assignments/media-types/media-types.xhtml#model
-            provider.Mappings[".glb"] = "model/gltf+binary";
-            provider.Mappings[".gltf"] = "model/gltf+json";
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                   Path.Combine(Directory.GetCurrentDirectory(), "Assets/millennium_falcon")),
-                RequestPath = "/Assets/millennium_falcon",
-                ContentTypeProvider = provider
-            });
-
-            app.UseAuthentication();
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             app.UseRouting();
             app.UseAuthorization();
 
@@ -102,7 +103,16 @@ namespace VierGewinnt
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}");
+
+            app.MapHub<ChatHub>("/chatHub");
+
             app.Run();
+
+
+             // Eventuell brauchen wir diese zwie noch.
+             // ---
+            //app.UseAuthentication();
+            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
     }
 }

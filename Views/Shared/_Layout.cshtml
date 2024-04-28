@@ -29,6 +29,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="GameLobby" asp-route-username="@User.Identity.Name">GameLobby</a>
+                                @* <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="GameLobby">GameLobby</a> *@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="SignalRTest">SignalRTest</a>
@@ -36,7 +37,7 @@
                         </ul>
                         <ul class="navbar-nav justify-content-end align-items-center">
                             <li class="nav-item">
-                                <label class="navbar-brand text-light" asp-area="">@User.Identity.Name</label>
+                                <label id="userNameLabel" class="navbar-brand text-light" asp-area="">@User.Identity.Name</label>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change Password</a>
@@ -55,7 +56,8 @@
                                 <label class="navbar-brand text-light" asp-area="">Roboking</label>
                             </li>
                         </ul>
-                        @if (ViewData["Title"].ToString() != "Login"){
+                        @if (ViewData["Title"].ToString() != "Login")
+                        {
                             <ul class="navbar-nav justify-content-end">
                                 <li class="nav-item">
                                     <a class="nav-link btn btn-link text-light py-0" asp-controller="Account" asp-action="SignIn" style="width: 5vw;">Sign In</a>
