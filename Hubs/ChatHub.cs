@@ -42,12 +42,6 @@ namespace VierGewinnt.Hubs
             await Clients.Caller.SendAsync("ReceiveAvailableUsers", players);
         }
 
-        //public async Task NotificateRemovePlayer(string user)
-        //{
-        //    await Clients.Others.SendAsync("ReceivePlayerRemoval", user);
-        //}
-
-
         public async Task LeaveLobby(string userName)
         {
             if (players.Contains(userName))

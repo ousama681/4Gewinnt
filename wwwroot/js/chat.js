@@ -16,10 +16,28 @@ connection.on("ReceiveAvailableUsers", function (players) {
     console.log("Online Users werden in Liste geladen.");
 
     for (var i = 0; i < players.length; i++) {
+
         var li = document.createElement("li");
+        
+        li.id = playerTwo;
+
+        var anchor = document.createElement("a");
+
+        var playerOne = document.getElementById("userNameLabel").textContent;
+        var playerTwo = players[i];
+
+        // Setting up URL Params
+        const baseUrl = "https://localhost:7102/";
+        const params = new URLSearchParams();
+        params.append("playerOne", playerOne);
+        params.append("playerTwo", playerTwo);
+    
+        anchor.href = `${baseUrl}?${params.toString()}`;
+        anchor.textContent = `${playerTwo}`;
+
+        li.appendChild(anchor);
+
         document.getElementById("playerList").appendChild(li);
-        li.textContent = `${players[i]}`;
-        li.id = players[i];
     }
     console.log("Online Users wurden erfolgreich in Liste geladen.");
 });
@@ -27,11 +45,27 @@ connection.on("ReceiveAvailableUsers", function (players) {
 connection.on("ReceiveNewUser", function (user) {
     console.log("inside ReceiveNewUser");
 
-    var li = document.createElement("li");
-    li.textContent = `${user}`;
-    li.id = user;
+        var li = document.createElement("li");
+
+        li.id = user;
+
+        var anchor = document.createElement("a");
+
+        var playerOne = document.getElementById("userNameLabel").textContent;
+        var playerTwo = user;
+
+        // Setting up URL Params
+        const baseUrl = "https://localhost:7102/";
+        const params = new URLSearchParams();
+        params.append("playerOne", playerOne);
+        params.append("playerTwo", playerTwo);
     
-    document.getElementById("playerList").appendChild(li);
+        anchor.href = `${baseUrl}?${params.toString()}`;
+        anchor.textContent = `${user}`;
+
+        li.appendChild(anchor);
+
+        document.getElementById("playerList").appendChild(li);
 });
 
 connection.start().then(function () {
