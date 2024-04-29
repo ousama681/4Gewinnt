@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System.Numerics;
-using VierGewinnt.Models;
 
 namespace VierGewinnt.Hubs
 {
@@ -31,7 +29,7 @@ namespace VierGewinnt.Hubs
             }
             else
             {
-                onlineUsers.Add(Context.ConnectionId, player);
+                onlineUsers.Add(player, Context.ConnectionId);
                 players.Add(player);
             }
             return;
@@ -47,7 +45,7 @@ namespace VierGewinnt.Hubs
             if (players.Contains(userName))
             {
                 players.Remove(userName);
-                onlineUsers.Remove(Context.ConnectionId);
+                onlineUsers.Remove(userName);
                 await Clients.Others.SendAsync("PlayerLeft", userName);
                 return;
             }
@@ -59,11 +57,26 @@ namespace VierGewinnt.Hubs
             if (!string.IsNullOrEmpty(userName) && players.Contains(userName))
             {
                 players.Remove(userName);
-                onlineUsers.Remove(Context.ConnectionId);
+                onlineUsers.Remove(userName);
                 await Clients.Others.SendAsync("PlayerLeft", userName);
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task NotificateGameStart(string playerOne, string playerTwo, string gameUrl)
+        {
+            string conIdP1;
+            onlineUsers.TryGetValue(playerOne, out conIdP1);
+            string conIdP2;
+            onlineUsers.TryGetValue(playerTwo, out conIdP2);
+
+            IList<string> conIds = new List<string>();
+            conIds.Add(conIdP1);
+            conIds.Add(conIdP2);
+
+            await Clients.All.SendAsync("NavigateToGame", playerOne, playerTwo);
+            //await Clients.User(conIdP2).SendAsync("NavigateToGame", playerOne, playerTwo);
         }
     }
 }

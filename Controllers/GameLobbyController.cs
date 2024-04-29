@@ -73,8 +73,9 @@ namespace VierGewinnt.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Game(string playerOne, string playerTwo)
+        [HttpGet]
+        [Route("/GameLobby/Game")]
+        public async Task<IActionResult> Game([FromForm]string playerOne, [FromForm]string playerTwo)
         {
             GameViewModel vm = new GameViewModel(playerOne, playerTwo);
 
@@ -82,14 +83,25 @@ namespace VierGewinnt.Controllers
             return View("Board", vm);
         }
 
+        //[HttpGet]
+        //[Route("/GameLobby/Game")]
+        //public async Task<IActionResult> Game()
+        //{
+        //    //GameViewModel vm = new GameViewModel(playerOne, playerTwo);
 
-        [HttpPost]
-        public async Task<IActionResult> Game(string playerTwo)
-        {
-            GameViewModel vm = new GameViewModel() {PlayerTwo = playerTwo };
+        //    // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+        //    //return View("Board", vm);
+        //    return View();
+        //}
 
-            // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
-            return View("Board", vm);
-        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> Game(string playerTwo)
+        //{
+        //    GameViewModel vm = new GameViewModel() {PlayerTwo = playerTwo };
+
+        //    // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+        //    return View("Board", vm);
+        //}
     }
 }
