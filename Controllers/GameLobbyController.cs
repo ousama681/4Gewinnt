@@ -75,7 +75,7 @@ namespace VierGewinnt.Controllers
 
         [HttpGet]
         [Route("/GameLobby/Game")]
-        public async Task<IActionResult> Game([FromForm]string playerOne, [FromForm]string playerTwo)
+        public async Task<IActionResult> Game(string playerOne, string playerTwo)
         {
             GameViewModel vm = new GameViewModel(playerOne, playerTwo);
 
