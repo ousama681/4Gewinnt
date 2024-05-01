@@ -3,8 +3,6 @@
     ViewData["Title"] = "Login";
 }
 
-<div id="particles-js"></div>
-
 <div class="background-container">
     <div class="background-content">
         <div class="container-fluid d-flex justify-content-center align-items-center">
@@ -23,12 +21,12 @@
                             <div class="form-group">
                                 <label asp-for="SignInModel.Email" class="control-label text-light"></label>
                                 <span asp-validation-for="SignInModel.Email" class="text-danger"></span>
-                                <input asp-for="SignInModel.Email" class="form-control" type="text" id="email" name="Email" />
+                                <input asp-for="SignInModel.Email" class="form-control" type="text" id="emailSignIn" name="Email" />
                             </div>
                             <div class="form-group">
                                 <label asp-for="SignInModel.Password" class="control-label text-light"></label>
                                 <span asp-validation-for="SignInModel.Password" class="text-danger"></span>
-                                <input asp-for="SignInModel.Password" class="form-control" type="password" id="password" name="Password" />
+                                <input asp-for="SignInModel.Password" class="form-control" type="password" id="passwordSignIn" name="Password" />
                             </div>
                             <div class="form-group">
                                 <input type="submit" class="success-btn btn btn-primary mt-2" value="Sign In" />
@@ -55,12 +53,12 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="SignUpModel.Email" class="control-label text-light"></label>
-                                <input asp-for="SignUpModel.Email" class="form-control" type="text" id="email" name="Email" />
+                                <input asp-for="SignUpModel.Email" class="form-control" type="text" id="emailSignUp" name="Email" />
                                 <span asp-validation-for="SignUpModel.Email" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="SignUpModel.Password" class="control-label text-light"></label>
-                                <input asp-for="SignUpModel.Password" class="form-control" type="password" id="password" name="Password" />
+                                <input asp-for="SignUpModel.Password" class="form-control" type="password" id="passwordSignUp" name="Password" />
                                 <span asp-validation-for="SignUpModel.Password" class="text-danger"></span>
                             </div>
                             <div class="form-group">
