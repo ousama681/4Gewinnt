@@ -19,7 +19,7 @@
                     {
                         <ul class="navbar-nav align-items-center">
                             <li class="nav-item">
-                                <a class="navbar-brand text-light" asp-area="" asp-controller="Game" asp-action="Lobby">Lobby</a>
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="GameLobby" asp-action="Board">Board</a>
                             </li>
                             <li class="navbar-item">
                                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Leaderboard">Bestenliste</a>
@@ -28,11 +28,11 @@
                                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="MatchHistory">Spielrückblick</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="GameLobby" asp-route-username="@User.Identity.Name">GameLobby</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="GameLobby" asp-action="GameLobby" asp-route-username="@User.Identity.Name">GameLobby</a>
                                 @* <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="GameLobby">GameLobby</a> *@
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="SignalRTest">SignalRTest</a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="GameLobby" asp-action="SignalRTest">SignalRTest</a>
                             </li>
                         </ul>
                         <ul class="navbar-nav justify-content-end align-items-center">
@@ -85,7 +85,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

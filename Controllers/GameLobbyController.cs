@@ -73,14 +73,44 @@ namespace VierGewinnt.Controllers
             return View();
         }
 
+        //[HttpGet]
+        //[Route("/GameLobby/Game")]
+        //public async Task<IActionResult> Game([FromForm]string playerOne, [FromForm]string playerTwo)
+        //{
+        //    GameViewModel vm = new GameViewModel(playerOne, playerTwo);
+
+        //    // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+        //    return View("Board", vm);
+        //}
+
         [HttpGet]
+
+        public async Task<IActionResult> Board()
+        {        
+            return View();
+        }
+
+        [HttpPost]
+        public void PlaceYellowStone()
+        {
+            // The return false in the board.js PlaceYellowStone function may block submission to this function
+            // Send call to Robot interface
+            // save to DB
+        }
+
         [Route("/GameLobby/Game")]
         public async Task<IActionResult> Game(string playerOne, string playerTwo)
-        {
-            GameViewModel vm = new GameViewModel(playerOne, playerTwo);
 
-            // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
-            return View("Board", vm);
+        {
+  
+        }
+
+        [HttpPost]
+        public void PlaceRedStone()
+        {
+            // The return false in the board.js PlaceRedStone function may block submission to this function
+            // Send call to Robot interface
+            // save to DB       
         }
 
         //[HttpGet]
