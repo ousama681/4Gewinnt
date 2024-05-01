@@ -84,6 +84,7 @@ namespace VierGewinnt.Controllers
         //}
 
         [HttpGet]
+
         public async Task<IActionResult> Board()
         {        
             return View();
@@ -95,6 +96,13 @@ namespace VierGewinnt.Controllers
             // The return false in the board.js PlaceYellowStone function may block submission to this function
             // Send call to Robot interface
             // save to DB
+        }
+
+        [Route("/GameLobby/Game")]
+        public async Task<IActionResult> Game(string playerOne, string playerTwo)
+
+        {
+  
         }
 
         [HttpPost]
