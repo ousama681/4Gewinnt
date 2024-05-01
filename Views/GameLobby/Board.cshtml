@@ -7,62 +7,78 @@
 <div class="text-center">
     <h1 class="display-4 text-light">Player vs Roboking</h1>
 </div>
-<div id="playerOne">
-    <label class="text-light">PlayerOne:</label>
-@*     <p>@Model.PlayerOne</p> *@
-</div>
-<div class="text-light">Stone</div>
-<div class="yellow-stone"></div>
-<div class="text-light">Select a column: </div>
-<form id="placeYellowStone">
-    <input type="number" id="colNumberYellow" name="colNumberYellow" value="1" min="1" max="7">
-    <br />
-<button class="btn btn-primary mt-2" style="margin: 0;" type="submit" onclick="placeYellowStone('colNumberYellow')">Place Stone</button>
-</form>
-<div class="container mt-5">
-    <h2 class="text-center text-light">Turn 1: Player 1</h2>
 
-    <!-- Column numbers row -->
-    <div class="row justify-content-center">
-        @for (int col = 1; col <= 7; col++)
-        {
-            <div class="colNumber col-auto text-center text-light h4">
-                @col
+<div class="container">
+    <div class="row">
+        <!-- Column for PlayerOne -->
+        <div class="col d-flex flex-column align-items-center">
+            <div id="playerOne">
+                <label class="text-light">PlayerOne:</label>
+                <!-- Your PlayerOne content here -->
             </div>
-        }
-    </div>
+            <div class="d-flex flex-column align-items-center">
+                <div class="yellow-stone"></div>
+                <div class="text-light mb-2">Select a column: </div>
+                <form id="placeYellowStone" class="d-flex flex-column align-items-center">
+                    <input type="number" id="colNumberYellow" name="colNumberYellow" value="1" min="1" max="7">
+                    <button class="btn btn-primary mt-2" type="submit" onclick="placeYellowStone('colNumberYellow')">Place Stone</button>
+                </form>
+            </div>
+        </div>
 
-    <div class="row justify-content-center">
-        <div class="col-auto">
-            <div class="board">
-                <!-- Game board rows -->
-                @for (int row = 1; row <= 6; row++)
-                {
-                    <div class="row">
-                        <!-- Game board columns -->
-                        @for (int col = 1; col <= 7; col++)
-                        {
-                            <div class="cell" data-colnr="@col" data-rownr="@row"></div>
-                        }
+        <!-- Column for the game board -->
+        <div class="col-md-6 d-flex justify-content-center">
+            <div class="container mt-5">
+                <h2 class="text-center text-light">Turn 1: Player 1</h2>
+
+                <!-- Column numbers row -->
+                <div class="row justify-content-center">
+                    @for (int col = 1; col <= 7; col++)
+                    {
+                        <div class="colNumber col-auto text-center text-light h4">
+                            @col
+                        </div>
+                    }
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-auto">
+                        <div class="board">
+                            <!-- Game board rows -->
+                            @for (int row = 1; row <= 6; row++)
+                            {
+                                <div class="row justify-content-center">
+                                    <!-- Game board columns -->
+                                    @for (int col = 1; col <= 7; col++)
+                                    {
+                                        <div class="cell" data-colnr="@col" data-rownr="@row"></div>
+                                    }
+                                </div>
+                            }
+                        </div>
                     </div>
-                }
+                </div>
+            </div>
+        </div>
+
+        <!-- Column for PlayerTwo -->
+        <div class="col d-flex flex-column align-items-center">
+            <div id="playerTwo">
+                <label class="text-light">PlayerTwo:</label>
+            </div>
+            <div class ="d-flex flex-column align-items-center">
+                <div class="red-stone"></div>
+                <div class="text-light mb-2">Select a column: </div>
+                <form id="PlaceRedStone" class="d-flex flex-column align-items-center">
+                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
+                    <button class="btn btn-primary mt-2" type="submit" onclick="placeRedStone('colNumberRed')">Place Stone</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
-    <div id="playerTwo">
-        <label class="text-light">PlayerTwo:</label>
-@*         <p> @Model.PlayerTwo</p> *@
-    </div>
-    <div class="text-light">Stone</div>
-    <div class="red-stone"></div>
-    <div class="text-light">Select a column: </div>
-    <form id="PlaceRedStone">
-        <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
-        <br />
-        <button class="btn btn-primary mt-2" style="margin: 0;" type="submit" onclick="placeRedStone('colNumberRed')">Place Stone</button>
-    </form>
-</div>
+
+
 <script src="~/js/board.js" asp-append-version="true"></script>
 
 @*  TO DO SignalR links *@

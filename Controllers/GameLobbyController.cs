@@ -100,9 +100,8 @@ namespace VierGewinnt.Controllers
 
         [Route("/GameLobby/Game")]
         public async Task<IActionResult> Game(string playerOne, string playerTwo)
-
         {
-  
+            return View();
         }
 
         [HttpPost]
