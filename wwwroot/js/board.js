@@ -1,45 +1,75 @@
-﻿function placeYellowStone(inputId) {
-    var colNumber = document.getElementById(inputId).value;
-    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
-    if (selectedColumn) {
-        selectedColumn.classList.add('blinkYellow');
-        setTimeout(function () {
-            selectedColumn.classList.remove('blinkYellow');
-        }, 5000); // Blink duration in milliseconds
-    }
-    return false; // Prevent form submission
+﻿
+function disableButton(btnId) {
+    var button = document.getElementById(btnId);
+    button.disabled = true;
 }
 
-function placeRedStone(inputId) {
-    var colNumber = document.getElementById(inputId).value;
-    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
-    if (selectedColumn) {
-        selectedColumn.classList.add('blinkRed');
-        setTimeout(function () {
-            selectedColumn.classList.remove('blinkRed');
-        }, 5000); // Blink duration in milliseconds
-    }
-    return false; // Prevent form submission
+function activateButton(btnId) {
+    var button = document.getElementById(btnId);
+    button.disabled = false;
 }
 
-// To be tested: ChatGpt
-$(function () {
-    var hub = $.connection.myHub;
+//function placeYellowStone(numericId, btnId) {
+//    event.preventDefault();
+//    disableButton(btnId);
+//    var colNumber = document.getElementById(numericId).value;
+//    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
+//    if (selectedColumn) {
+//        selectedColumn.classList.add('blinkYellow');
+//        setTimeout(function () {
+//            selectedColumn.classList.remove('blinkYellow');
+//            activateButton(btnId);
+//        }, 5000); // Blink duration in milliseconds        
+//    }
+//    return false; // Prevent form submission
+//}
 
-    // Start the SignalR connection
-    $.connection.hub.start().done(function () {
-        $('#placeYellowStone').submit(function (event) {
-            event.preventDefault();
-            var columnNumber = $('#colNumberYellow').val();
+async function animationYellow(col, endRow, btnId) {
+    event.preventDefault();
+    disableButton(btnId);
+    for (let row = 1; row <= endRow; row++) {
+        var selectedCell = document.getElementById(`${col.value}${row}`);
+        if (selectedCell != null) {
+            selectedCell.classList.add('blinkYellow');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            selectedCell.classList.remove('blinkYellow');
+            if (row == endRow) {
+                selectedCell.style.backgroundColor = "yellow";
+            }
+        }
+    }
+    activateButton(btnId);
+}
 
-            // TO DO: Implement function to Hub
-            hub.server.placeStone(columnNumber);
-        });
-    });
+//function placeRedStone(numericId, btnId) {
+//    event.preventDefault();
+//    disableButton(btnId);
+//    var colNumber = document.getElementById(numericId).value;
+//    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
+//    if (selectedColumn) {
+//        selectedColumn.classList.add('blinkRed');
+//        setTimeout(function () {
+//            selectedColumn.classList.remove('blinkRed');
+//            activateButton(btnId);
+//        }, 5000); // Blink duration in milliseconds      
+//    }
+//    return false; // Prevent form submission
+//}
 
-    // Define a client-side method to handle the response from the server
-    hub.client.stonePlaced = function (columnNumber) {
-        // Update the UI here with the received columnNumber
-        console.log('Stone placed in column:', columnNumber);
-    };
-});
+
+async function animationRed(col, endRow, btnId) {
+    event.preventDefault();
+    disableButton(btnId);
+    for (let row = 1; row <= endRow; row++) {
+        var selectedCell = document.getElementById(`${col.value}${row}`);
+        if (selectedCell != null) {
+            selectedCell.classList.add('blinkRed');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            selectedCell.classList.remove('blinkRed');
+            if (row == endRow) {
+                selectedCell.style.backgroundColor = "red";
+            }
+        }
+    }
+    activateButton(btnId);
+}
