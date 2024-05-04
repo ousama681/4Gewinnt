@@ -30,7 +30,7 @@ connection.on("ReceiveAvailableUsers", function (players) {
         const params = new URLSearchParams();
         params.append("playerOne", playerOne);
         params.append("playerTwo", playerTwo);
-    
+
         const gameUrl = `${baseUrl}?${params.toString()}`;
 
         //anchor.href = `${baseUrl}?${params.toString()}`;

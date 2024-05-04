@@ -1,6 +1,3 @@
-using VierGewinnt.Models;
-using VierGewinnt.Repositories.Interfaces;
-using VierGewinnt.Repositories;
 using VierGewinnt.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +6,11 @@ using Microsoft.Extensions.FileProviders;
 using VierGewinnt.ViewModels.GameLobby;
 using System.Net;
 using VierGewinnt.Hubs;
+using VierGewinnt.Data.Repositories;
+using VierGewinnt.Data.Interfaces;
+using VierGewinnt.Data;
+using VierGewinnt.Models;
+using VierGewinnt.Data.Models;
 
 namespace VierGewinnt
 {
@@ -23,7 +25,8 @@ namespace VierGewinnt
             builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
 
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            // vlt ooptions => options.SignIn.RequireConfirmedAccount = true
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -96,6 +99,8 @@ namespace VierGewinnt
             //});
 
             app.UseStaticFiles();
+            app.UseAuthentication();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             app.UseRouting();
             app.UseAuthorization();
 

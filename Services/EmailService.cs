@@ -1,8 +1,8 @@
-﻿using VierGewinnt.Models;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using System.Net.Mail;
 using System.Net;
 using System.Text;
+using VierGewinnt.Models;
 
 namespace VierGewinnt.Services
 {

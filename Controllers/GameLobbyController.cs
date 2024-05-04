@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Models;
-using VierGewinnt.Repositories.Interfaces;
 using VierGewinnt.ViewModels;
 using VierGewinnt.ViewModels.GameLobby;
 
@@ -12,7 +12,7 @@ namespace VierGewinnt.Controllers
         private readonly IAccountRepository _accountRepository;
 
 
-        // Mal überlegen wie oft wir die _users aktualisieren. Eigentlich sobald jemand eingeloggt ist und den Gamelobby button anklickt, hier den User adden. Wenn jemand die Seite verlässt, wieder den User entfernen.
+        // Mal überlegen wie oft wir die _users aktualisieren. Eigentlich sobald jemand eingeloggt ist und den Gamelobby button anklickt, hier den ApplicationUser adden. Wenn jemand die Seite verlässt, wieder den ApplicationUser entfernen.
         // Achtung. Die Liste wird für die jeweiligen Viewer nur dann geupdatet wenn sie ihre Seite refreshen. 
         private readonly List<string> _users;
 
@@ -60,7 +60,7 @@ namespace VierGewinnt.Controllers
         [HttpPost]
         public async Task<IActionResult> Challenge(string userName, string playerTwoUsername)
         {
-            // Wenn ein User nun jemanden herausfordet, diesen User aus der Liste nehmen. Falls die HErausforderung nicht angenommen wird, dann den User wieder einfügen.
+            // Wenn ein ApplicationUser nun jemanden herausfordet, diesen ApplicationUser aus der Liste nehmen. Falls die HErausforderung nicht angenommen wird, dann den ApplicationUser wieder einfügen.
             _users.Remove(userName);
             return View();
         }
@@ -69,7 +69,7 @@ namespace VierGewinnt.Controllers
         public async Task<IActionResult> AcceptChallenge(string userName)
         {
             _users.Remove(userName);
-            // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+            // Wenn ein ApplicationUser die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
             return View();
         }
 
@@ -118,7 +118,7 @@ namespace VierGewinnt.Controllers
         //{
         //    //GameViewModel vm = new GameViewModel(playerOne, playerTwo);
 
-        //    // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+        //    // Wenn ein ApplicationUser die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
         //    //return View("Board", vm);
         //    return View();
         //}
@@ -129,7 +129,7 @@ namespace VierGewinnt.Controllers
         //{
         //    GameViewModel vm = new GameViewModel() {PlayerTwo = playerTwo };
 
-        //    // Wenn ein User die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
+        //    // Wenn ein ApplicationUser die Challenge akzeptiert, dann auch ihn aus der UserListe entfernen.
         //    return View("Board", vm);
         //}
     }

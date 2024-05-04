@@ -1,5 +1,4 @@
-﻿//using AspNetCore;
-using static VierGewinnt.Models.GameBoard;
+﻿using static VierGewinnt.Data.Models.GameBoard;
 
 namespace VierGewinnt.Services
 {

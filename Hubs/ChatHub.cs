@@ -14,8 +14,8 @@ namespace VierGewinnt.Hubs
         public async Task SendNotification(string player)
         {
 
-            // Entweder wir laden hier die User die i´n der chatLobby drin sind.
-            // Aber dann müssen wir eigentlich für jeden User der sich mit dem Hub connected in einer Tabelle in der DB speichern.
+            // Entweder wir laden hier die ApplicationUser die i´n der chatLobby drin sind.
+            // Aber dann müssen wir eigentlich für jeden ApplicationUser der sich mit dem Hub connected in einer Tabelle in der DB speichern.
             await Clients.Others.SendAsync("ReceiveNewUser", player);
 
             ////await Clients.All.SendAsync("ReceiveMessage", player, message);
@@ -76,7 +76,7 @@ namespace VierGewinnt.Hubs
             conIds.Add(conIdP2);
 
             await Clients.All.SendAsync("NavigateToGame", playerOne, playerTwo);
-            //await Clients.User(conIdP2).SendAsync("NavigateToGame", playerOne, playerTwo);
+            //await Clients.ApplicationUser(conIdP2).SendAsync("NavigateToGame", playerOne, playerTwo);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using VierGewinnt.Models;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
+using VierGewinnt.Data.Models;
 
 namespace VierGewinnt.ViewModels
 {
@@ -24,7 +25,7 @@ namespace VierGewinnt.ViewModels
 
 
 
-        public UserManagamentViewModel(IdentityUser acc)
+        public UserManagamentViewModel(ApplicationUser acc)
         {
             Id = acc.Id;
             //PlayerName = acc.PlayerName;

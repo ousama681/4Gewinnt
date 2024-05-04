@@ -1,4 +1,6 @@
-﻿namespace VierGewinnt.ViewModels
+﻿using VierGewinnt.Data.Models;
+
+namespace VierGewinnt.ViewModels
 {
     public class GameViewModel
     {
@@ -14,5 +16,8 @@
 
         public string PlayerOne {  get; set; }
         public string PlayerTwo { get; set; }
+        public int ColumnNr { get; set; }
+        public int PlayerNr {  get; set; }
+        public GameBoard Board {  get; set; }
     }
 }
