@@ -1,5 +1,6 @@
-﻿@model GameLobbyViewModel
-@inject SignInManager<IdentityUser> signInManager
+﻿@using VierGewinnt.Data.Models
+@model GameLobbyViewModel
+@inject SignInManager<ApplicationUser> signInManager
 
 @{
     ViewData["Title"] = "Home";
@@ -7,32 +8,9 @@
 }
 
 
-@* <style>
-* {
-  font-family: arial;
-  scroll-behavior: smooth;
-}
-section {
-  max-width: 300px;
-}
-ul {
-    padding: 0;
-}
-li {
-  background-color: #333;
-  color: white;
-  list-style-position: inside;
-  margin-bottom: 2px;
-  padding: 4px 0 4px 10px;
-}
-li:hover {
-  background-color: #999;
-}
-a {
-  text-decoration: none;
-  color: white;
-}
-</style> *@
+
+
+
 
 <div class="container">
     <div class="row p-1">
@@ -41,5 +19,7 @@ a {
         </div>
     </div>
 </div>
+
+
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
