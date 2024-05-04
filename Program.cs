@@ -105,7 +105,7 @@ namespace VierGewinnt
                 pattern: "{controller=Home}/{action=Index}");
 
             app.MapHub<ChatHub>("/chatHub");
-
+            app.MapHub<ChatHub>("/GameHub");
             app.Run();
 
 
