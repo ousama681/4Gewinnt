@@ -18,6 +18,11 @@ namespace VierGewinnt.Controllers
             return View();
         }
 
+        public async Task<IActionResult> GameLobby(string username)
+        {
+            return View();
+        }
+
         public IActionResult Leaderboard()
         {
             return View();
