@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Identity;
+using VierGewinnt.Data.Models;
 
 namespace VierGewinnt.ViewModels.GameLobby
 {
     public class GameLobbyViewModel
     {
         public IEnumerable<string> Playernames {  get; set; }
-        public IdentityUser PlayerOne { get; set; }
+        public ApplicationUser PlayerOne { get; set; }
 
 
 

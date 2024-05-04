@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using VierGewinnt.Models;
+using VierGewinnt.Data;
 
 #nullable disable
 
@@ -72,129 +72,6 @@ namespace VierGewinnt.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "dc738904-5800-48fe-84da-0c182e1d1765",
-                            Email = "abc@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "passwort123",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "6b87ea83-9695-4d69-9bee-276870e3ad30",
-                            TwoFactorEnabled = false,
-                            UserName = "TheLegend27"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "06715f6a-f5e8-4c0f-b10b-08e29f0d1384",
-                            Email = "bobo@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "wertwert",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "a99deb1b-26db-4b25-9164-dec641d13cbb",
-                            TwoFactorEnabled = false,
-                            UserName = "DjBobo1337"
-                        },
-                        new
-                        {
-                            Id = "3",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "fa2574f3-10db-4c7f-9430-85aaffdc36ee",
-                            Email = "Frodo@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "qwert789",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "a5f6f1b1-26cc-42ec-a308-32303be76669",
-                            TwoFactorEnabled = false,
-                            UserName = "FBeutlin69"
-                        },
-                        new
-                        {
-                            Id = "4",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "1c5507ad-5ad2-4625-8ca2-877f83e6bd2b",
-                            Email = "Frodo@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "afasfwafafa",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "c3324e99-865b-46d5-bc87-4735d3b11783",
-                            TwoFactorEnabled = false,
-                            UserName = "Son_Goku"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -278,6 +155,181 @@ namespace VierGewinnt.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("VierGewinnt.Data.Model.Move", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("GameBoardID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MoveNr")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PlayerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("GameBoardID");
+
+                    b.HasIndex("PlayerID");
+
+                    b.ToTable("Moves");
+                });
+
+            modelBuilder.Entity("VierGewinnt.Data.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "e7e200b2-5912-44fd-80d5-b6531de40cf8",
+                            Email = "abc@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "passwort123",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "92e85bc0-3d14-466e-8784-b118fc961ed8",
+                            TwoFactorEnabled = false,
+                            UserName = "TheLegend27"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "13c9ece2-f865-4f87-b6fd-557b56d72566",
+                            Email = "bobo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "wertwert",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "8328b01d-b873-49af-8546-c6c5d57762d1",
+                            TwoFactorEnabled = false,
+                            UserName = "DjBobo1337"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "fecb0946-58f5-48ec-a7e9-feff3da50292",
+                            Email = "Frodo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "qwert789",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "03da80b1-3b8a-4cc4-b69c-e0efac9108b4",
+                            TwoFactorEnabled = false,
+                            UserName = "FBeutlin69"
+                        },
+                        new
+                        {
+                            Id = "4",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b38ed157-d5b5-45da-8ba5-a2b865b7642c",
+                            Email = "Frodo@abc.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "afasfwafafa",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "10d9188a-ad4f-47f6-a684-2412a659bc68",
+                            TwoFactorEnabled = false,
+                            UserName = "Son_Goku"
+                        });
+                });
+
+            modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("PlayerOneID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PlayerTwoID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PlayerOneID");
+
+                    b.HasIndex("PlayerTwoID");
+
+                    b.ToTable("GameBoards");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -289,7 +341,7 @@ namespace VierGewinnt.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -298,7 +350,7 @@ namespace VierGewinnt.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -313,7 +365,7 @@ namespace VierGewinnt.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -322,11 +374,54 @@ namespace VierGewinnt.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("VierGewinnt.Data.Model.Move", b =>
+                {
+                    b.HasOne("VierGewinnt.Data.Models.GameBoard", "GameBoard")
+                        .WithMany("Moves")
+                        .HasForeignKey("GameBoardID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GameBoard");
+
+                    b.Navigation("Player");
+                });
+
+            modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>
+                {
+                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", "PlayerOne")
+                        .WithMany()
+                        .HasForeignKey("PlayerOneID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", "PlayerTwo")
+                        .WithMany()
+                        .HasForeignKey("PlayerTwoID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("PlayerOne");
+
+                    b.Navigation("PlayerTwo");
+                });
+
+            modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>
+                {
+                    b.Navigation("Moves");
                 });
 #pragma warning restore 612, 618
         }

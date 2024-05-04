@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Models;
-using VierGewinnt.Repositories.Interfaces;
 
 namespace VierGewinnt.Controllers
 {
@@ -44,7 +44,7 @@ namespace VierGewinnt.Controllers
                 }
                 else if (result.IsLockedOut)
                 {
-                    ModelState.AddModelError("", "User blocked. Try after some time.");
+                    ModelState.AddModelError("", "ApplicationUser blocked. Try after some time.");
                 }
                 else
                 {
