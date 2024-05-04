@@ -7,13 +7,6 @@ namespace VierGewinnt.Controllers
 {
     public class AccountController : Controller
     {
-
-        [AllowAnonymous]
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         private readonly IAccountRepository _accountRepository;
 
         public AccountController(IAccountRepository accountRepository)
@@ -50,11 +43,7 @@ namespace VierGewinnt.Controllers
                 {
                     ModelState.AddModelError("", "Invalid credentials");
                 }
-
             }
-
-
-
             return View(new SignInUpModel() { SignInModel = signInModel });
         }
 
@@ -84,10 +73,6 @@ namespace VierGewinnt.Controllers
             return RedirectToAction("SignIn", new SignInUpModel() { SignUpModel = userModel });
         }
 
-        public IActionResult Login()
-        {
-            return View();
-        }
 
         public async Task<IActionResult> Logout()
         {
@@ -141,15 +126,15 @@ namespace VierGewinnt.Controllers
         }
 
 
-        [AllowAnonymous, HttpGet("reset-password")]
-        public IActionResult ResetPassword(string uid, string token)
-        {
-            ResetPasswordModel resetPasswordModel = new ResetPasswordModel
-            {
-                Token = token,
-                UserId = uid
-            };
-            return View(resetPasswordModel);
-        }
+        //[AllowAnonymous, HttpGet("reset-password")]
+        //public IActionResult ResetPassword(string uid, string token)
+        //{
+        //    ResetPasswordModel resetPasswordModel = new ResetPasswordModel
+        //    {
+        //        Token = token,
+        //        UserId = uid
+        //    };
+        //    return View(resetPasswordModel);
+        //}
     }
 }

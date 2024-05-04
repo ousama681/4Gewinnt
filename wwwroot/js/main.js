@@ -59,7 +59,7 @@ spotLight3.castShadow = true;
 spotLight3.shadow.bias = -0.0001;
 scene.add(spotLight3);
 
-const loader = new GLTFLoader().setPath('/Assets/millennium_falcon/');
+const loader = new GLTFLoader().setPath('/Assets/roboking/');
 loader.load('RoboKing_3.glb', (gltf) => {
     const mesh = gltf.scene;
 

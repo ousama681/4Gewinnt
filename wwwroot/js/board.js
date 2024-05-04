@@ -9,21 +9,6 @@ function activateButton(btnId) {
     button.disabled = false;
 }
 
-//function placeYellowStone(numericId, btnId) {
-//    event.preventDefault();
-//    disableButton(btnId);
-//    var colNumber = document.getElementById(numericId).value;
-//    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
-//    if (selectedColumn) {
-//        selectedColumn.classList.add('blinkYellow');
-//        setTimeout(function () {
-//            selectedColumn.classList.remove('blinkYellow');
-//            activateButton(btnId);
-//        }, 5000); // Blink duration in milliseconds        
-//    }
-//    return false; // Prevent form submission
-//}
-
 async function animationYellow(col, endRow, btnId) {
     event.preventDefault();
     disableButton(btnId);
@@ -41,22 +26,6 @@ async function animationYellow(col, endRow, btnId) {
     activateButton(btnId);
 }
 
-//function placeRedStone(numericId, btnId) {
-//    event.preventDefault();
-//    disableButton(btnId);
-//    var colNumber = document.getElementById(numericId).value;
-//    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
-//    if (selectedColumn) {
-//        selectedColumn.classList.add('blinkRed');
-//        setTimeout(function () {
-//            selectedColumn.classList.remove('blinkRed');
-//            activateButton(btnId);
-//        }, 5000); // Blink duration in milliseconds      
-//    }
-//    return false; // Prevent form submission
-//}
-
-
 async function animationRed(col, endRow, btnId) {
     event.preventDefault();
     disableButton(btnId);
@@ -73,3 +42,34 @@ async function animationRed(col, endRow, btnId) {
     }
     activateButton(btnId);
 }
+
+
+//function placeRedStone(numericId, btnId) {
+//    event.preventDefault();
+//    disableButton(btnId);
+//    var colNumber = document.getElementById(numericId).value;
+//    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
+//    if (selectedColumn) {
+//        selectedColumn.classList.add('blinkRed');
+//        setTimeout(function () {
+//            selectedColumn.classList.remove('blinkRed');
+//            activateButton(btnId);
+//        }, 5000); // Blink duration in milliseconds
+//    }
+//    return false; // Prevent form submission
+//}
+
+//function placeYellowStone(numericId, btnId) {
+//    event.preventDefault();
+//    disableButton(btnId);
+//    var colNumber = document.getElementById(numericId).value;
+//    var selectedColumn = document.querySelector('.cell[data-colnr="' + colNumber + '"]');
+//    if (selectedColumn) {
+//        selectedColumn.classList.add('blinkYellow');
+//        setTimeout(function () {
+//            selectedColumn.classList.remove('blinkYellow');
+//            activateButton(btnId);
+//        }, 5000); // Blink duration in milliseconds
+//    }
+//    return false; // Prevent form submission
+//}

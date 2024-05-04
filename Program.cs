@@ -1,9 +1,6 @@
 using VierGewinnt.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
-using VierGewinnt.ViewModels.GameLobby;
 using System.Net;
 using VierGewinnt.Hubs;
 using VierGewinnt.Data.Repositories;
@@ -22,10 +19,8 @@ namespace VierGewinnt
 
             // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
             // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
+            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
 
-
-            // vlt ooptions => options.SignIn.RequireConfirmedAccount = true
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
@@ -62,10 +57,8 @@ namespace VierGewinnt
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-
             builder.Services.AddControllersWithViews();
             builder.Services.AddSignalR();
-
 
             var app = builder.Build();
 
@@ -78,8 +71,6 @@ namespace VierGewinnt
             }
 
             app.UseHttpsRedirection();
-
-
             // Vorerst auskommentiert da das Laden damit viel länger dauert und das testen so auch länger.
             //------------
             //// For 3D Homepage,  Set up custom content types - associating file extension to MIME type
@@ -93,8 +84,8 @@ namespace VierGewinnt
             //app.UseStaticFiles(new StaticFileOptions
             //{
             //    FileProvider = new PhysicalFileProvider(
-            //       Path.Combine(Directory.GetCurrentDirectory(), "Assets/millennium_falcon")),
-            //    RequestPath = "/Assets/millennium_falcon",
+            //       Path.Combine(Directory.GetCurrentDirectory(), "Assets/roboking")),
+            //    RequestPath = "/Assets/roboking",
             //    ContentTypeProvider = provider
             //});
 
@@ -110,14 +101,8 @@ namespace VierGewinnt
                 pattern: "{controller=Home}/{action=Index}");
 
             app.MapHub<ChatHub>("/chatHub");
-            app.MapHub<ChatHub>("/GameHub");
+            app.MapHub<GameHub>("/gameHub");
             app.Run();
-
-
-             // Eventuell brauchen wir diese zwie noch.
-             // ---
-            //app.UseAuthentication();
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
         }
     }
 }

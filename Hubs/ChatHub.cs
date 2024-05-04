@@ -7,18 +7,9 @@ namespace VierGewinnt.Hubs
         static readonly IList<string> players = new List<string>();
         static readonly IDictionary<string, string> onlineUsers = new Dictionary<string, string>();
 
-        //public async Task SendNotification(string player, string message)
-
-        // Unser Problem ist, dass wenn jemand schon drinn ist, er dann nicht sieht
-
         public async Task SendNotification(string player)
         {
-
-            // Entweder wir laden hier die ApplicationUser die i´n der chatLobby drin sind.
-            // Aber dann müssen wir eigentlich für jeden ApplicationUser der sich mit dem Hub connected in einer Tabelle in der DB speichern.
             await Clients.Others.SendAsync("ReceiveNewUser", player);
-
-            ////await Clients.All.SendAsync("ReceiveMessage", player, message);
         }
 
         public async Task AddUser(string player)
@@ -64,19 +55,9 @@ namespace VierGewinnt.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task NotificateGameStart(string playerOne, string playerTwo, string gameUrl)
-        {
-            string conIdP1;
-            onlineUsers.TryGetValue(playerOne, out conIdP1);
-            string conIdP2;
-            onlineUsers.TryGetValue(playerTwo, out conIdP2);
-
-            IList<string> conIds = new List<string>();
-            conIds.Add(conIdP1);
-            conIds.Add(conIdP2);
-
+        public async Task NotificateGameStart(string playerOne, string playerTwo)
+        {    
             await Clients.All.SendAsync("NavigateToGame", playerOne, playerTwo);
-            //await Clients.ApplicationUser(conIdP2).SendAsync("NavigateToGame", playerOne, playerTwo);
         }
     }
 }

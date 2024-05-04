@@ -4,13 +4,6 @@ namespace VierGewinnt.Models
 {
     public class SignUpUserModel
     {
-        [Required(ErrorMessage = "Please enter your first name")]
-        [Display(Name = "First name")]
-        public string FirstName { get; set; }
-
-        [Display(Name = "Last name")]
-        public string LastName { get; set; }
-
         [Required(ErrorMessage = "Please enter your email")]
         [Display(Name = "Email address")]
         [EmailAddress(ErrorMessage = "Please enter a valid email")]

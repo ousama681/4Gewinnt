@@ -42,16 +42,6 @@
                         <form asp-action="SignUp">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group">
-                                <label asp-for="SignUpModel.FirstName" class="control-label text-light"></label>
-                                <input asp-for="SignUpModel.FirstName" class="form-control" type="text" id="firstName" name="FirstName"/>
-                                <span asp-validation-for="SignUpModel.FirstName" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="SignUpModel.LastName" class="control-label text-light"></label>
-                                <input asp-for="SignUpModel.LastName" class="form-control" type="text" id="lastName" name="LastName" />
-                                <span asp-validation-for="SignUpModel.LastName" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
                                 <label asp-for="SignUpModel.Email" class="control-label text-light"></label>
                                 <input asp-for="SignUpModel.Email" class="form-control" type="text" id="emailSignUp" name="Email" />
                                 <span asp-validation-for="SignUpModel.Email" class="text-danger"></span>

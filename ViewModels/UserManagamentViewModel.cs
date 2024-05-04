@@ -7,7 +7,6 @@ namespace VierGewinnt.ViewModels
 {
     public class UserManagamentViewModel
     {
-
         public string Id { get; set; }
 
         [Display(Name = "Playername")]
@@ -28,9 +27,7 @@ namespace VierGewinnt.ViewModels
         public UserManagamentViewModel(ApplicationUser acc)
         {
             Id = acc.Id;
-            //PlayerName = acc.PlayerName;
             Email = acc.Email;
-            //Password = acc.Password;
         }
     }
 }

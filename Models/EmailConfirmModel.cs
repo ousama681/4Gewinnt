@@ -7,7 +7,6 @@
         public bool EmailSent { get; set; }
         public bool EmailVerified { get; set; }
         public string Token { get; set; }
-
         public string Uid { get; set; }
 
     }

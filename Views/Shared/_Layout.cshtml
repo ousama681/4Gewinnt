@@ -12,7 +12,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm  border-bottom ">
+        <nav class="navbar navbar-expand-sm border-bottom ">
             <div class="container-fluid">
                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -20,20 +20,16 @@
                     {
                         <ul class="navbar-nav align-items-center">
                             <li class="nav-item">
-                                <a class="navbar-brand text-light" asp-area="" asp-controller="GameLobby" asp-action="Board">Board</a>
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="GameLobby" asp-action="GameLobby" asp-route-username="@User.Identity.Name">Lobby</a>
                             </li>
-                            <li class="navbar-item">
+                            <li class="nav-item">
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="Game" asp-action="Board">Board</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Leaderboard">Bestenliste</a>
                             </li>
                             <li class="nav-item">
                                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="MatchHistory">Spielrückblick</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="" asp-controller="GameLobby" asp-action="GameLobby" asp-route-username="@User.Identity.Name">GameLobby</a>
-                                @* <a class="nav-link text-dark" asp-area="" asp-controller="GameLobby" asp-action="GameLobby">GameLobby</a> *@
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="" asp-controller="GameLobby" asp-action="SignalRTest">SignalRTest</a>
                             </li>
                         </ul>
                         <ul class="navbar-nav justify-content-end align-items-center">
@@ -41,7 +37,7 @@
                                 <label id="userNameLabel" class="navbar-brand text-light" asp-area="">@User.Identity.Name</label>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change Password</a>
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change Password</a>
                             </li>
                             <li class="nav-item">
                                 <form method="post" asp-controller="account" asp-action="logout">

@@ -4,19 +4,18 @@ namespace VierGewinnt.Services
 {
     public class GameManager
     {
-
         public void ManageGame()
         {
-            var board = new Board(8, 7);
+            var board = new Board(7, 6);
             var random = new Random();
 
             while (true)
             {
-                Console.WriteLine("Pick a column 1 -8");
+                Console.WriteLine("Pick a column 1 - 7");
                 int move;
-                if (!int.TryParse(Console.ReadLine(), out move) || move < 1 || move > 8)
+                if (!int.TryParse(Console.ReadLine(), out move) || move < 1 || move > 7)
                 {
-                    Console.WriteLine("Must enter a number 1-8.");
+                    Console.WriteLine("Must enter a number 1 - 7");
                     continue;
                 }
 
@@ -45,7 +44,7 @@ namespace VierGewinnt.Services
                 {
                     if (!board.DropCoin(2, i))
                         continue;
-                    moves.Add(Tuple.Create(i, ConnectFourAIService.MinMax(6, board, false)));
+                    moves.Add(Tuple.Create(i, ConnectFourAIService.MinMax(5, board, false)));
                     board.RemoveTopCoin(i);
                 }
 

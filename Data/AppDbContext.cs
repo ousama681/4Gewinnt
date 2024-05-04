@@ -8,19 +8,6 @@ namespace VierGewinnt.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
-
-
-        //public AppDbContext()
-        //{
-
-        //}
-
-
-        //public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        //{
-
-        //}
-
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
@@ -29,7 +16,6 @@ namespace VierGewinnt.Data
         public DbSet<ApplicationUser> Accounts { get; set; }
         public DbSet<GameBoard> GameBoards { get; set; }
         public DbSet<Move> Moves { get; set; }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,28 +38,10 @@ namespace VierGewinnt.Data
                 .HasForeignKey(g => g.PlayerTwoID)
             .OnDelete(DeleteBehavior.NoAction);
 
-            //modelBuilder.Entity<GameBoard>()
-            //    .HasMany(g => g.Players)
-            //    .WithMany();
-
-
             modelBuilder.Entity<Move>()
                 .HasOne(m => m.Player)
                 .WithMany()
                 .HasForeignKey(m => m.PlayerID);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             modelBuilder.Entity<ApplicationUser>().HasData(
                 new ApplicationUser

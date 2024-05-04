@@ -12,7 +12,6 @@ namespace VierGewinnt.Data.Models
         public ICollection<Move> Moves { get; set; }
         public ApplicationUser PlayerOne { get; set; }
         public ApplicationUser PlayerTwo { get; set; }
-        //public ICollection<ApplicationUser> Players { get; set; }
 
 
         // Wie erhalte ich den State für das Brett? Wahrscheinlich eine Hilfstabelle die jedne Spielzug repräsentiert
