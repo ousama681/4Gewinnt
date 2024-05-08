@@ -106,17 +106,16 @@ window.addEventListener("beforeunload", () => {
     connection.invoke("LeaveLobby", username);
 });
 
-connection.on("NavigateToGame", (playerOne, playerTwo, gameUrl) => {
+connection.on("NavigateToGame", (playerOne, playerTwo) => {
     //Möglichkeit um beide Spieler ins selbe Spiel zu lotsen
    /**
     * Erste Möglichkeit. Wir suchen in der DB nach einem Spiel in dem beide Spieler drinn sind und schauen den Flas isGame done an? Da beide Spieler nicht in zwei Spielen gleichzeitig sein können die laufen.e
     */
-   var passtUrl = gameUrl;
     const baseUrl = "https://localhost:7102/Game/Board";
     const params = new URLSearchParams();
     params.append("playerOne", playerOne);
     params.append("playerTwo", playerTwo);
 
+
     window.location.href = `${baseUrl}?${params.toString()}`;
-    
 });

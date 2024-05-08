@@ -9,39 +9,105 @@ function activateButton(btnId) {
     button.disabled = false;
 }
 
-async function animationYellow(col, endRow, btnId) {
-    event.preventDefault();
-    disableButton(btnId);
-    for (let row = 1; row <= endRow; row++) {
-        var selectedCell = document.getElementById(`${col.value}${row}`);
-        if (selectedCell != null) {
+
+async function BlinkTopRow(column, btnId) {
+    var selectedCell = document.getElementById(`${column.value}1`);
+    if (selectedCell != null) {
+        if (btnId == "btnYellow") {
             selectedCell.classList.add('blinkYellow');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            selectedCell.classList.remove('blinkYellow');
-            if (row == endRow) {
-                selectedCell.style.backgroundColor = "yellow";
-            }
+            return "yellow"
+        }
+        else {
+            selectedCell.classList.add('blinkRed');
+            return "red"
         }
     }
-    activateButton(btnId);
+    return null;
 }
 
-async function animationRed(col, endRow, btnId) {
-    event.preventDefault();
-    disableButton(btnId);
-    for (let row = 1; row <= endRow; row++) {
-        var selectedCell = document.getElementById(`${col.value}${row}`);
-        if (selectedCell != null) {
-            selectedCell.classList.add('blinkRed');
-            await new Promise(resolve => setTimeout(resolve, 1000));
+async function StopBlinkTopRow(column, color) {
+    var selectedCell = document.getElementById(`${column.value}1`);
+    if (selectedCell != null) {
+        if (color == "yellow") {
+            selectedCell.classList.remove('blinkYellow');
+        }
+        else {
             selectedCell.classList.remove('blinkRed');
-            if (row == endRow) {
-                selectedCell.style.backgroundColor = "red";
+        }
+    }
+}
+
+async function animate(column, endRow, color) {
+    if (color == "yellow") {
+        for (let row = 1; row <= endRow; row++) {
+            var selectedCell = document.getElementById(`${column.value}${row}`);
+            if (selectedCell != null) {
+                selectedCell.classList.add('blinkYellow');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                selectedCell.classList.remove('blinkYellow');
+                if (row == endRow) {
+                    selectedCell.style.backgroundColor = "yellow";
+                }
             }
         }
     }
-    activateButton(btnId);
+    else if (color == "red") {
+        for (let row = 1; row <= endRow; row++) {
+            var selectedCell = document.getElementById(`${column.value}${row}`);
+            if (selectedCell != null) {
+                selectedCell.classList.add('blinkRed');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                selectedCell.classList.remove('blinkRed');
+                if (row == endRow) {
+                    selectedCell.style.backgroundColor = "red";
+                }
+            }
+        }
+    }
 }
+
+//async function animate(col, endRow, color) {
+//    for (let row = 1; row <= endRow; row++) {
+//        var selectedCell = document.getElementById(`${col.value}${row}`);
+//        if (selectedCell != null) {
+//            if (color == "yellow") {
+//                selectedCell.classList.add('blinkYellow');
+//                await new Promise(resolve => setTimeout(resolve, 1000));
+//                selectedCell.classList.remove('blinkYellow');
+//                if (row == endRow) {
+//                    selectedCell.style.backgroundColor = "yellow";
+//                    var button = "btnYellow";
+//                }
+//            }
+//            else {
+//                selectedCell.classList.add('blinkRed');
+//                await new Promise(resolve => setTimeout(resolve, 1000));
+//                selectedCell.classList.remove('blinkRed');
+//                if (row == endRow) {
+//                    selectedCell.style.backgroundColor = "red";
+//                    var button = "btnRed";
+//                }
+//            }
+
+//        }
+//    }
+//    activateButton(button);
+//}
+
+//async function animationRed(col, endRow, btnId) {
+//    event.preventDefault();
+//    disableButton(btnId);
+//    for (let row = 1; row <= endRow; row++) {
+//        var selectedCell = document.getElementById(`${col.value}${row}`);
+//        if (selectedCell != null) {
+//           c
+//            if (row == endRow) {
+//                selectedCell.style.backgroundColor = "red";
+//            }
+//        }
+//    }
+//    activateButton(btnId);
+//}
 
 
 //function placeRedStone(numericId, btnId) {
