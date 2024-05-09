@@ -2,7 +2,7 @@
 
 namespace VierGewinnt.Data.Interfaces
 {
-    public class IGameRepository : IRepository<GameBoard>
+    public interface IGameRepository : IRepository<GameBoard>
     {
         public Task<bool> AddAsync(GameBoard item)
         {

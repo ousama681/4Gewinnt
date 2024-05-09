@@ -43,7 +43,6 @@ async function animationRed(col, endRow, btnId) {
     activateButton(btnId);
 }
 
-
 //function placeRedStone(numericId, btnId) {
 //    event.preventDefault();
 //    disableButton(btnId);

@@ -59,5 +59,10 @@ namespace VierGewinnt.Hubs
         {    
             await Clients.All.SendAsync("NavigateToGame", playerOne, playerTwo);
         }
+
+        public override Task OnConnectedAsync()
+        {
+            return base.OnConnectedAsync();
+        }
     }
 }

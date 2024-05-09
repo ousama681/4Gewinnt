@@ -8,6 +8,9 @@ using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Data;
 using VierGewinnt.Models;
 using VierGewinnt.Data.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore;
 
 namespace VierGewinnt
 {
@@ -19,11 +22,71 @@ namespace VierGewinnt
 
             // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
             // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
+            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
 
+            ConfigureIdentityOptions(builder);
+
+            builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
+
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
+            // Adds Controllers
+            builder.Services.AddControllersWithViews();
+           
+            //Adds SignalR
+            builder.Services.AddSignalR();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+
+            app.UseRouting();
+            app.UseAuthorization();
+
+
+            // Default ControllerMapping
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}");
+            // Default ControllerMapping End 
+
+
+            // SignalR Hub Mapping
+            app.MapHub<ChatHub>("/chatHub");
+            app.MapHub<GameHub>("/gameHub");
+            //SignalR Hub Mapping End
+
+            app.Run();
+        }
+
+        public static void ConfigureIdentityOptions(WebApplicationBuilder builder)
+        {
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
+
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromMinutes(5);
+            });
+
+            builder.Services.ConfigureApplicationCookie(config =>
+            {
+                IConfiguration _conf = builder.Configuration;
+                config.LoginPath = _conf["Application:LoginPath"];
+            });
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -40,69 +103,29 @@ namespace VierGewinnt
                 options.Lockout.MaxFailedAccessAttempts = 10;
             });
 
-            builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
-            {
-                options.TokenLifespan = TimeSpan.FromMinutes(5);
-            });
-
-            builder.Services.ConfigureApplicationCookie(config =>
-            {
-                IConfiguration _conf = builder.Configuration;
-                config.LoginPath = _conf["Application:LoginPath"];
-            });
-
-            builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
-
-            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IEmailService, EmailService>();
-
-            builder.Services.AddControllersWithViews();
-            builder.Services.AddSignalR();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-            // Vorerst auskommentiert da das Laden damit viel länger dauert und das testen so auch länger.
-            //------------
-            //// For 3D Homepage,  Set up custom content types - associating file extension to MIME type
-            //FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
-
-            //// The MIME type for .GLB and .GLTF files are registered with IANA under the 'model' heading
-            //// https://www.iana.org/assignments/media-types/media-types.xhtml#model
-            //provider.Mappings[".glb"] = "model/gltf+binary";
-            //provider.Mappings[".gltf"] = "model/gltf+json";
-
-            //app.UseStaticFiles(new StaticFileOptions
-            //{
-            //    FileProvider = new PhysicalFileProvider(
-            //       Path.Combine(Directory.GetCurrentDirectory(), "Assets/roboking")),
-            //    RequestPath = "/Assets/roboking",
-            //    ContentTypeProvider = provider
-            //});
-
-            app.UseStaticFiles();
-            app.UseAuthentication();
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            app.UseRouting();
-            app.UseAuthorization();
-
-
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}");
-
-            app.MapHub<ChatHub>("/chatHub");
-            app.MapHub<GameHub>("/gameHub");
-            app.Run();
+            return;
         }
     }
 }
+
+
+// For later Use
+
+
+// Vorerst auskommentiert da das Laden damit viel länger dauert und das testen so auch länger.
+//------------
+//// For 3D Homepage,  Set up custom content types - associating file extension to MIME type
+//FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+
+//// The MIME type for .GLB and .GLTF files are registered with IANA under the 'model' heading
+//// https://www.iana.org/assignments/media-types/media-types.xhtml#model
+//provider.Mappings[".glb"] = "model/gltf+binary";
+//provider.Mappings[".gltf"] = "model/gltf+json";
+
+//app.UseStaticFiles(new StaticFileOptions
+//{
+//    FileProvider = new PhysicalFileProvider(
+//       Path.Combine(Directory.GetCurrentDirectory(), "Assets/roboking")),
+//    RequestPath = "/Assets/roboking",
+//    ContentTypeProvider = provider
+//});
