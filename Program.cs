@@ -27,7 +27,7 @@ namespace VierGewinnt
             ConfigureIdentityOptions(builder);
 
             builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
-
+            builder.Services.AddScoped<IGameRepository, GameRepository>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
@@ -110,12 +110,6 @@ namespace VierGewinnt
 
 
 // For later Use
-            builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
-            builder.Services.AddScoped<IGameRepository, GameRepository>();
-            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IEmailService, EmailService>();
-
 
 // Vorerst auskommentiert da das Laden damit viel länger dauert und das testen so auch länger.
 //------------
