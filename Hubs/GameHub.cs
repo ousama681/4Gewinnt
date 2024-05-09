@@ -7,14 +7,10 @@ namespace VierGewinnt.Hubs
         public string playerTwo { get; set; }
 
 
-        public void PlaceYellowChip(int col)
+        public void PlaceChip(int col, string btnId)
         {
 
         }
 
-        public void PlaceRedChip(int col)
-        {
-
-        }
     }
 }

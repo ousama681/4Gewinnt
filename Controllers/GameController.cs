@@ -11,6 +11,5 @@ namespace VierGewinnt.Controllers
         {
             return View();
         }
-
     }
 }
