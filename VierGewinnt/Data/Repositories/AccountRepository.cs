@@ -104,41 +104,46 @@ namespace VierGewinnt.Data.Repositories
             await _emailService.SendEmailForEmailConfirmation(options);
         }
 
-        public async Task<bool> AddAsync(ApplicationUser item)
+        public bool AddAsync(ApplicationUser item)
         {
             context.Accounts.Add(item);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
             return true;
         }
 
-        public async Task<bool> DeleteAsync(ApplicationUser item)
+        public bool DeleteAsync(ApplicationUser item)
         {
-            ApplicationUser accountFound = await context.Accounts.FindAsync(item.Id) == null ? new ApplicationUser() { Id = "-1" } : await context.Accounts.FindAsync(item.Id);
+            ApplicationUser accountFound = context.Accounts.Find(item.Id) == null ? new ApplicationUser() { Id = "-1" } : context.Accounts.Find(item.Id);
             if (accountFound.Id.Equals("-1"))
             {
                 return false;
             }
 
             context.Accounts.Remove(item);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
 
             return true;
         }
 
-        public async Task<List<ApplicationUser>> GetAllAsync()
+        public List<ApplicationUser> GetAllAsync()
         {
-            return await context.Accounts.ToListAsync();
+            return context.Accounts.ToList();
         }
 
-        public async Task<ApplicationUser> GetByIdAsync(ApplicationUser item)
+        public ApplicationUser GetByIdAsync(ApplicationUser item)
         {
-            ApplicationUser accountFound = await context.Accounts.FindAsync(item.Id) == null ? new ApplicationUser() { Id = "-1" } : await context.Accounts.FindAsync(item.Id);
+            ApplicationUser accountFound =  context.Accounts.Find(item.Id) == null ? new ApplicationUser() { Id = "-1" } : context.Accounts.Find(item.Id);
             return accountFound;
         }
 
-        public async Task UpdateAsync(ApplicationUser item)
+        public Task UpdateAsync(ApplicationUser item)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ApplicationUser> GetUserByUsername(string username)
+        {
+            return await _userManager.FindByNameAsync(username);
         }
     }
 }

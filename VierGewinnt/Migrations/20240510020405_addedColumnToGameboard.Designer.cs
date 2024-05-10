@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VierGewinnt.Data;
 
@@ -11,9 +12,11 @@ using VierGewinnt.Data;
 namespace VierGewinnt.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240510020405_addedColumnToGameboard")]
+    partial class addedColumnToGameboard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,7 +331,7 @@ namespace VierGewinnt.Migrations
             modelBuilder.Entity("VierGewinnt.Data.Model.Move", b =>
                 {
                     b.HasOne("VierGewinnt.Data.Models.GameBoard", "GameBoard")
-                        .WithMany("Moves")
+                        .WithMany()
                         .HasForeignKey("GameBoardID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -342,11 +345,6 @@ namespace VierGewinnt.Migrations
                     b.Navigation("GameBoard");
 
                     b.Navigation("Player");
-                });
-
-            modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>
-                {
-                    b.Navigation("Moves");
                 });
 #pragma warning restore 612, 618
         }

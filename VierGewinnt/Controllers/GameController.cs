@@ -1,33 +1,84 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using MQTTnet;
+using MQTTBroker;
 using MQTTnet.Client;
-using System.Text;
+using MQTTnet;
+using VierGewinnt.Data.Interfaces;
+using VierGewinnt.Data.Model;
+using VierGewinnt.Data.Models;
 using VierGewinnt.Hubs;
 using VierGewinnt.ViewModels;
+using System.Text;
+using System.Diagnostics;
 
 namespace VierGewinnt.Controllers
 {
     public class GameController : Controller
     {
         private readonly IHubContext<GameHub> _hubContext;
+        private readonly IGameRepository _gameRepository;
+        private readonly IAccountRepository _accountRepository;
+        private IMqttClient mqttClient = null;
 
-        bool isSubscribed = false;
+        private static bool isFinishedCreatingEntity = false;
 
-        public GameController(IHubContext<GameHub> hubContext)
+        public GameController(IHubContext<GameHub> hubContext, IGameRepository gameRepository, IAccountRepository accountRepository)
         {
             _hubContext = hubContext;
-            if (!isSubscribed)
-            {
-                SubscribeAsync();
-                isSubscribed = true;
-            }
+            _gameRepository = gameRepository;
+            _accountRepository = accountRepository;
         }
 
         public async Task SendMessage(string message)
         {
+            Move move = new Move();
+            _gameRepository.AddMoveAsync(move);
+
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", message);
         }
+
+        // Achtung wenn diese Methode von beisden Spielern verwendet werden sollte, dann müssen wir einiges noch anpassen.
+        public async Task<IActionResult> SpielzugAusfuehren()
+        {
+            GameViewModel gvm = new GameViewModel();
+            int colNumberYellow = int.Parse(Request.Form["colNumber"]);
+            int moveNr = int.Parse(Request.Form["moveNr"]);
+            int boardId = int.Parse(Request.Form["boardId"]);
+            string playerName = Request.Form["userId"];
+
+            // Move in Database speichern
+
+            moveNr++;
+
+            string playerId = _accountRepository.GetUserByUsername(playerName).Result.Id;
+
+            Move move = new Move();
+            move.PlayerID = playerId;
+            move.MoveNr = moveNr;
+            move.Column = colNumberYellow;
+            move.GameBoardID = boardId;
+
+            // Hier gibt es noch eine Exception der DB bzgl GameBoadID Foreign Key. 
+
+            _gameRepository.AddMoveAsync(move);
+
+            // Publish to Robot the next PlayerMove
+            await MQTTBroker.MQTTBrokerService.PublishAsync("PlayerMove", colNumberYellow.ToString());
+
+            // Subscribe to wait till Robot is finished.
+            await SubscribeAsync("RobotStatus");
+
+            GameBoard board = _gameRepository.GetByIdAsync(new GameBoard() { ID = boardId});
+
+            gvm.Board = board;
+            gvm.PlayerOne = playerName;
+            gvm.MoveNr = moveNr;
+
+            await _hubContext.Clients.All.SendAsync("SendPlayerMove", colNumberYellow);
+
+            return View("Board", gvm);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Board(string playerOne, string playerTwo)
@@ -35,31 +86,76 @@ namespace VierGewinnt.Controllers
             GameViewModel gameViewModel = new GameViewModel();
             gameViewModel.PlayerOne = playerOne;
             gameViewModel.PlayerTwo = playerTwo;
-            gameViewModel.Board = new Data.Models.GameBoard();
+            
+            while (!isFinishedCreatingEntity)
+            {
+                // Wait till BoardEntityIsCreated
+            }
+
+            GameBoard gameBoard = FindGameBoardByPlayernames(playerOne, playerTwo);
+
+            gameViewModel.Board = gameBoard;
+
+            gameViewModel.MoveNr = 0;
 
             return View(gameViewModel);
         }
 
-        public async Task SubscribeAsync()
+        private GameBoard FindGameBoardByPlayernames(string playerOne, string playerTwo)
         {
+            return _gameRepository.FindGameByPlayerNames(playerOne, playerTwo);
+        }
+
+        public void CreateGame(string playerone, string playertwo)
+        {
+            isFinishedCreatingEntity = false;
+            CreateBoardEntityAsync(playerone, playertwo);
+            Task.Delay(500);
+            isFinishedCreatingEntity = true;
+        }
+
+        private async Task<GameBoard> CreateBoardEntityAsync(string playerOne, string playerTwo)
+        {
+            ApplicationUser playerOneEnt = GetUser(playerOne).Result;
+
+            string playerOneId = playerOneEnt.Id;
+
+            ApplicationUser playerTwoEnt = GetUser(playerTwo).Result;
+            string playerTwoId = playerTwoEnt.Id;
+
+            GameBoard game = new GameBoard();
+            game.PlayerOneID = playerOneEnt.Id;
+            game.PlayerTwoID = playerTwoEnt.Id;
+
+            _gameRepository.AddAsync(game);
+            return game;
+        }
+        private async Task<ApplicationUser> GetUser(string playerName)
+        {
+            return _accountRepository.GetUserByUsername(playerName).Result;
+        }
+
+
+
+
+        // MQTT METHODS
+
+        public async Task SubscribeAsync(string topic)
+        {
+
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
-            string topicForReceive = "RobotStatus";
-            string topicForPublish = "PlayerMove";
-            //string username = "emqx";
-            //string password = "public";
 
             // Create a MQTT client factory
             var factory = new MqttFactory();
 
             // Create a MQTT client instance
-            var mqttClient = factory.CreateMqttClient();
+            this.mqttClient = factory.CreateMqttClient();
 
             // Create MQTT client options
             var options = new MqttClientOptionsBuilder()
-                .WithTcpServer(broker, port) // MQTT broker address and port
-                                             //.WithCredentials(username, password) // Set username and password
+                .WithTcpServer(broker, port)
                 .WithClientId(clientId)
                 .WithCleanSession()
                 .Build();
@@ -72,19 +168,18 @@ namespace VierGewinnt.Controllers
                 Console.WriteLine("Connected to MQTT broker successfully.");
 
                 // Subscribe to a topic
-                await mqttClient.SubscribeAsync(topicForReceive);
+                await mqttClient.SubscribeAsync(topic);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += e =>
                 {
-                    Console.WriteLine($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
-                    SendMessage($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
-
-                    // Javascript function für clients aufrufen
-
-
+                    Debug.WriteLine($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
+                    _hubContext.Clients.All.SendAsync("AllowNextMove", "Spieler darf den nächsten Zug ausführen.");
+                    mqttClient.UnsubscribeAsync("RobotStatus");
+                    mqttClient.DisconnectAsync();
                     return Task.CompletedTask;
                 };
+
             }
             else
             {
@@ -92,19 +187,4 @@ namespace VierGewinnt.Controllers
             }
         }
     }
-
-
-    // TODO: Wenn wir eine Lösung haben, dass Action nicht die Page refreshed, können wir das wieder verwenden
-    // ansonsten ist SigtnalR / Hubs die Ausweichlösung
-
-    //public async Task<IActionResult> SpielzugAusfuehren(int colNumberYellow)
-    //{
-    //    string payload = "column:" + colNumberYellow;
-    //    var model = new GameViewModel();
-    //    model.Column = colNumberYellow;
-
-    //    await MQTTBrokerService.PublishAsync(payload);
-
-    //    return PartialView("_PartialViewName", model);
-    //}
 }

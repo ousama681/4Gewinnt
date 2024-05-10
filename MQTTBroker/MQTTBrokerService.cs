@@ -12,13 +12,11 @@ namespace MQTTBroker
 {
     public static class MQTTBrokerService
     {
-        public static async Task PublishAsync(string payload)
+        public static async Task PublishAsync(string topic, string payload)
         {
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
-            string topicForReceive = "RobotStatus";
-            string topicForPublish = "PlayerMove";
 
             // Create a MQTT client factory
             var factory = new MqttFactory();
@@ -40,31 +38,15 @@ namespace MQTTBroker
             {
                 Console.WriteLine("Connected to MQTT broker successfully.");
 
-                // Subscribe to a topic
-                await mqttClient.SubscribeAsync(topicForReceive);
-
-                // Callback function when a message is received
-                mqttClient.ApplicationMessageReceivedAsync += e =>
-                {
-                    Console.WriteLine($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
-                    return Task.CompletedTask;
-                };
-
                 var message = new MqttApplicationMessageBuilder()
-                    .WithTopic(topicForPublish)
+                    .WithTopic(topic)
                     .WithPayload(payload)
                     .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
                     .WithRetainFlag()
                     .Build();
 
                 await mqttClient.PublishAsync(message);
-
-                // Delay macht mehr sinn, für Applikationen die viele Nachrichten schicken. Bei uns wahrscheinlich nicht.
                 await Task.Delay(1000);
-
-                //// Unsubscribe and disconnect
-                //await mqttClient.UnsubscribeAsync(topicForReceive);
-                //await mqttClient.DisconnectAsync();
             }
             else
             {
@@ -72,14 +54,12 @@ namespace MQTTBroker
             }
         }
 
-        public static async Task SubscribeAsync()
+        public static async Task SubscribeAsync(string topic)
         {
 
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
-            string topicForReceive = "RobotStatus";
-            string topicForPublish = "PlayerMove";
 
             // Create a MQTT client factory
             var factory = new MqttFactory();
@@ -102,7 +82,7 @@ namespace MQTTBroker
                 Console.WriteLine("Connected to MQTT broker successfully.");
 
                 // Subscribe to a topic
-                await mqttClient.SubscribeAsync(topicForReceive);
+                await mqttClient.SubscribeAsync(topic);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += e =>

@@ -1,6 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MQTTnet.Client;
+using MQTTnet;
 using System.Diagnostics;
+using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Models;
+using System.Text;
+using Microsoft.AspNetCore.SignalR;
+using VierGewinnt.Hubs;
+using VierGewinnt.Data.Models;
+using VierGewinnt.Data.Repositories;
+using VierGewinnt.Data.Model;
 
 namespace VierGewinnt.Controllers
 {
@@ -8,17 +17,23 @@ namespace VierGewinnt.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
+
+
+        private string username;
+
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+ 
         }
 
         public IActionResult Index()
         {
+
             return View();
         }
 
-        public async Task<IActionResult> GameLobby(string username)
+        public async Task<IActionResult> GameLobby()
         {
             return View();
         }

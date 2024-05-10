@@ -9,10 +9,9 @@ namespace VierGewinnt.Data.Models
         public int ID {  get; set; }
         public string PlayerOneID { get; set; }
         public string PlayerTwoID { get; set; }
-        public ICollection<Move> Moves { get; set; }
-        public ApplicationUser PlayerOne { get; set; }
-        public ApplicationUser PlayerTwo { get; set; }
+        public bool IsFinished { get; set; }
 
+        public ICollection<Move> Moves { get; set; }
 
         // Wie erhalte ich den State für das Brett? Wahrscheinlich eine Hilfstabelle die jedne Spielzug repräsentiert
 

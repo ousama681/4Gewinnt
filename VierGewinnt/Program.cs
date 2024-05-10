@@ -60,12 +60,12 @@ namespace VierGewinnt
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}");
-            // Default ControllerMapping End 
-
+            // Default ControllerMapping End
 
             // SignalR Hub Mapping
-            app.MapHub<ChatHub>("/chatHub");
+            app.MapHub<PlayerlobbyHub>("/playerlobbyHub");
             app.MapHub<GameHub>("/gameHub");
+            //app.MapHub<LobbySecondHub>("/lobbyHub");
             //SignalR Hub Mapping End
 
             app.Run();

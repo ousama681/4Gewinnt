@@ -1,22 +1,24 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using MQTTnet.Client;
-using MQTTnet;
-using System.Text;
 using MQTTBroker;
+using MQTTnet;
+using MQTTnet.Client;
+using System.Text;
 
 namespace VierGewinnt.Hubs
 {
     public class GameHub : Hub
     {
+
         public string playerOne { get; set; }
         public string playerTwo { get; set; }
 
-        public async Task SendPlayerMove(string column)
-        {
-            string payload = "column:" + column;
+        //public async Task SendPlayerMove(string column)
+        //{
+        //    string payload = "column:" + column;
+        //    await MQTTBrokerService.PublishAsync(payload);
+        //}
 
-            await MQTTBrokerService.PublishAsync(payload);
-        }
+
 
 
 

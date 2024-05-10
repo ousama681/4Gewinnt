@@ -12,7 +12,7 @@ using VierGewinnt.Data;
 namespace VierGewinnt.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240501193832_initDB")]
+    [Migration("20240509180533_initDB")]
     partial class initDB
     {
         /// <inheritdoc />
@@ -166,6 +166,9 @@ namespace VierGewinnt.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<int>("Column")
+                        .HasColumnType("int");
+
                     b.Property<int>("GameBoardID")
                         .HasColumnType("int");
 
@@ -248,64 +251,6 @@ namespace VierGewinnt.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "e7e200b2-5912-44fd-80d5-b6531de40cf8",
-                            Email = "abc@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "passwort123",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "92e85bc0-3d14-466e-8784-b118fc961ed8",
-                            TwoFactorEnabled = false,
-                            UserName = "TheLegend27"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "13c9ece2-f865-4f87-b6fd-557b56d72566",
-                            Email = "bobo@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "wertwert",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "8328b01d-b873-49af-8546-c6c5d57762d1",
-                            TwoFactorEnabled = false,
-                            UserName = "DjBobo1337"
-                        },
-                        new
-                        {
-                            Id = "3",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "fecb0946-58f5-48ec-a7e9-feff3da50292",
-                            Email = "Frodo@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "qwert789",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "03da80b1-3b8a-4cc4-b69c-e0efac9108b4",
-                            TwoFactorEnabled = false,
-                            UserName = "FBeutlin69"
-                        },
-                        new
-                        {
-                            Id = "4",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "b38ed157-d5b5-45da-8ba5-a2b865b7642c",
-                            Email = "Frodo@abc.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "afasfwafafa",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "10d9188a-ad4f-47f6-a684-2412a659bc68",
-                            TwoFactorEnabled = false,
-                            UserName = "Son_Goku"
-                        });
                 });
 
             modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>
@@ -318,17 +263,13 @@ namespace VierGewinnt.Migrations
 
                     b.Property<string>("PlayerOneID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PlayerTwoID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("PlayerOneID");
-
-                    b.HasIndex("PlayerTwoID");
 
                     b.ToTable("GameBoards");
                 });
@@ -387,7 +328,7 @@ namespace VierGewinnt.Migrations
             modelBuilder.Entity("VierGewinnt.Data.Model.Move", b =>
                 {
                     b.HasOne("VierGewinnt.Data.Models.GameBoard", "GameBoard")
-                        .WithMany("Moves")
+                        .WithMany()
                         .HasForeignKey("GameBoardID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -401,30 +342,6 @@ namespace VierGewinnt.Migrations
                     b.Navigation("GameBoard");
 
                     b.Navigation("Player");
-                });
-
-            modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>
-                {
-                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", "PlayerOne")
-                        .WithMany()
-                        .HasForeignKey("PlayerOneID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", "PlayerTwo")
-                        .WithMany()
-                        .HasForeignKey("PlayerTwoID")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("PlayerOne");
-
-                    b.Navigation("PlayerTwo");
-                });
-
-            modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>
-                {
-                    b.Navigation("Moves");
                 });
 #pragma warning restore 612, 618
         }

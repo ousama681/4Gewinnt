@@ -19,12 +19,17 @@
             <div class="d-flex flex-column align-items-center">
                 <div class="yellow-stone"></div>
                 <div class="text-light mb-2">Select a column: </div>
-                <form id="placeYellowStone" class="d-flex flex-column align-items-center">
-                    <input type="number" id="colNumberYellow" name="colNumberYellow" value="1" min="1" max="7" asp-for="Column">
-                    @* <button id="btnYellow" classs="btn btn-primary mt-2" type="submit" onclick="updatePartialView()" asp-route-colNumberYellow="@Model.Column">Place Stone</button> *@
-                    <button id="btnYellow" classs="btn btn-primary mt-2" type="submit">Place Stone</button>
-@*                     <button id="btnYellow" classs="btn btn-primary mt-2" type="submit" asp-action="SpielzugAusfuehren" asp-controller="Game" asp-route-colNumberYellow="@Model.Column">Place Stone</button>
- *@                </form>
+                <form asp-area="" asp-controller="Game" asp-action="SpielzugAusfuehren" method="post">
+                    <input asp-for="PlayerOne" name="userId" type="hidden"/>
+                    @* <input name="userId" type="hidden" value="@Model.Board.PlayerOneID" /> *@
+                    <input asp-for="MoveNr" name="moveNr" type="hidden" />
+                    @* <input name="moveNr" type="hidden" value="@Model.MoveNr" /> *@
+                    <input asp-for="Board.ID" name="boardId" type="hidden" />
+                    @* <input name="boardId" type="hidden" value="@Model.Board.ID" /> *@
+                    @* <input type="number" id="colNumberYellow" name="colNumberYellow" value="1" min="1" max="7" /> *@
+                    <input type="number" id="colNumberYellow" name="colNumber" value="1" min="1" max="7" asp-for="Column">
+                    <button type="submit">Place stone</button>
+                </form>
             </div>
         </div>
 
@@ -72,40 +77,28 @@
                 <div class="red-stone"></div>
                 <div class="text-light mb-2">Select a column: </div>
                 <form id="PlaceRedStone" class="d-flex flex-column align-items-center">
-                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
-                    <button id="btnRed" class="btn btn-primary mt-2" type="submit" onclick="animationRed(colNumberRed, 6, 'btnRed')" @* onclick="placeRedStone('colNumberRed', 'btnRed')" *@>Place Stone</button>
+                    <input asp-for="PlayerTwo" name="userId" type="hidden" />
+                    @* <input name="userId" type="hidden" value="@Model.Board.PlayerOneID" /> *@
+                    <input asp-for="MoveNr" name="moveNr" type="hidden" />
+                    @* <input name="moveNr" type="hidden" value="@Model.MoveNr" /> *@
+                    <input asp-for="Board.ID" name="boardId" type="hidden" />
+                    @* <input name="boardId" type="hidden" value="@Model.Board.ID" /> *@
+                    @* <input type="number" id="colNumberYellow" name="colNumberYellow" value="1" min="1" max="7" /> *@
+                    <input type="number" id="colNumberRed" name="colNumber" value="1" min="1" max="7" asp-for="Column">
+                    @* <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7"> *@
+                    <button type="submit">Place Stone</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
+@* 
 <div id="partialViewContainer">
     @await Html.PartialAsync("_PartialViewName", Model)
-</div>
+</div> *@
 
 
 <script src="~/js/board.js" asp-append-version="true"></script>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/Game.js"></script>
-
-                    <script>
-    function updatePartialView() {
-        event.preventDefault();
-
-       const modelvalue =  document.getElementById("colNumberYellow").value;
-
-        $.ajax({
-            url: "/Game/SpielzugAusfuehren",
-            type: 'GET',
-            data: { "column": $("#colNumberYellow").val() },
-            success: function (result) {
-                $('#partialViewContainer').html(result);
-            },
-            error: function (xhr, status, error) {
-                console.error(error);
-            }
-        });
-    }
-</script>

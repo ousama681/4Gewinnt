@@ -21,5 +21,7 @@ namespace VierGewinnt.ViewModels
         public int Column { get; set; }
         public int PlayerNr {  get; set; }
         public GameBoard Board {  get; set; }
+
+        public int MoveNr { get; set; }
     }
 }

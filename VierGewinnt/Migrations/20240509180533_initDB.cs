@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace VierGewinnt.Migrations
 {
     /// <inheritdoc />
@@ -50,6 +48,20 @@ namespace VierGewinnt.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GameBoards",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PlayerOneID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlayerTwoID = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameBoards", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -159,30 +171,6 @@ namespace VierGewinnt.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GameBoards",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PlayerOneID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PlayerTwoID = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GameBoards", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_GameBoards_AspNetUsers_PlayerOneID",
-                        column: x => x.PlayerOneID,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_GameBoards_AspNetUsers_PlayerTwoID",
-                        column: x => x.PlayerTwoID,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Moves",
                 columns: table => new
                 {
@@ -190,7 +178,8 @@ namespace VierGewinnt.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MoveNr = table.Column<int>(type: "int", nullable: false),
                     PlayerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    GameBoardID = table.Column<int>(type: "int", nullable: false)
+                    GameBoardID = table.Column<int>(type: "int", nullable: false),
+                    Column = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -207,17 +196,6 @@ namespace VierGewinnt.Migrations
                         principalTable: "GameBoards",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[,]
-                {
-                    { "1", 0, "e7e200b2-5912-44fd-80d5-b6531de40cf8", "abc@abc.com", false, false, null, null, null, "passwort123", null, false, "92e85bc0-3d14-466e-8784-b118fc961ed8", false, "TheLegend27" },
-                    { "2", 0, "13c9ece2-f865-4f87-b6fd-557b56d72566", "bobo@abc.com", false, false, null, null, null, "wertwert", null, false, "8328b01d-b873-49af-8546-c6c5d57762d1", false, "DjBobo1337" },
-                    { "3", 0, "fecb0946-58f5-48ec-a7e9-feff3da50292", "Frodo@abc.com", false, false, null, null, null, "qwert789", null, false, "03da80b1-3b8a-4cc4-b69c-e0efac9108b4", false, "FBeutlin69" },
-                    { "4", 0, "b38ed157-d5b5-45da-8ba5-a2b865b7642c", "Frodo@abc.com", false, false, null, null, null, "afasfwafafa", null, false, "10d9188a-ad4f-47f6-a684-2412a659bc68", false, "Son_Goku" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -260,16 +238,6 @@ namespace VierGewinnt.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GameBoards_PlayerOneID",
-                table: "GameBoards",
-                column: "PlayerOneID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GameBoards_PlayerTwoID",
-                table: "GameBoards",
-                column: "PlayerTwoID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Moves_GameBoardID",
                 table: "Moves",
                 column: "GameBoardID");
@@ -305,10 +273,10 @@ namespace VierGewinnt.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "GameBoards");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "GameBoards");
         }
     }
 }

@@ -7,6 +7,8 @@ namespace VierGewinnt.Data.Interfaces
 {
     public interface IAccountRepository : IRepository<ApplicationUser>
     {
+
+        Task<ApplicationUser> GetUserByUsername(string username);
         Task<ApplicationUser> GetUserByEmailAsync(string email);
 
         Task<IdentityResult> CreateUserAsync(SignUpUserModel userModel);
