@@ -61,9 +61,26 @@ connection.on("NavigateToGame", (gameId) => {
 //}
 
 function createListelement(playerTwo) {
-    var li = document.createElement("li");
-    var anchor = document.createElement("a");
+
     var playerOne = document.getElementById("userNameLabel").textContent;
+
+    // Create the <li> element
+    var li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    // Create the <a> element
+    var anchor = document.createElement("a");
+    anchor.className = "text-decoration-none";
+
+    // Create the <span> element
+    var dotSpan = document.createElement("span");
+    dotSpan.className = "dot bg-success";
+
+    // Append the <a> element to the <li> element
+    li.appendChild(anchor);
+
+    // Append the <span> element to the <li> element
+    li.appendChild(dotSpan);
 
     li.id = playerTwo;
     anchor.textContent = `${playerTwo}`;
