@@ -8,14 +8,43 @@
 }
 
 <div class="container">
-    <div class="row p-1">
-        <div class="col-6">
-            <ul class="text-light" id="playerList"></ul>
+    <div class="row mt-4">
+        <div class="col text-center">
+            <h2 class="text-light">Choose Game Mode</h2>
+            <div class="d-flex justify-content-between mt-4">
+                <a type="button" asp-action="PvP" asp-controller="Game" class="btn btn-primary">Player vs Player</a>
+                <a type="button" asp-action="PvE" asp-controller="Game" class="btn btn-primary">Player vs Robot</a>
+                <a type="button" asp-action="EvE" asp-controller="Game" class="btn btn-primary">Robot vs Robot</a>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <h2 class="text-light">Player Lobby</h2>
+            <div class="lobby-container" style="max-width: 300px;">
+                <ul class="text-light list-group" id="playerList"></ul>
+            </div>
+        </div>
+        <div class="col">
+            <h2 class="text-light">Robot Lobby</h2>
+            <div class="lobby-container" style="max-width: 300px;">
+                <ul class="text-light list-group" id="robotList"></ul>
+            </div>
+        </div>
+        <div class="col">
+            <h2 class="text-light">Game Rules</h2>
+            <p class="text-light">How to play:</p>
+            <ul>
+                <li class="text-light">Yellow starts first</li>
+                <li class="text-light">Choose a column from 1 to 7</li>
+                <li class="text-light">Place your Chip by pressing the button</li>
+                <li class="text-light">Wait for the robot to finish the move</li>
+                <li class="text-light">Now red can choose a column, etc.</li> 
+                <li class="text-light">First one to connect 4 chips wins</li>
+            </ul>
         </div>
     </div>
 </div>
-
-
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/playerlobby.js"></script>
 @* <script src="~/js/lobby.js"></script> *@

@@ -11,7 +11,7 @@ function activateButton(btnId) {
 
 
 async function BlinkTopRow(column, btnId) {
-    var selectedCell = document.getElementById(`${column.value}1`);
+    var selectedCell = document.getElementById(`${column}1`);
     if (selectedCell != null) {
         if (btnId == "btnYellow") {
             selectedCell.classList.add('blinkYellow');
@@ -26,7 +26,7 @@ async function BlinkTopRow(column, btnId) {
 }
 
 async function StopBlinkTopRow(column, color) {
-    var selectedCell = document.getElementById(`${column.value}1`);
+    var selectedCell = document.getElementById(`${column}1`);
     if (selectedCell != null) {
         if (color == "yellow") {
             selectedCell.classList.remove('blinkYellow');
@@ -40,7 +40,7 @@ async function StopBlinkTopRow(column, color) {
 async function animate(column, endRow, color) {
     if (color == "yellow") {
         for (let row = 1; row <= endRow; row++) {
-            var selectedCell = document.getElementById(`${column.value}${row}`);
+            var selectedCell = document.getElementById(`${column}${row}`);
             if (selectedCell != null) {
                 selectedCell.classList.add('blinkYellow');
                 await new Promise(resolve => setTimeout(resolve, 1000));

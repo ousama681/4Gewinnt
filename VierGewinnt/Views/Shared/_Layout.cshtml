@@ -23,9 +23,6 @@
                                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="GameLobby" asp-route-username="@User.Identity.Name">Lobby</a>
                             </li>
                             <li class="nav-item">
-                                <a class="navbar-brand text-light" asp-area="" asp-controller="Game" asp-action="Board">Board</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Leaderboard">Bestenliste</a>
                             </li>
                             <li class="nav-item">
@@ -79,7 +76,6 @@
             @RenderBody()
         </main>
     </div>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
