@@ -1,14 +1,10 @@
 "use strict";
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
-
-
-
 connection.start();
 
 connection.on("AnimatePlayerMove", (message) => {
     event.preventDefault();
-    console.log(message);
 });
 
 

@@ -16,12 +16,12 @@ namespace VierGewinnt.Controllers
 {
     public class HomeController : Controller
     {
-        private             string                      username;
-        private             IMqttClient                 mqttClient = null;
-        private readonly    ILogger<HomeController>     _logger;
-        private readonly    IHubContext<PlayerlobbyHub> _hubContext;
-        private static      List<IMqttClient>           connectedMqttClients = new List<IMqttClient>();
-        private static      IList<string>               playersInHub = new List<string>();
+        private string username;
+        private IMqttClient mqttClient = null;
+        private readonly ILogger<HomeController> _logger;
+        private readonly IHubContext<PlayerlobbyHub> _hubContext;
+        private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
+        private static IList<string> playersInHub = new List<string>();
 
 
         public HomeController(ILogger<HomeController> logger, IHubContext<PlayerlobbyHub> hubContext, IGameRepository gameRepository, IAccountRepository accountRepository)
@@ -100,34 +100,23 @@ namespace VierGewinnt.Controllers
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-                    Debug.WriteLine($"Received message: {payload}");
-                    // eventuell könnten wir hier das game createn aber zuerstmal das Herausfordern machen.
                     string[] players = payload.Split(',');
 
                     string playerOne = players[0];
                     string playerTwo = players[1];
-                        GameBoard game = null;
+
+                    GameBoard game = null;
 
                     if (playerTwo.Equals(this.username))
                     {
-
-                        var connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
-                        var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-                        optionsBuilder.UseSqlServer(connectionstring);
-
-                        using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-                        {
-                            game = await CreateBoardEntityAsync(playerOne, playerTwo);
-                        }
+                        game = await CreateBoardEntityAsync(playerOne, playerTwo);
 
                         await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
-
-                        afterStartingGame(mqttClient, topic);
+                        await afterStartingGame(mqttClient, topic);
                     }
                     else if (playerOne.Equals(this.username))
                     {
-                        afterStartingGame(mqttClient, topic);
+                        await afterStartingGame(mqttClient, topic);
                     }
                     await Task.CompletedTask;
                 };
@@ -157,17 +146,16 @@ namespace VierGewinnt.Controllers
 
             // Or you can also instantiate inside using
             GameBoard game = new GameBoard();
-            ApplicationUser playerOneEnt = new ApplicationUser();
-            ApplicationUser playerTwoEnt = new ApplicationUser();
+  
 
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
                 try
                 {
-                    playerOneEnt = await GetUser(playerOne, dbContext);
+                    playerOneEnt = 
                     playerTwoEnt = await GetUser(playerTwo, dbContext);
 
-                    game.PlayerOneID = playerOneEnt.Id;
+                    game.PlayerOneID = await GetUser(playerOne, dbContext).Id;
                     game.PlayerTwoID = playerTwoEnt.Id;
 
                     await dbContext.GameBoards.AddAsync(game);
