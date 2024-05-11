@@ -7,17 +7,17 @@ connection.on("ReceiveMessage", function (message) {
     event.preventDefault();
     // Animationszug
     var column = document.getElementById("colNumberYellow").value;
-    connection.invoke("Animate")
+    connection.invoke("Animate");
     console.log("Der Spielzug wird animiert");
 
     document.getElementById("robotStatus").textContent = "Der Spielzug wird animiert";
 });
 
 connection.start().then(function () {
-    console.log("Wir sind im GameJS drin ak, GameHub funktioniert.")
+    console.log("Wir sind im GameJS drin ak, GameHub funktioniert.");
 
     // Start Player is always Yellow, so we disable the Button of Red
-    disableButton("btnRed")
+    disableButton("btnRed");
 });
 
 

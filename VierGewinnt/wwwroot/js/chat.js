@@ -6,13 +6,34 @@ connection.on("ReceiveAvailableUsers", function (players) {
 
     for (var i = 0; i < players.length; i++) {
 
-        var li = document.createElement("li");
+      /*  var li = document.createElement("li");*/
 
+
+        // Create the <li> element
+        var li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+        // Create the <a> element
         var anchor = document.createElement("a");
+        anchor.className = "text-decoration-none";
+        
+
+        // Create the <span> element
+        var dotSpan = document.createElement("span");
+        dotSpan.className = "dot bg-success";
+
+        // Append the <a> element to the <li> element
+        li.appendChild(anchor);
+
+        // Append the <span> element to the <li> element
+        li.appendChild(dotSpan);
 
         var playerOne = document.getElementById("userNameLabel").textContent;
         var playerTwo = players[i];
+        console.log("playerTwo: ", players[i])
+
         li.id = playerTwo;
+        anchor.textContent = `${playerTwo}`;
 
         // Setting up URL Params
         const baseUrl = "https://localhost:7102/Game/Board";
@@ -21,8 +42,7 @@ connection.on("ReceiveAvailableUsers", function (players) {
         params.append("playerTwo", playerTwo);
 
         const gameUrl = `${baseUrl}?${params.toString()}`;
-
-        anchor.textContent = `${playerTwo}`;
+        console.log("NotificateGameStart Params, gameUrl: ", params, gameUrl);
         anchor.onclick = function () {
             connection.invoke("NotificateGameStart", playerOne, playerTwo, gameUrl).catch(function (err) {
                 return console.error(err.toString());
@@ -34,6 +54,8 @@ connection.on("ReceiveAvailableUsers", function (players) {
         li.appendChild(anchor);
 
         document.getElementById("playerList").appendChild(li);
+        console.log("ReceiveAvailableUsers: Li element textContent: ", li.textContent)
+        console.log("Players: ", players)
     }
     console.log("Online Users wurden erfolgreich in Liste geladen.");
 });
@@ -41,24 +63,34 @@ connection.on("ReceiveAvailableUsers", function (players) {
 connection.on("ReceiveNewUser", function (user) {
     console.log("inside ReceiveNewUser");
 
-        var li = document.createElement("li");
+    // Create the <li> element
+    var li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.id = user;
 
-        li.id = user;
+    // Create the <a> element
+    var anchor = document.createElement("a");
+    anchor.textContent = `${user}`;
+    anchor.className = "text-decoration-none";
 
-        var anchor = document.createElement("a");
+    // Create the <span> element
+    var dotSpan = document.createElement("span");
+    dotSpan.className = "dot bg-success";
 
-        var playerOne = document.getElementById("userNameLabel").textContent;
-        var playerTwo = user;
+    li.appendChild(anchor);
+    li.appendChild(dotSpan);
 
-        // Setting up URL Params
+    var playerOne = document.getElementById("userNameLabel").textContent;
+    var playerTwo = user;
+
+    // Setting up URL Params
     const baseUrl = "https://localhost:7102/Game/Board";
-        const params = new URLSearchParams();
-        params.append("playerOne", playerOne);
+    const params = new URLSearchParams();
+    params.append("playerOne", playerOne);
     params.append("playerTwo", playerTwo);
     
     const gameUrl = `${baseUrl}?${params.toString()}`;
-    anchor.textContent = `${user}`;
-
+    console.log("NotificateGameStart Params, gameUrl: ", params, gameUrl);
     anchor.onclick = function () {
         connection.invoke("NotificateGameStart", playerOne, playerTwo).catch(function (err) {
             return console.error(err.toString());
@@ -66,9 +98,11 @@ connection.on("ReceiveNewUser", function (user) {
             return console.error(err.toString());
         });
     };
-        li.appendChild(anchor);
+    li.appendChild(anchor);
 
-        document.getElementById("playerList").appendChild(li);
+    document.getElementById("playerList").appendChild(li);
+    console.log("ReceiveNewUser: Li element textContent: ", li.textContent)
+    console.log("Players: ", user)
 });
 
 connection.start().then(function () {
