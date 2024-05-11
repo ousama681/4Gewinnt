@@ -30,12 +30,10 @@ window.addEventListener("beforeunload", () => {
     connection.invoke("LeaveLobby", username);
 });
 
-
-connection.on("NavigateToGame", (playerOne, playerTwo) => {
+connection.on("NavigateToGame", (gameId) => {
     const baseUrl = "https://localhost:7102/Game/Board";
     const params = new URLSearchParams();
-    params.append("playerOne", playerOne);
-    params.append("playerTwo", playerTwo);
+    params.append("gameId", gameId);
 
     window.location.href = `${baseUrl}?${params.toString()}`;
 });
@@ -43,6 +41,8 @@ connection.on("NavigateToGame", (playerOne, playerTwo) => {
 // JSCode END
 
 // FUNCTIONS START
+
+// Wahrscheinlich später löschen brauchts nicht mehr.
 
 function createBoardEntity(playeroneName, playertwoName) {
     event.preventDefault();
@@ -78,48 +78,3 @@ function createListelement(playerTwo) {
 
     document.getElementById("playerList").appendChild(li);
 }
-
-
-// THIS PART WAS IN ReceiveNewUser
-
-//    var li = document.createElement("li");
-
-//    li.id = user;
-
-//    var anchor = document.createElement("a");
-
-//    var playerOne = document.getElementById("userNameLabel").textContent;
-//var playerTwo = user;
-
-//anchor.textContent = `${user}`;
-
-//anchor.onclick = function () {
-//    event.preventDefault();
-//    createBoardEntity(playerOne, playerTwo);
-//    connection.invoke("NotificateGameStart", playerOne, playerTwo);
-
-
-//}
-//    li.appendChild(anchor);
-
-//document.getElementById("playerList").appendChild(li);
-
-// THIS PART WAS IN ReceiveNewUser END
-
-// THIS PART IS FROM NavigateToGame 
-
-//connection.on("NavigateToGame", (playerOne, playerTwo) => {
-//    //Möglichkeit um beide Spieler ins selbe Spiel zu lotsen
-//   /**
-//    * Erste Möglichkeit. Wir suchen in der DB nach einem Spiel in dem beide Spieler drinn sind und schauen den Flas isGame done an? Da beide Spieler nicht in zwei Spielen gleichzeitig sein können die laufen.e
-//    */
-//    const baseUrl = "https://localhost:7102/Game/Board";
-//    const params = new URLSearchParams();
-//    params.append("playerOne", playerOne);
-//    params.append("playerTwo", playerTwo);
-
-
-//    window.location.href = `${baseUrl}?${params.toString()}`;
-//});
-
-// THIS PART IS FROM NavigateToGame END

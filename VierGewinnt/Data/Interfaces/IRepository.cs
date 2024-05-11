@@ -3,14 +3,14 @@
     public interface IRepository<T> where T : class
     {
 
-        bool AddAsync(T item);
+        Task<bool> AddAsync(T item);
 
-        List<T> GetAllAsync();
+        Task<List<T>> GetAllAsync();
 
-        T GetByIdAsync(T item);
+        Task<T> GetByIdAsync(T item);
 
         Task UpdateAsync(T item);
 
-        bool DeleteAsync(T item);
+        Task<bool> DeleteAsync(T item);
     }
 }

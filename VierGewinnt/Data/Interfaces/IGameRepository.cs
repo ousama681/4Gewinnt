@@ -5,13 +5,13 @@ namespace VierGewinnt.Data.Interfaces
 {
     public interface IGameRepository : IRepository<GameBoard>
     {
-        bool AddAsync(GameBoard item);
-        bool DeleteAsync(GameBoard item);
-        List<GameBoard> GetAllAsync();
-        GameBoard GetByIdAsync(GameBoard item);
+        Task<bool> AddAsync(GameBoard item);
+        Task<bool> DeleteAsync(GameBoard item);
+        Task<List<GameBoard>> GetAllAsync();
+        Task<GameBoard> GetByIdAsync(GameBoard item);
         Task UpdateAsync(GameBoard item);
-        void AddMoveAsync(Move move);
-        void AddGameBoardAsync(GameBoard board);
-        GameBoard FindGameByPlayerNames(string playerOne, string playerTwo);
+        Task AddMoveAsync(Move move);
+        Task AddGameBoardAsync(GameBoard board);
+        Task<GameBoard> FindGameByPlayerNames(string playerOne, string playerTwo);
     }
 }

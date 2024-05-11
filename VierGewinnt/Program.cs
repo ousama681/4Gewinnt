@@ -32,6 +32,7 @@ namespace VierGewinnt
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
+
             // Adds Controllers
             builder.Services.AddControllersWithViews();
            
