@@ -10,13 +10,13 @@ connection.on("AnimatePlayerMove", (message) => {
 
 window.onload = function () {
     var element = document.getElementById("btnColYellow");
-    element.onclick = function () {
+        element.onclick = function () {
         event.preventDefault();
         connection.invoke("SendPlayerMove", element.value);
     }
 
     var element = document.getElementById("btnColRed");
-    element.onclick = function () {
+        element.onclick = function () {
         event.preventDefault();
         connection.invoke("SendPlayerMove", element.value);
     }

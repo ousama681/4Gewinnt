@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using MQTTnet;
 using MQTTnet.Client;
-using System.Diagnostics;
 
 namespace VierGewinnt.Hubs
 {
@@ -18,15 +17,8 @@ namespace VierGewinnt.Hubs
 
         public async Task SendPlayerMove(string column)
         {
-            Debug.WriteLine("Inside SendplayeRMove in GameHub");
-
-            // Move in DB speichern
-
             await MQTTBroker.MQTTBrokerService.PublishAsync("PlayerMove", column);
-
             await SubscribeAsync("RobotStatus");
-
-            // Hier noch Subscriben und von hier aus die clients steuern.
         }
 
 
@@ -53,6 +45,11 @@ namespace VierGewinnt.Hubs
                 .Build();
 
             // Connect to MQTT broker
+            await ConnectToMQTTBroker(mqttClient, options, topic);
+        }
+
+        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
+        {
             var connectResult = await mqttClient.ConnectAsync(options);
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
@@ -65,14 +62,9 @@ namespace VierGewinnt.Hubs
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
-                    // Animate Move when robot gives O.K.
-                   await _hubClients.All.SendAsync("AnimatePlayerMove", "Spielzug wird animiert.");
-
-                    
-
-                    // UI  Freigeben, wenn Player am Zug ist.
-                    mqttClient.UnsubscribeAsync(topic);
-                    mqttClient.DisconnectAsync();
+                    await _hubClients.All.SendAsync("AnimatePlayerMove", "Spielzug wird animiert.");
+                    await mqttClient.UnsubscribeAsync(topic);
+                    await mqttClient.DisconnectAsync();
                     await Task.CompletedTask;
                 };
 
