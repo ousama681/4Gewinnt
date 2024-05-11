@@ -14,26 +14,26 @@ namespace VierGewinnt.Data.Repositories
             _context = context;
         }
 
-        public bool AddAsync(GameBoard item)
+        public async Task<bool> AddAsync(GameBoard item)
         {
-            _context.GameBoards.Add(item);
-            _context.SaveChanges();
+            await _context.GameBoards.AddAsync(item);
+            await _context.SaveChangesAsync();
             return true;
         }
 
-        public bool DeleteAsync(GameBoard item)
+        public Task<bool> DeleteAsync(GameBoard item)
         {
             throw new NotImplementedException();
         }
 
-        public List<GameBoard> GetAllAsync()
+        public Task<List<GameBoard>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public GameBoard GetByIdAsync(GameBoard item)
+        public async Task<GameBoard> GetByIdAsync(GameBoard item)
         {
-            return _context.GameBoards.Include(gb => gb.Moves).FirstAsync(gb => gb.ID.Equals(item.ID)).Result;
+            return await _context.GameBoards.Include(gb => gb.Moves).FirstAsync(gb => gb.ID.Equals(item.ID));
         }
 
         public Task UpdateAsync(GameBoard item)
@@ -41,16 +41,16 @@ namespace VierGewinnt.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public void AddMoveAsync(Move move)
+        public async Task AddMoveAsync(Move move)
         {
-            _context.Moves.Add(move);
-            _context.SaveChanges();
+            await _context.Moves.AddAsync(move);
+            await _context.SaveChangesAsync();
         }
 
-        public void AddGameBoardAsync(GameBoard board)
+        public async Task AddGameBoardAsync(GameBoard board)
         {
-            _context.GameBoards.Add(board);
-            _context.SaveChanges();
+            await _context.GameBoards.AddAsync(board);
+            await _context.SaveChangesAsync();
         }
 
         Task IRepository<GameBoard>.UpdateAsync(GameBoard item)
@@ -58,17 +58,17 @@ namespace VierGewinnt.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public GameBoard FindGameByPlayerNames(string playerOne, string playerTwo)
+        public async Task<GameBoard> FindGameByPlayerNames(string playerOne, string playerTwo)
         {
-            string playerOneID = _context.Accounts.First(a => a.UserName.Equals(playerOne)).Id;
-            string playerTwoID = _context.Accounts.First(a => a.UserName.Equals(playerTwo)).Id;
+            string playerOneID = _context.Accounts.FirstAsync(a => a.UserName.Equals(playerOne)).Result.Id;
+            string playerTwoID = _context.Accounts.FirstAsync(a => a.UserName.Equals(playerTwo)).Result.Id;
 
             //return _context.GameBoards.Include(gb => gb.Moves).Single(gb =>
             //    gb.PlayerOneID.Equals(playerOneID) &&
             //    gb.PlayerTwoID.Equals(playerTwoID) &&
             //gb.IsFinished.Equals(0));
 
-            return _context.GameBoards.Include(gb => gb.Moves).First(gb =>
+            return await _context.GameBoards.Include(gb => gb.Moves).FirstAsync(gb =>
                 gb.PlayerOneID.Equals(playerOneID) &&
                 gb.PlayerTwoID.Equals(playerTwoID));
             //&&

@@ -104,36 +104,35 @@ namespace VierGewinnt.Data.Repositories
             await _emailService.SendEmailForEmailConfirmation(options);
         }
 
-        public bool AddAsync(ApplicationUser item)
+        public async Task<bool> AddAsync(ApplicationUser item)
         {
-            context.Accounts.Add(item);
-            context.SaveChanges();
+            await context.Accounts.AddAsync(item);
+            await context.SaveChangesAsync();
             return true;
         }
 
-        public bool DeleteAsync(ApplicationUser item)
+        public async Task<bool> DeleteAsync(ApplicationUser item)
         {
-            ApplicationUser accountFound = context.Accounts.Find(item.Id) == null ? new ApplicationUser() { Id = "-1" } : context.Accounts.Find(item.Id);
+            ApplicationUser accountFound = await context.Accounts.FindAsync(item.Id) == null ? new ApplicationUser() { Id = "-1" } : context.Accounts.Find(item.Id);
             if (accountFound.Id.Equals("-1"))
             {
                 return false;
             }
 
             context.Accounts.Remove(item);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return true;
         }
 
-        public List<ApplicationUser> GetAllAsync()
+        public async Task<List<ApplicationUser>> GetAllAsync()
         {
-            return context.Accounts.ToList();
+            return await context.Accounts.ToListAsync();
         }
 
-        public ApplicationUser GetByIdAsync(ApplicationUser item)
+        public async Task<ApplicationUser> GetByIdAsync(ApplicationUser item)
         {
-            ApplicationUser accountFound =  context.Accounts.Find(item.Id) == null ? new ApplicationUser() { Id = "-1" } : context.Accounts.Find(item.Id);
-            return accountFound;
+            return await context.Accounts.FindAsync(item.Id) == null ? new ApplicationUser() { Id = "-1" } : context.Accounts.Find(item.Id);
         }
 
         public Task UpdateAsync(ApplicationUser item)
