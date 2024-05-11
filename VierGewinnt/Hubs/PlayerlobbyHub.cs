@@ -4,6 +4,7 @@ using MQTTnet;
 using MQTTnet.Protocol;
 using System.Text;
 using VierGewinnt.Data.Interfaces;
+using MQTTBroker;
 
 namespace VierGewinnt.Hubs
 {
@@ -56,8 +57,13 @@ namespace VierGewinnt.Hubs
                 onlineUsers.Remove(userName);
                 await Clients.Others.SendAsync("PlayerLeft", userName);
             }
-
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task ChallengePlayer(string playerOne, string playerTwo)
+        {
+            string payload = $"{playerOne},{playerTwo}";
+            await MQTTBrokerService.PublishAsync("Challenge", payload);
         }
     }
 }

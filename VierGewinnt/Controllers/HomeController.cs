@@ -24,7 +24,7 @@ namespace VierGewinnt.Controllers
         private static IList<string> playersInHub = new List<string>();
 
 
-        public HomeController(ILogger<HomeController> logger, IHubContext<PlayerlobbyHub> hubContext, IGameRepository gameRepository, IAccountRepository accountRepository)
+        public HomeController(ILogger<HomeController> logger, IHubContext<PlayerlobbyHub> hubContext)
         {
             _logger = logger;
             _hubContext = hubContext;

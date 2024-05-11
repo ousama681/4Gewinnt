@@ -54,8 +54,6 @@ namespace VierGewinnt.Hubs
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
             {
-                Console.WriteLine("Connected to MQTT broker successfully.");
-
                 // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
 
@@ -67,7 +65,6 @@ namespace VierGewinnt.Hubs
                     await mqttClient.DisconnectAsync();
                     await Task.CompletedTask;
                 };
-
             }
             else
             {

@@ -44,21 +44,21 @@ connection.on("NavigateToGame", (gameId) => {
 
 // Wahrscheinlich später löschen brauchts nicht mehr.
 
-function createBoardEntity(playeroneName, playertwoName) {
-    event.preventDefault();
+//function createBoardEntity(playeroneName, playertwoName) {
+//    event.preventDefault();
 
-    $.ajax({
-        url: "/Game/CreateGame",
-        type: 'GET',
-        data: { "playerone": playeroneName, "playertwo": playertwoName },
-        success: function (result) {
-            console.log("SpielErstellt");
-        },
-        error: function (xhr, status, error) {
-            console.error(error);
-        }
-    });
-}
+//    $.ajax({
+//        url: "/Game/CreateGame",
+//        type: 'GET',
+//        data: { "playerone": playeroneName, "playertwo": playertwoName },
+//        success: function (result) {
+//            console.log("SpielErstellt");
+//        },
+//        error: function (xhr, status, error) {
+//            console.error(error);
+//        }
+//    });
+//}
 
 function createListelement(playerTwo) {
     var li = document.createElement("li");
@@ -70,8 +70,8 @@ function createListelement(playerTwo) {
 
     anchor.onclick = function () {
         event.preventDefault();
-        createBoardEntity(playerOne, playerTwo);
-        connection.invoke("NotificateGameStart", playerOne, playerTwo);
+/*        createBoardEntity(playerOne, playerTwo);*/
+        connection.invoke("ChallengePlayer", playerOne, playerTwo);
     }
 
     li.appendChild(anchor);
