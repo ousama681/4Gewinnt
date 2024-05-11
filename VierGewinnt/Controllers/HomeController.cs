@@ -85,6 +85,11 @@ namespace VierGewinnt.Controllers
                 .WithCleanSession()
                 .Build();
 
+            await ConnectToMQTTBroker(mqttClient, options, topic);
+        }
+
+        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
+        {
             // Connect to MQTT broker
             var connectResult = await mqttClient.ConnectAsync(options);
 
@@ -152,11 +157,8 @@ namespace VierGewinnt.Controllers
             {
                 try
                 {
-                    playerOneEnt = 
-                    playerTwoEnt = await GetUser(playerTwo, dbContext);
-
-                    game.PlayerOneID = await GetUser(playerOne, dbContext).Id;
-                    game.PlayerTwoID = playerTwoEnt.Id;
+                    game.PlayerOneID = GetUser(playerOne, dbContext).Result.Id;
+                    game.PlayerTwoID = GetUser(playerTwo, dbContext).Result.Id;
 
                     await dbContext.GameBoards.AddAsync(game);
                     await dbContext.SaveChangesAsync();
