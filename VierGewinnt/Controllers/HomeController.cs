@@ -7,7 +7,6 @@ using MQTTnet.Server;
 using System.Diagnostics;
 using System.Text;
 using VierGewinnt.Data;
-using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Data.Models;
 using VierGewinnt.Hubs;
 using VierGewinnt.Models;
@@ -82,7 +81,7 @@ namespace VierGewinnt.Controllers
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(broker, port)
                 .WithClientId(clientId)
-                .WithCleanSession()
+                .WithCleanSession(true)
                 .Build();
 
             await ConnectToMQTTBroker(mqttClient, options, topic);
@@ -104,6 +103,12 @@ namespace VierGewinnt.Controllers
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
+                    var message = e.ApplicationMessage;
+                    if (message.Retain) // Ignore retained messages
+                    {
+                        return;
+                    }
+
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
                     string[] players = payload.Split(',');
 
@@ -117,14 +122,16 @@ namespace VierGewinnt.Controllers
                         game = await CreateBoardEntityAsync(playerOne, playerTwo);
 
                         await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
-                        await afterStartingGame(mqttClient, topic);
+                        await AfterStartingGame(mqttClient, topic);
                     }
                     else if (playerOne.Equals(this.username))
                     {
-                        await afterStartingGame(mqttClient, topic);
+                        await AfterStartingGame(mqttClient, topic);
                     }
-                    await Task.CompletedTask;
+                    await mqttClient.UnsubscribeAsync(topic);
+                    await mqttClient.DisconnectAsync();
                 };
+
             }
             else
             {
@@ -132,14 +139,12 @@ namespace VierGewinnt.Controllers
             }
         }
 
-        private async Task afterStartingGame(IMqttClient mqttClient, string topic)
+        private async Task AfterStartingGame(IMqttClient mqttClient, string topic)
         {
-            await mqttClient.UnsubscribeAsync(topic);
-            await mqttClient.DisconnectAsync();
+
             connectedMqttClients.Remove(mqttClient);
             playersInHub.Remove(this.username);
             this.username = null;
-            this.mqttClient = null;
         }
 
         private static async Task<GameBoard> CreateBoardEntityAsync(string playerOne, string playerTwo)
@@ -153,7 +158,7 @@ namespace VierGewinnt.Controllers
 
             // Or you can also instantiate inside using
             GameBoard game = new GameBoard();
-  
+
 
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {

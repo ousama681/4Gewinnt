@@ -5,7 +5,6 @@ using MQTTnet.Client;
 using System.Diagnostics;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Model;
-using VierGewinnt.Data.Models;
 
 namespace VierGewinnt.Hubs
 {
@@ -80,6 +79,12 @@ namespace VierGewinnt.Hubs
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
+                    var message = e.ApplicationMessage;
+                    if (message.Retain) // Ignore retained messages
+                    {
+                        return;
+                    }
+
                     BoardPlayer bpKey = currentMoveKey;
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
