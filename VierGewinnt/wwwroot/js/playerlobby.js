@@ -95,3 +95,18 @@ function createListelement(playerTwo) {
 
     document.getElementById("playerList").appendChild(li);
 }
+
+//Robot vs Robot
+
+var robotList = document.getElementById("robotList");
+var selectedRobots = document.getElementById("selectedRobots");
+
+robotList.addEventListener("click", function (event) {
+    var selectedRobot = event.target;
+    var selectedRobotsCount = selectedRobots.children.length;
+    if (selectedRobotsCount < 2 && selectedRobot.tagName === "LI") {
+        // Clone the selected robot and append it to the selectedRobots list
+        var clonedRobot = selectedRobot.cloneNode(true);
+        selectedRobots.appendChild(clonedRobot);
+    }
+});

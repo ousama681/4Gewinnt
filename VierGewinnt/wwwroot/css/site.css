@@ -138,3 +138,13 @@ nav {
     border-radius: 50%;
     display: inline-block;
 }
+
+/* Player and Robot Lobby */
+.lobby-container-small {
+    height: 20vh; /* Adjust height as needed */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    max-width: 300px;
+}
