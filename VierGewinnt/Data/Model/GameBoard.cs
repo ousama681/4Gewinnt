@@ -13,8 +13,6 @@ namespace VierGewinnt.Data.Models
 
         public ICollection<Move> Moves { get; set; }
 
-        // Wie erhalte ich den State für das Brett? Wahrscheinlich eine Hilfstabelle die jedne Spielzug repräsentiert
-
         public class Board
         {
             private readonly int?[,] _board;
