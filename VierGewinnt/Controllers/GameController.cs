@@ -21,7 +21,6 @@ namespace VierGewinnt.Controllers
             GameBoard gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
             gameViewModel.Board = gameBoard;
             gameViewModel.MoveNr = 0;
-
             return View(gameViewModel);
         }
 
