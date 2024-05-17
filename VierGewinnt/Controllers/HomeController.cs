@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
 using VierGewinnt.Data;
@@ -112,10 +113,21 @@ namespace VierGewinnt.Controllers
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
                     string[] players = payload.Split(',');
 
+                    // Search for Gameboard that has both player in it with gamefinished == 0.
+
+                    // IF found, return that gameId, else create new game.
+
                     string playerOne = players[0];
                     string playerTwo = players[1];
 
-                    GameBoard game = null;
+                    GameBoard game = await CheckForExistingGame(playerOne, playerTwo);
+
+                    if (game != null)
+                    {
+                        await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
+                        return;
+                    }
+
 
                     if (playerTwo.Equals(this.username))
                     {
@@ -137,6 +149,36 @@ namespace VierGewinnt.Controllers
             {
                 Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
             }
+        }
+
+        private async Task<GameBoard> CheckForExistingGame(string playerOne, string playerTwo)
+        {
+            var connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            // Or you can also instantiate inside using
+            GameBoard game = new GameBoard();
+
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    string playerOneID = GetUser(playerOne, dbContext).Result.Id;
+                    string playerTwoID = GetUser(playerTwo, dbContext).Result.Id;
+
+                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneID.Equals(playerOneID) && gb.PlayerTwoID.Equals(playerTwoID) && gb.IsFinished.Equals(false)) ||
+                    (gb.PlayerOneID.Equals(playerTwoID) && gb.PlayerTwoID.Equals(playerOneID) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
+                    return existingGame;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+            return game;
         }
 
         private async Task AfterStartingGame(IMqttClient mqttClient, string topic)

@@ -20,25 +20,10 @@ namespace VierGewinnt.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // ConstraintForeignkey auf Move mal anschauen und gegebenenfalls löschen.
-            //    .WithMany()
-            //    .HasForeignKey(g => g.PlayerOneID)
-            //.OnDelete(DeleteBehavior.Cascade);
-
-            //modelBuilder.Entity<GameBoard>()
-            //    .HasOne(g => g.PlayerTwo)
-            //    .WithMany()
-            //    .HasForeignKey(g => g.PlayerTwoID)
-            //    .OnDelete(DeleteBehavior.Cascade);
-            //    .WithMany()
-            //    .HasForeignKey(g => g.PlayerTwoID)
-            //.OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<GameBoard>()
                 .HasMany(g => g.Moves)
-                .WithOne(m => m.GameBoard)
-                .HasForeignKey(m => m.GameBoardID)
-                .IsRequired();
+                .WithOne()
+                .HasForeignKey(m => m.GameBoardID);
 
             modelBuilder.Entity<Move>()
                 .HasOne(m => m.Player)

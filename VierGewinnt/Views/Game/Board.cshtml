@@ -26,9 +26,8 @@
                 <div class="text-light mb-2">Select a column: </div>
                 <form asp-area="" method="post" class="d-flex flex-column align-items-center">
                     <input asp-for="Board.PlayerOneID" id="playerIdOne" name="userIdOne" type="hidden" />
-                    <input asp-for="MoveNr" name="moveNrOne" type="hidden" />
                     <input asp-for="Board.ID" name="boardIdOne" type="hidden" />
-                    <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7" asp-for="Column">
+                    <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7">
                     <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
                 </form>
             </div>
@@ -79,9 +78,8 @@
                 <div class="text-light mb-2">Select a column: </div>
                 <form id="PlaceRedStone" class="d-flex flex-column align-items-center">
                     <input asp-for="Board.PlayerTwoID" id="playerIdTwo" name="userIdTwo" type="hidden" />
-                    <input asp-for="MoveNr" name="moveNrTwo" type="hidden" />
                     <input asp-for="Board.ID" name="boardIdTwo" type="hidden" />
-                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7" asp-for="Column">
+                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
                     <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Place Chip</button>
                 </form>
             </div>
@@ -98,3 +96,7 @@
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/board.js" asp-append-version="true"></script>
 <script src="~/js/Game.js" asp-append-version="true"></script>
+
+<script>
+    var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));
+</script>

@@ -66,7 +66,6 @@ namespace VierGewinnt
             // SignalR Hub Mapping
             app.MapHub<PlayerlobbyHub>("/playerlobbyHub");
             app.MapHub<GameHub>("/gameHub");
-            //app.MapHub<LobbySecondHub>("/lobbyHub");
             //SignalR Hub Mapping End
 
             app.Run();

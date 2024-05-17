@@ -1,8 +1,53 @@
 "use strict";
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
-connection.start();
-disableButton("btnColRed"); // Gelb startet immer
+
+connection.start()
+    .then(() => {
+        PlaceAlreadyPlayedMoves(movesToLoad);
+    }
+);
+
+function PlaceAlreadyPlayedMoves(movesToLoad) {
+    event.preventDefault();
+    let colDepth = {};
+
+    colDepth['1'] = 6;
+    colDepth['2'] = 6;
+    colDepth['3'] = 6;
+    colDepth['4'] = 6;
+    colDepth['5'] = 6;
+    colDepth['6'] = 6;
+    colDepth['7'] = 6;
+
+    var moveNr = 1;
+    
+    movesToLoad.forEach(m => {
+        var column = m['column'];
+        var key = `${column}`;
+        
+        if (moveNr % 2 == 0) {
+            var selectedCell = document.getElementById(`${column}${colDepth[key]}`);
+            if (selectedCell != null) {
+                selectedCell.style.backgroundColor = "yellow";
+                colDepth[key] = colDepth[key] - 1;
+                moveNr++;
+                return;
+            }
+        } else {
+            var selectedCell = document.getElementById(`${column}${colDepth[key]}`);
+            if (selectedCell != null) {
+                selectedCell.style.backgroundColor = "red";
+                colDepth[key] = colDepth[key] - 1;
+                moveNr++;
+                return;
+            }
+        }    
+    });
+}
+
+
+disableButton("btnColYellow"); // Gelb startet immer
 
 connection.on("AnimatePlayerMove", async (column, playerId) => {
     event.preventDefault();
@@ -133,7 +178,7 @@ async function GetEndRow(column) {
             return "full"
         }
         else if (array[column - 1][i - 1] == 0) { // column and row of the board starts at 1, array starts at 0, so we subtract - 1 
-            return i 
+            return i
         }
     }
 }

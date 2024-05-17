@@ -10,7 +10,6 @@ namespace VierGewinnt.Data.Model
         public string PlayerID { get; set; }
         public int GameBoardID { get; set; }
         public int Column {  get; set; }
-        public GameBoard GameBoard { get; set; }
         public ApplicationUser Player { get; set; }
     }
 }

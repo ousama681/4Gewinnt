@@ -32,6 +32,7 @@ window.addEventListener("beforeunload", () => {
 
 connection.on("NavigateToGame", (gameId) => {
     const baseUrl = "https://localhost:7102/Game/Board";
+    //const baseUrl = "https://localhost:8443/Game/Board";
     const params = new URLSearchParams();
     params.append("gameId", gameId);
 
