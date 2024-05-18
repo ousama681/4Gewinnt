@@ -19,6 +19,8 @@ namespace VierGewinnt.Hubs
 {
     public class GameHub : Hub
     {
+        private static readonly string connectionString = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+
         private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
         private static IHubCallerClients _hubClients = null;
@@ -132,10 +134,8 @@ namespace VierGewinnt.Hubs
 
         private async Task SetIsFinished(int gameId)
         {
-            var connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
+            optionsBuilder.UseSqlServer(GameHub.connectionString);
 
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
@@ -157,10 +157,8 @@ namespace VierGewinnt.Hubs
 
         private bool CheckForWin(int gameId)
         {
-            var connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
+            optionsBuilder.UseSqlServer(GameHub.connectionString);
             ICollection<Move> moves = new List<Move>();
 
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
@@ -275,12 +273,8 @@ namespace VierGewinnt.Hubs
 
         private static async Task<Move> SaveMove(BoardPlayer boardPlayer, int column)
         {
-            // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            var connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
+            optionsBuilder.UseSqlServer(GameHub.connectionString);
             Move move = new Move();
 
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
