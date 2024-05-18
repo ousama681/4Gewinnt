@@ -22,13 +22,13 @@
                 <!-- Your PlayerOne content here -->
             </div>
             <div class="d-flex flex-column align-items-center">
-                <div class="yellow-stone"></div>
+                <div class="red-stone"></div>
                 <div class="text-light mb-2">Select a column: </div>
                 <form asp-area="" method="post" class="d-flex flex-column align-items-center">
                     <input asp-for="Board.PlayerOneID" id="playerIdOne" name="userIdOne" type="hidden" />
                     <input asp-for="Board.ID" name="boardIdOne" type="hidden" />
-                    <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7">
-                    <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
+                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
+                    <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Place Chip</button>
                 </form>
             </div>
         </div>
@@ -74,13 +74,13 @@
                 <label class="text-light">PlayerTwo:</label>
             </div>
             <div class ="d-flex flex-column align-items-center">
-                <div class="red-stone"></div>
+                <div class="yellow-stone"></div>
                 <div class="text-light mb-2">Select a column: </div>
-                <form id="PlaceRedStone" class="d-flex flex-column align-items-center">
+                <form id="PlaceYellowStone" class="d-flex flex-column align-items-center">
                     <input asp-for="Board.PlayerTwoID" id="playerIdTwo" name="userIdTwo" type="hidden" />
                     <input asp-for="Board.ID" name="boardIdTwo" type="hidden" />
-                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
-                    <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Place Chip</button>
+                    <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7">
+                    <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
                 </form>
             </div>
         </div>
@@ -99,4 +99,7 @@
 
 <script>
     var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));
+    var playerOneID = @Json.Serialize(Model.Board.PlayerOneID);
+    var playerTwoID = @Json.Serialize(Model.Board.PlayerTwoID);
+    var gameId = @Json.Serialize(Model.Board.ID);
 </script>

@@ -4,9 +4,15 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
 connection.start()
     .then(() => {
-        PlaceAlreadyPlayedMoves(movesToLoad);
+        PlaceAlreadyPlayedMoves(movesToLoad); 
+        // Wenn playerOne immer Rot ist, dann heisst das, dass PlayeROne imme rbei ungeraden Zahlen drann ist.
+        connection.invoke("RegisterGameInStaticProperty", playerOneID, playerTwoID, gameId)
     }
 );
+
+connection.on("NotificateGameEnd", function (winnerId) {
+    console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
+});
 
 function PlaceAlreadyPlayedMoves(movesToLoad) {
     event.preventDefault();
@@ -44,10 +50,18 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
             }
         }    
     });
+
+    if (moveNr % 2 != 0) {
+        activateButton("btnColRed");
+        disableButton("btnColYellow");
+    } else  {
+                activateButton("btnColYellow");
+        disableButton("btnColRed");
+    }
 }
 
 
-disableButton("btnColYellow"); // Gelb startet immer
+disableButton("btnColYellow"); // Red startet immer
 
 connection.on("AnimatePlayerMove", async (column, playerId) => {
     event.preventDefault();
@@ -61,9 +75,6 @@ connection.on("AnimatePlayerMove", async (column, playerId) => {
     else if (endRow != "full" && playerIdTwo == playerId) {
         animate(column, endRow, "red")
     }
-    
-    // Hier die Logik einbauen um f�r den Spieler der dran ist die Buttons zu enablen.
-    console.log("Spielzug auf Spalte: " + column);
 });
 
 
