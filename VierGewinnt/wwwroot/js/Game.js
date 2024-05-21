@@ -69,11 +69,20 @@ connection.on("AnimatePlayerMove", async (column, playerId) => {
     var playerIdOne = document.getElementById("playerIdOne").value;
     var playerIdTwo = document.getElementById("playerIdTwo").value;
     var endRow = await PlaceChipInArray(column)
-
-    if (endRow != "full" && playerIdOne == playerId) {
+    if (endRow == "full") {
+        alert("Row is already full. Please select another Row.")
+        if (playerIdOne == playerId) {
+            activateButton("btnColYellow")
+        }
+        else {
+            activateButton("btnColRed")
+        }
+        
+    }
+    else if (playerIdOne == playerId) {
         animate(column, endRow, "yellow")
     }
-    else if (endRow != "full" && playerIdTwo == playerId) {
+    else if (playerIdTwo == playerId) {
         animate(column, endRow, "red")
     }
 });

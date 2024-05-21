@@ -1,0 +1,100 @@
+﻿@model VierGewinnt.ViewModels.GameViewModel
+@using Microsoft.AspNetCore.Identity;
+@using VierGewinnt.Data.Models
+@inject UserManager<ApplicationUser> userManager
+
+@{
+    ViewData["Title"] = "Player vs Robot";
+}
+<link rel="stylesheet" href="~/css/board.css" asp-append-version="true" />
+<div class="text-center">
+    <h1 class="display-4 text-light">Player vs Roboking</h1>
+</div>
+<param id="userIDvalue" value="@userManager.GetUserId(@User)"/>
+<param id="player1" value="@Model."
+
+<div class="container">
+    <div class="row align-items-center">
+        <!-- Column for PlayerOne -->
+        <div class="col d-flex flex-column align-items-center">
+            <div id="playerOne">
+                <label class="text-light">PlayerOne:</label>
+                <!-- Your PlayerOne content here -->
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <div class="yellow-stone"></div>
+                <div class="text-light mb-2">Select a column: </div>
+                <form asp-area="" method="post" class="d-flex flex-column align-items-center">
+                    <input asp-for="Board.PlayerOneID" id="playerIdOne" name="userIdOne" type="hidden" />
+                    <input asp-for="MoveNr" name="moveNrOne" type="hidden" />
+                    <input asp-for="Board.ID" name="boardIdOne" type="hidden" />
+                    <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7" asp-for="Column">
+                    <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Column for the game board -->
+        <div class="col-md-6 d-flex justify-content-center">
+            <div class="container mt-5">
+                <h2 class="text-center text-light">Turn 1: Player 1</h2>
+
+                <!-- Column numbers row -->
+                <div class="row justify-content-center">
+                    @for (int col = 1; col <= 7; col++)
+                    {
+                        <div class="colNumber col-auto text-center text-light h4">
+                            @col
+                        </div>
+                    }
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-auto">
+                        <div class="board">
+                            <!-- Game board rows -->
+                            @for (int row = 1; row <= 6; row++)
+                            {
+                                <div class="row justify-content-center">
+                                    <!-- Game board columns -->
+                                    @for (int col = 1; col <= 7; col++)
+                                    {
+                                        <div class="cell" id="@col@row" data-colnr="@col" data-rownr="@row"></div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column for PlayerTwo -->
+        <div class="col d-flex flex-column align-items-center">
+            <div id="playerTwo">
+                <label class="text-light">PlayerTwo:</label>
+            </div>
+            <div class ="d-flex flex-column align-items-center">
+                <div class="red-stone"></div>
+                <div class="text-light mb-2">Select a column: </div>
+                <form id="PlaceRedStone" class="d-flex flex-column align-items-center">
+                    <input asp-for="Board.PlayerTwoID" id="playerIdTwo" name="userIdTwo" type="hidden" />
+                    <input asp-for="MoveNr" name="moveNrTwo" type="hidden" />
+                    <input asp-for="Board.ID" name="boardIdTwo" type="hidden" />
+                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7" asp-for="Column">
+                    <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Place Chip</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@* 
+<div id="partialViewContainer">
+    @await Html.PartialAsync("_PartialViewName", Model)
+</div> *@
+
+
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/board.js" asp-append-version="true"></script>
+<script src="~/js/Game.js" asp-append-version="true"></script>
