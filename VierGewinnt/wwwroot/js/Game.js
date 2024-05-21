@@ -5,7 +5,7 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 connection.start()
     .then(() => {
         PlaceAlreadyPlayedMoves(movesToLoad); 
-        // Wenn playerOne immer Rot ist, dann heisst das, dass PlayeROne imme rbei ungeraden Zahlen drann ist.
+        // Wenn playerOne immer Rot ist, dann heisst das, dass PlayerOne immer bei ungeraden Zahlen drann ist.
         connection.invoke("RegisterGameInStaticProperty", playerOneID, playerTwoID, gameId)
     }
 );
@@ -36,6 +36,7 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
             var selectedCell = document.getElementById(`${column}${colDepth[key]}`);
             if (selectedCell != null) {
                 selectedCell.style.backgroundColor = "yellow";
+                array[column -1][(colDepth[key]) -1] = 1; // update virtual board
                 colDepth[key] = colDepth[key] - 1;
                 moveNr++;
                 return;
@@ -44,6 +45,7 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
             var selectedCell = document.getElementById(`${column}${colDepth[key]}`);
             if (selectedCell != null) {
                 selectedCell.style.backgroundColor = "red";
+                array[column -1][(colDepth[key]) -1] = 1; // update virtual board
                 colDepth[key] = colDepth[key] - 1;
                 moveNr++;
                 return;
@@ -55,11 +57,10 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
         activateButton("btnColRed");
         disableButton("btnColYellow");
     } else  {
-                activateButton("btnColYellow");
+        activateButton("btnColYellow");
         disableButton("btnColRed");
     }
 }
-
 
 disableButton("btnColYellow"); // Red startet immer
 
@@ -82,7 +83,7 @@ window.onload = function () {
     var YellowBtn = document.getElementById("btnColYellow");
     YellowBtn.onclick = function () {
         event.preventDefault();
-
+        disableButton("btnColYellow");
         var arr = $('form').serializeArray();
         var dataObj = {};
 
@@ -101,7 +102,7 @@ window.onload = function () {
 
     RedBtn.onclick = function () {
         event.preventDefault();
-
+        disableButton("btnColRed");
         var arr = $('form').serializeArray();
         var dataObj = {};
 
@@ -124,7 +125,6 @@ async function animate(column, endRow, color) {
             if (selectedCell != null) {
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "yellow";
-                    disableButton("btnColYellow");
                     activateButton("btnColRed");
                     return;
                 }
@@ -141,7 +141,6 @@ async function animate(column, endRow, color) {
             if (selectedCell != null) {
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "red";
-                    disableButton("btnColRed");
                     activateButton("btnColYellow");
                     return;
                 }
