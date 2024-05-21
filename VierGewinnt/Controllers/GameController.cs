@@ -23,14 +23,5 @@ namespace VierGewinnt.Controllers
             return View(gameViewModel);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> BoardEvE(int gameId)
-        {
-            GameViewModel gameViewModel = new GameViewModel();
-            GameBoard gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
-            gameViewModel.Board = gameBoard;
-
-            return View(gameViewModel);
-        }
     }
 }
