@@ -44,6 +44,7 @@ namespace VierGewinnt.Controllers
                 this.username = username;
                 playersInHub.Add(username);
                 await SubscribeAsync("Challenge");
+                await SubscribeAsync("ChallengeRobot");
             }
             if(countInstances == 0)
             {
@@ -100,7 +101,7 @@ namespace VierGewinnt.Controllers
             }
             else if(topic == "ChallengeRobot")
             {
-                //await ReceiveRobotSubscription(mqttClient, options, topic);
+                await ReceiveChallengeRobot(mqttClient, options, topic);
             }
         }
 
@@ -167,6 +168,66 @@ namespace VierGewinnt.Controllers
             }
         }
 
+        private async Task ReceiveChallengeRobot(IMqttClient mqttClient, MqttClientOptions options, string topic)
+        {
+            // Connect to MQTT broker
+            var connectResult = await mqttClient.ConnectAsync(options);
+
+            if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
+            {
+                // Subscribe to a topic
+                await mqttClient.SubscribeAsync(topic);
+
+                // Hier adde ich den Client zur statischen Liste der clients
+                connectedMqttClients.Add(mqttClient);
+
+                // Callback function when a message is received
+                mqttClient.ApplicationMessageReceivedAsync += async e =>
+                {
+                    var message = e.ApplicationMessage;
+                    if (message.Retain) // Ignore retained messages
+                    {
+                        return;
+                    }
+
+                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+                    string[] players = payload.Split(',');
+
+                    // Search for Gameboard that has both player in it with gamefinished == 0.
+
+                    // IF found, return that gameId, else create new game.
+
+                    string playerOne = players[0];
+                    string robotID = players[1];
+
+                    GameBoard game = await CheckForExistingGameAgainstRobot(playerOne, robotID);
+
+                    if (game != null)
+                    {
+                        await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
+                        return;
+                    }
+
+                        game = await CreateBoardEntityAgainstRobotAsync(playerOne, robotID);
+
+                        await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
+                        await AfterStartingGame(mqttClient, topic);
+                    
+                    //if (playerOne.Equals(this.username))
+                    //{
+                    //    await AfterStartingGame(mqttClient, topic);
+                    //}
+                    //await mqttClient.UnsubscribeAsync(topic);
+                    //await mqttClient.DisconnectAsync();
+                };
+
+            }
+            else
+            {
+                Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
+            }
+        }
+
         private async Task<GameBoard> CheckForExistingGame(string playerOne, string playerTwo)
         {
             var connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
@@ -187,6 +248,35 @@ namespace VierGewinnt.Controllers
 
                     GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneID.Equals(playerOneID) && gb.PlayerTwoID.Equals(playerTwoID) && gb.IsFinished.Equals(false)) ||
                     (gb.PlayerOneID.Equals(playerTwoID) && gb.PlayerTwoID.Equals(playerOneID) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
+                    return existingGame;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+            return game;
+        }
+
+        private async Task<GameBoard> CheckForExistingGameAgainstRobot(string playerOne, string robotID)
+        {
+            var connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            // Or you can also instantiate inside using
+            GameBoard game = new GameBoard();
+
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    string playerOneID = GetUser(playerOne, dbContext).Result.Id;                   
+
+                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneID.Equals(playerOneID) && gb.PlayerTwoID.Equals(robotID) && gb.IsFinished.Equals(false)) ||
+                    (gb.PlayerOneID.Equals(robotID) && gb.PlayerTwoID.Equals(playerOneID) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
                     return existingGame;
                 }
                 catch (Exception e)
@@ -224,6 +314,36 @@ namespace VierGewinnt.Controllers
                 {
                     game.PlayerOneID = GetUser(playerOne, dbContext).Result.Id;
                     game.PlayerTwoID = GetUser(playerTwo, dbContext).Result.Id;
+
+                    await dbContext.GameBoards.AddAsync(game);
+                    await dbContext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+            return game;
+        }
+        private static async Task<GameBoard> CreateBoardEntityAgainstRobotAsync(string playerOne, string robotID)
+        {
+            // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
+            // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
+            var connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            // Or you can also instantiate inside using
+            GameBoard game = new GameBoard();
+
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    game.PlayerOneID = GetUser(playerOne, dbContext).Result.Id;
+                    game.PlayerTwoID = robotID;
 
                     await dbContext.GameBoards.AddAsync(game);
                     await dbContext.SaveChangesAsync();
@@ -291,8 +411,6 @@ namespace VierGewinnt.Controllers
                     
                     robotsInHub.Add(robotID);
                     await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
-                    //await mqttClient.UnsubscribeAsync(topic);
-                    //await mqttClient.DisconnectAsync();
                 };
 
             }
