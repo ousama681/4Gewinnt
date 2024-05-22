@@ -55,7 +55,6 @@ namespace VierGewinnt.Controllers
             return View();
         }
 
-
         public IActionResult Leaderboard()
         {
             return View();
@@ -204,21 +203,12 @@ namespace VierGewinnt.Controllers
 
                     if (game != null)
                     {
-                        await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
+                        await _hubContext.Clients.All.SendAsync("NavigateToGameAgainstRobot", game.ID);
                         return;
                     }
-
-                        game = await CreateBoardEntityAgainstRobotAsync(playerOne, robotID);
-
-                        await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
-                        await AfterStartingGame(mqttClient, topic);
-                    
-                    //if (playerOne.Equals(this.username))
-                    //{
-                    //    await AfterStartingGame(mqttClient, topic);
-                    //}
-                    //await mqttClient.UnsubscribeAsync(topic);
-                    //await mqttClient.DisconnectAsync();
+                    game = await CreateBoardEntityAgainstRobotAsync(playerOne, robotID);
+                    await _hubContext.Clients.All.SendAsync("NavigateToGameAgainstRobot", game.ID);
+                    await AfterStartingGame(mqttClient, topic);
                 };
 
             }

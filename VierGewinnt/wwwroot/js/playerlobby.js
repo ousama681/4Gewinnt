@@ -7,7 +7,7 @@ connection.start().then(function () {
     connection.invoke("GetAvailableUsers");
     connection.invoke("AddUser", username);
     connection.invoke("SendNotification", username);
-
+    connection.invoke("FillRobotLobby");
 });
 
 connection.on("ReceiveAvailableUsers", function (players) {
@@ -126,6 +126,14 @@ function createListelementRobot(robot) {
     li.appendChild(anchor);
     document.getElementById("robotList").appendChild(li);
 }
+
+connection.on("NavigateToGameAgainstRobot", (gameId) => {
+    const baseUrl = "https://localhost:7102/Game/BoardPvE";
+    const params = new URLSearchParams();
+    params.append("gameId", gameId);
+
+    window.location.href = `${baseUrl}?${params.toString()}`;
+});
 
 connection.on("RobotLeft", (robot) => {
     var liElement = document.getElementById(robot);

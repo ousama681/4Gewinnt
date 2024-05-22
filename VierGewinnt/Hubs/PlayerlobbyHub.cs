@@ -92,6 +92,11 @@ namespace VierGewinnt.Hubs
             return;
         }
 
+        public async Task FillRobotLobby()
+        {
+            await Clients.All.SendAsync("UpdateRobotLobby", robots);
+        }
+
         public async Task SendNotificationRobot(string robot)
         {
             await Clients.Others.SendAsync("ReceiveNewRobot", robot);
