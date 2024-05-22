@@ -2,6 +2,14 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/playerlobbyHub").build();
 
+connection.start().then(function () {
+    var username = document.getElementById("userNameLabel").textContent;
+    connection.invoke("GetAvailableUsers");
+    connection.invoke("AddUser", username);
+    connection.invoke("SendNotification", username);
+
+});
+
 connection.on("ReceiveAvailableUsers", function (players) {
 
     for (var i = 0; i < players.length; i++) {
@@ -11,13 +19,6 @@ connection.on("ReceiveAvailableUsers", function (players) {
 
 connection.on("ReceiveNewUser", function (playerTwo) {
     createListelement(playerTwo);
-});
-
-connection.start().then(function () {
-    var username = document.getElementById("userNameLabel").textContent;
-    connection.invoke("GetAvailableUsers");
-    connection.invoke("AddUser", username);
-    connection.invoke("SendNotification", username);
 });
 
 connection.on("PlayerLeft", (userName) => {
@@ -38,28 +39,6 @@ connection.on("NavigateToGame", (gameId) => {
 
     window.location.href = `${baseUrl}?${params.toString()}`;
 });
-
-// JSCode END
-
-// FUNCTIONS START
-
-// Wahrscheinlich später löschen brauchts nicht mehr.
-
-//function createBoardEntity(playeroneName, playertwoName) {
-//    event.preventDefault();
-
-//    $.ajax({
-//        url: "/Game/CreateGame",
-//        type: 'GET',
-//        data: { "playerone": playeroneName, "playertwo": playertwoName },
-//        success: function (result) {
-//            console.log("SpielErstellt");
-//        },
-//        error: function (xhr, status, error) {
-//            console.error(error);
-//        }
-//    });
-//}
 
 function createListelement(playerTwo) {
 
@@ -97,17 +76,75 @@ function createListelement(playerTwo) {
     document.getElementById("playerList").appendChild(li);
 }
 
-//Robot vs Robot
+// Robot Lobby
 
-var robotList = document.getElementById("robotList");
-var selectedRobots = document.getElementById("selectedRobots");
+// Test method
+var testButton = document.getElementById("test")
 
-robotList.addEventListener("click", function (event) {
-    var selectedRobot = event.target;
-    var selectedRobotsCount = selectedRobots.children.length;
-    if (selectedRobotsCount < 2 && selectedRobot.tagName === "LI") {
-        // Clone the selected robot and append it to the selectedRobots list
-        var clonedRobot = selectedRobot.cloneNode(true);
-        selectedRobots.appendChild(clonedRobot);
+testButton.onclick = function () {
+    var testText = document.getElementById("testtext").value
+    event.preventDefault();
+    connection.invoke("CreateRobot", testText);
+}
+
+
+connection.on("UpdateRobotLobby", function (robots) {
+    document.getElementById("robotList").innerHTML = "";
+    for (var i = 0; i < robots.length; i++) {
+        createListelementRobot(robots[i]);
     }
 });
+
+connection.on("AddRobot", function (robotID) {
+    connection.invoke("AddRobot", robotID)
+});
+
+function createListelementRobot(robot) {
+
+    var playerOne = document.getElementById("userNameLabel").textContent;
+
+    var li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    var anchor = document.createElement("a");
+    anchor.className = "text-decoration-none";
+
+    var dotSpan = document.createElement("span");
+    dotSpan.className = "dot bg-success";
+
+    li.appendChild(anchor);
+    li.appendChild(dotSpan);
+
+    li.id = robot;
+    anchor.textContent = `${robot}`;
+
+    anchor.onclick = function () {
+        event.preventDefault();
+        connection.invoke("ChallengeRobot", playerOne, robot);
+    }
+
+    li.appendChild(anchor);
+    document.getElementById("robotList").appendChild(li);
+}
+
+connection.on("RobotLeft", (robot) => {
+    var liElement = document.getElementById(robot);
+    liElement.remove();
+});
+
+//Robot vs Robot
+
+// ändern zu drag and drop statt click
+
+//var robotList = document.getElementById("robotList");
+//var selectedRobots = document.getElementById("selectedRobots");
+
+//robotList.addEventListener("click", function (event) {
+//    var selectedRobot = event.target;
+//    var selectedRobotsCount = selectedRobots.children.length;
+//    if (selectedRobotsCount < 2 && selectedRobot.tagName === "LI") {
+//        // Clone the selected robot and append it to the selectedRobots list
+//        var clonedRobot = selectedRobot.cloneNode(true);
+//        selectedRobots.appendChild(clonedRobot);
+//    }
+//});

@@ -22,6 +22,5 @@ namespace VierGewinnt.Controllers
             gameViewModel.Board = gameBoard;
             return View(gameViewModel);
         }
-
     }
 }
