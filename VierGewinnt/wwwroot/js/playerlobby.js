@@ -80,12 +80,12 @@ function createListelement(playerTwo) {
 
 // Test method
 var testButton = document.getElementById("test")
-
 testButton.onclick = function () {
     var testText = document.getElementById("testtext").value
     event.preventDefault();
     connection.invoke("CreateRobot", testText);
 }
+
 
 
 connection.on("UpdateRobotLobby", function (robots) {

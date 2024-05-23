@@ -62,8 +62,6 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
     }
 }
 
-disableButton("btnColYellow"); // Red startet immer
-
 connection.on("AnimatePlayerMove", async (column, playerId) => {
     event.preventDefault();
     var playerIdOne = document.getElementById("playerIdOne").value;
@@ -76,8 +74,7 @@ connection.on("AnimatePlayerMove", async (column, playerId) => {
         }
         else {
             activateButton("btnColRed")
-        }
-        
+        }       
     }
     else if (playerIdOne == playerId) {
         animate(column, endRow, "red")
@@ -89,6 +86,9 @@ connection.on("AnimatePlayerMove", async (column, playerId) => {
 
 
 window.onload = function () {
+
+    // To Do: implement robot move instead of yellow
+
     var YellowBtn = document.getElementById("btnColYellow");
     YellowBtn.onclick = function () {
         event.preventDefault();
@@ -106,6 +106,7 @@ window.onload = function () {
 
         connection.invoke("SendPlayerMove", playerIdOne, boardIdOne, columnYellow);
     }
+
 
     var RedBtn = document.getElementById("btnColRed");
 

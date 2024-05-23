@@ -81,8 +81,8 @@ namespace VierGewinnt.Hubs
         {
             if (robots.Contains(robotID))
             {
-                return;
                 Debug.WriteLine("ID already exists. Robot could not be added.");
+                return;
             }
             else
             {
