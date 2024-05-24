@@ -2,6 +2,7 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
+// Prepare Game
 connection.start()
     .then(() => {
         PlaceAlreadyPlayedMoves(movesToLoad); 
@@ -9,10 +10,6 @@ connection.start()
         connection.invoke("RegisterGameInStaticProperty", playerOneID, playerTwoID, gameId)
     }
 );
-
-connection.on("NotificateGameEnd", function (winnerId) {
-    console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
-});
 
 function PlaceAlreadyPlayedMoves(movesToLoad) {
     event.preventDefault();
@@ -53,6 +50,9 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
         }    
     });
 
+
+    // To Do: activateButton not necessary for AI move.....
+
     if (moveNr % 2 != 0) {
         activateButton("btnColRed");
         disableButton("btnColYellow");
@@ -62,32 +62,11 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
     }
 }
 
-connection.on("AnimatePlayerMove", async (column, playerId) => {
-    event.preventDefault();
-    var playerIdOne = document.getElementById("playerIdOne").value;
-    var playerIdTwo = document.getElementById("playerIdTwo").value;
-    var endRow = await PlaceChipInArray(column)
-    if (endRow == "full") {
-        alert("Row is already full. Please select another Row.")
-        if (playerIdOne == playerId) {
-            activateButton("btnColYellow")
-        }
-        else {
-            activateButton("btnColRed")
-        }       
-    }
-    else if (playerIdOne == playerId) {
-        animate(column, endRow, "red")
-    }
-    else if (playerIdTwo == playerId) {
-        animate(column, endRow, "yellow")
-    }
-});
 
-
+// Player action
 window.onload = function () {
 
-    // To Do: implement robot move instead of yellow
+    // To Do: implement robot move instead of yellow.......
 
     var YellowBtn = document.getElementById("btnColYellow");
     YellowBtn.onclick = function () {
@@ -109,7 +88,6 @@ window.onload = function () {
 
 
     var RedBtn = document.getElementById("btnColRed");
-
     RedBtn.onclick = function () {
         event.preventDefault();
         disableButton("btnColRed");
@@ -127,6 +105,35 @@ window.onload = function () {
         connection.invoke("SendPlayerMove", playerIdTwo, boardIdTwo, columnRed);
     }
 }
+
+// Robot action
+function startAiMove() {
+
+}
+
+
+// animate Moves
+connection.on("AnimatePlayerMove", async (column, playerId) => {
+    event.preventDefault();
+    var playerIdOne = document.getElementById("playerIdOne").value;
+    var playerIdTwo = document.getElementById("playerIdTwo").value; // playerIdTwo correct for AI?
+    var endRow = await PlaceChipInArray(column)
+    if (endRow == "full") {
+        alert("Row is already full. Please select another Row.")
+        if (playerIdOne == playerId) {
+            activateButton("btnColRed")
+        }
+        else {
+            activateButton("btnColYellow")
+        }
+    }
+    else if (playerIdOne == playerId) {
+        animate(column, endRow, "red")
+    }
+    else if (playerIdTwo == playerId) {
+        animate(column, endRow, "yellow")
+    }
+});
 
 async function animate(column, endRow, color) {
     if (color == "yellow") {
@@ -162,16 +169,6 @@ async function animate(column, endRow, color) {
     }
 }
 
-function disableButton(btnId) {
-    var button = document.getElementById(btnId);
-    button.disabled = true;
-}
-
-function activateButton(btnId) {
-    var button = document.getElementById(btnId);
-    button.disabled = false;
-}
-
 //virtual board to check if a chip is already placed
 var array = [
     [0, 0, 0, 0, 0, 0],
@@ -202,3 +199,20 @@ async function GetEndRow(column) {
         }
     }
 }
+
+function disableButton(btnId) {
+    var button = document.getElementById(btnId);
+    button.disabled = true;
+}
+
+function activateButton(btnId) {
+    var button = document.getElementById(btnId);
+    button.disabled = false;
+}
+
+
+// Game End
+connection.on("NotificateGameEnd", function (winnerId) {
+    console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
+});
+

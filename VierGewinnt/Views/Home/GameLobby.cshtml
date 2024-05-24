@@ -30,10 +30,17 @@
             <h2 class="text-light">Choose 2 Robots</h2>
             <div class="lobby-container-small" style="max-width: 300px; display: flex; flex-direction: column;">
                 <ul class="text-light list-group" id="selectedRobots"></ul>
-
             </div>
         </div>
     </div>
 </div>
+
+<div id="challengeModal" style="display: none;">
+    <div>
+        <p>Do you accept the challenge?</p>
+        <button id="confirmButton">Accept</button>
+    </div>
+</div>
+
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/playerlobby.js"></script>

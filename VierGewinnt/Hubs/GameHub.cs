@@ -42,10 +42,10 @@ namespace VierGewinnt.Hubs
             await SaveMove(bp, columnNr);
             playerMoves.Add(bp, columnNr);
 
-            await MQTTBroker.MQTTBrokerService.PublishAsync("PlayerMove", column);
-            await SubscribeAsync("RobotStatus");
+            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
+            await SubscribeAsync("feedback");
             // TestMethode um nicht mit Postman den RobotStatus zu simulieren
-            await MQTTBrokerService.PublishAsync("RobotStatus", "1");
+            await MQTTBrokerService.PublishAsync("feedback", "1");
         }
 
         public async Task GameIsOver(string winnerId, int gameId)

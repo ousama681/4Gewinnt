@@ -72,10 +72,10 @@ connection.on("AnimatePlayerMove", async (column, playerId) => {
     if (endRow == "full") {
         alert("Row is already full. Please select another Row.")
         if (playerIdOne == playerId) {
-            activateButton("btnColYellow")
+            activateButton("btnColRed")
         }
         else {
-            activateButton("btnColRed")
+            activateButton("btnColYellow")
         }
         
     }

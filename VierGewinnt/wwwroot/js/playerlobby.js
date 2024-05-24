@@ -2,6 +2,13 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/playerlobbyHub").build();
 
+
+// Global variables
+var connectionId;
+var playerName;
+
+
+// Init
 connection.start().then(function () {
     var username = document.getElementById("userNameLabel").textContent;
     connection.invoke("GetAvailableUsers");
@@ -10,39 +17,26 @@ connection.start().then(function () {
     connection.invoke("FillRobotLobby");
 });
 
+connection.on("SetConID", function (playerOneId, playerOnename) {
+    connectionId = playerOneId;
+    playerName = playerOnename
+});
+
+
+
+// Load Players
 connection.on("ReceiveAvailableUsers", function (players) {
 
-    for (var i = 0; i < players.length; i++) {
-        createListelement(players[i]);
+    for (const [player, id] of Object.entries(players)) {
+        createListelement(player, id);
     }
 });
 
-connection.on("ReceiveNewUser", function (playerTwo) {
-    createListelement(playerTwo);
+connection.on("ReceiveNewUser", function (playerTwo, playerTwoId) {
+    createListelement(playerTwo, playerTwoId);
 });
 
-connection.on("PlayerLeft", (userName) => {
-    var liElement = document.getElementById(userName);
-    liElement.remove();
-});
-
-window.addEventListener("beforeunload", () => {
-    var username = document.getElementById("userNameLabel").textContent;
-    connection.invoke("LeaveLobby", username);
-});
-
-connection.on("NavigateToGame", (gameId) => {
-    const baseUrl = "https://localhost:7102/Game/Board";
-    //const baseUrl = "https://localhost:8443/Game/Board";
-    const params = new URLSearchParams();
-    params.append("gameId", gameId);
-
-    window.location.href = `${baseUrl}?${params.toString()}`;
-});
-
-function createListelement(playerTwo) {
-
-    var playerOne = document.getElementById("userNameLabel").textContent;
+function createListelement(playerTwo, playerTwoId) {
 
     // Create the <li> element
     var li = document.createElement("li");
@@ -67,14 +61,79 @@ function createListelement(playerTwo) {
 
     anchor.onclick = function () {
         event.preventDefault();
-/*        createBoardEntity(playerOne, playerTwo);*/
-        connection.invoke("ChallengePlayer", playerOne, playerTwo);
+        console.log("ChallengePlayer invoked");
+        connection.invoke("ChallengePlayer", connectionId, playerTwoId, playerName, playerTwo);
     }
 
     li.appendChild(anchor);
 
     document.getElementById("playerList").appendChild(li);
 }
+
+
+
+// Initiate Game after clicking on Opponent and accepting Modals
+connection.on("ReceiveChallenge", function (payload, playerOneId) {
+    console.log("Challenge received for group: " + payload);
+    showModal(payload, playerOneId);
+});
+
+function showModal(payload, playerOneId) {
+    // Display modal code here
+    const modal = document.getElementById("challengeModal");
+    modal.style.display = "block";
+    // When the player confirms
+    document.getElementById("confirmButton").onclick = function () {
+        connection.invoke("ConfirmChallenge", payload, playerOneId);
+        modal.style.display = "none";
+    }
+}
+
+connection.on("AcceptChallenge", function (payload) {
+    console.log("Challenge received for group: " + payload);
+    showModal2(payload);
+});
+
+function showModal2(payload) {
+    // Display modal code here
+    const modal = document.getElementById("challengeModal");
+    modal.style.display = "block";
+    // When the player confirms
+    document.getElementById("confirmButton").onclick = function () {
+        modal.style.display = "none";
+        connection.invoke("StartGame", payload)
+    }
+}
+
+function startGame(groupId) {
+    console.log("Game starting for group: " + payload);
+    connection.invoke("StartGame", payload)
+    
+}
+
+
+
+// Player leaves Lobby
+connection.on("PlayerLeft", (userName) => {
+    var liElement = document.getElementById(userName);
+    liElement.remove();
+});
+
+window.addEventListener("beforeunload", () => {
+    var username = document.getElementById("userNameLabel").textContent;
+    connection.invoke("LeaveLobby", username);
+});
+
+connection.on("NavigateToGame", (gameId) => {
+    const baseUrl = "https://localhost:7102/Game/Board";
+    //const baseUrl = "https://localhost:8443/Game/Board";
+    const params = new URLSearchParams();
+    params.append("gameId", gameId);
+
+    window.location.href = `${baseUrl}?${params.toString()}`;
+});
+
+
 
 // Robot Lobby
 
