@@ -95,7 +95,6 @@ connection.on("AcceptChallenge", function (payload) {
 });
 
 function showModal2(payload) {
-    // Display modal code here
     const modal = document.getElementById("challengeModal");
     modal.style.display = "block";
     // When the player confirms
