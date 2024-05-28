@@ -35,12 +35,22 @@
     </div>
 </div>
 
-<div id="challengeModal" style="display: none; background-color: black; width: 15vw; height:10vh ">
+<div id="challengeModal" style="display: none; background-color: black;min-width:fit-content; width: 15vw; min-height:fit-content; height:10vh ">
     <div>
-        <label class="text-light">Do you accept the challenge?</label>
+        <label id="modalLabel" class="text-light">Do you accept the challenge?</label>
+        <label id="timer" class="text-light"></label>
         <button class="success-btn btn btn-primary mt-2" id="confirmButton">Accept</button>
+        <button class="success-btn btn btn-primary mt-2" id="abortButton">Abort</button>
     </div>
 </div>
+
+<div id="abortModal" style="display: none; background-color: black; width: 15vw; height:10vh ">
+    <div>
+        <label class="text-light">A Player was not ready for the game. Game aborted.</label>
+        <button class="success-btn btn btn-primary mt-2" id="okButton">Ok</button>
+    </div>
+</div>
+
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/playerlobby.js"></script>

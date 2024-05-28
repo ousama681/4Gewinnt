@@ -72,45 +72,76 @@ function createListelement(playerTwo, playerTwoId) {
 
 
 
-// Initiate Game after clicking on Opponent and accepting Modals
-connection.on("ReceiveChallenge", function (payload, playerOneId) {
+// Initiate Game after clicking on Opponent and both players accept Modals
+connection.on("ReceiveChallenge", function (payload, playerOneId, groupId) {
     console.log("Challenge received for group: " + payload);
-    showModal(payload, playerOneId);
+    showPlayerTwoChallengeModal(payload, playerOneId, groupId);
 });
 
-function showModal(payload, playerOneId) {
-    // Display modal code here
+async function showPlayerTwoChallengeModal(payload, playerOneId, groupId) {
+    const players = payload.split(',');
     const modal = document.getElementById("challengeModal");
+    const label = document.getElementById("modalLabel");
+    const timer = document.getElementById("timer");
+    label.textContent = `${players[0]} wants to play a game. Do you accept the challenge?`;
     modal.style.display = "block";
-    // When the player confirms
+
+    for (let i = 15; i >= 0; i--) {
+        timer.textContent = i
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (i == 0) {
+            connection.invoke("AbortChallenge", groupId, playerName);
+            modal.style.display = "none";
+        }
+    }
+
+    // When playerTwo confirms
     document.getElementById("confirmButton").onclick = function () {
-        connection.invoke("ConfirmChallenge", payload, playerOneId);
+        connection.invoke("ConfirmChallenge", payload, playerOneId, groupId);
         modal.style.display = "none";
     }
-}
 
-connection.on("AcceptChallenge", function (payload) {
+    // When PlayerTwo aborts
+    document.getElementById("abortButton").onclick = function () {
+        connection.invoke("AbortChallenge", groupId, playerName);
+        modal.style.display = "none";
+    }
+
+};
+
+connection.on("AcceptChallenge", function (payload, groupId) {
     console.log("Challenge received for group: " + payload);
-    showModal2(payload);
+    showPlayerOneChallengeModal(payload, groupId);
 });
 
-function showModal2(payload) {
+function showPlayerOneChallengeModal(payload, groupId) {
     const modal = document.getElementById("challengeModal");
     modal.style.display = "block";
-    // When the player confirms
+    // When playerOne confirms
     document.getElementById("confirmButton").onclick = function () {
         modal.style.display = "none";
         connection.invoke("StartGame", payload)
     }
-}
+    // When playerOne aborts
+    document.getElementById("abortButton").onclick = function () {        
+        connection.invoke("AbortChallenge", groupId, playerName);
+        modal.style.display = "none";
+    }
+};
 
-function startGame(groupId) {
-    console.log("Game starting for group: " + payload);
-    connection.invoke("StartGame", payload)
-    
-}
+connection.on("ChallengeAborted", function (player, groupId) {
+    showAbortChallengeModal(player, groupId);
+});
 
-
+function showAbortChallengeModal(player, groupId) {
+    const modal = document.getElementById("abortModal");
+    modal.style.display = "block";
+    // When playerOne confirms
+    document.getElementById("okButton").onclick = function () {
+        connection.invoke("RemoveFromGroup", groupId, connectionId)
+        modal.style.display = "none";
+    }
+};
 
 // Player leaves Lobby
 connection.on("PlayerLeft", (userName) => {

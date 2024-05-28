@@ -33,7 +33,7 @@ namespace VierGewinnt.Hubs
             {
                 onlineUsers.Add(player, Context.ConnectionId);
                 players.Add(Context.ConnectionId);
-                SetConnectionId(player);
+                await SetConnectionId(player);
             }
             return;
         }
@@ -77,18 +77,33 @@ namespace VierGewinnt.Hubs
             string groupId = $"{playerOneId},{playerTwoId}";
             await Groups.AddToGroupAsync(playerOneId, groupId);
             await Groups.AddToGroupAsync(playerTwoId, groupId);          
-            await Clients.Client(playerTwoId).SendAsync("ReceiveChallenge", payload, playerOneId);          
+            await Clients.Client(playerTwoId).SendAsync("ReceiveChallenge", payload, playerOneId, groupId); // send playerTwo a challenge request   
         }
 
-        public async Task ConfirmChallenge(string payload, string playerOneId)
+        public async Task ConfirmChallenge(string payload, string playerOneId, string groupId)
         {
-            await Clients.Client(playerOneId).SendAsync("AcceptChallenge", payload);
-            
+            // Challenge got confirmed from playerTwo, now we ask playerOne to accept the game as well
+            await Clients.Client(playerOneId).SendAsync("AcceptChallenge", payload, groupId);           
         }
+
         public async Task StartGame(string payload)
         {
+            //PlayerOne also has accepted the Challenge, we can now start the game
             await MQTTBrokerService.PublishAsync("Challenge", payload);
         }
+
+        public async Task AbortChallenge(string groupId, string playerName)
+        {
+            // Send Message to both players, that the challenge request was not successfull
+            await Clients.Group(groupId).SendAsync("ChallengeAborted", playerName, groupId);
+        }
+
+        public async Task RemoveFromGroup(string groupId, string connectionId)
+        {
+            await Groups.RemoveFromGroupAsync(connectionId, groupId);
+        }
+
+
 
 
         // Player vs Robot
@@ -116,7 +131,7 @@ namespace VierGewinnt.Hubs
 
         public async Task FillRobotLobby()
         {
-            await Clients.All.SendAsync("UpdateRobotLobby", robots);
+            await Clients.All.SendAsync("UpdateRobotLobby", robots);           
         }
 
         public async Task SendNotificationRobot(string robot)
