@@ -223,9 +223,11 @@ function createListelementRobot(robot) {
 
     var li = document.createElement("li");
     li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.id = robot;
 
     var anchor = document.createElement("a");
     anchor.className = "text-decoration-none";
+    anchor.textContent = `${robot}`;
 
     var dotSpan = document.createElement("span");
     dotSpan.className = "dot bg-success";
@@ -233,13 +235,19 @@ function createListelementRobot(robot) {
     li.appendChild(anchor);
     li.appendChild(dotSpan);
 
-    li.id = robot;
-    anchor.textContent = `${robot}`;
-
     anchor.onclick = function () {
         event.preventDefault();
         connection.invoke("ChallengeRobot", playerOne, robot);
     }
+
+
+
+    // Add drag and drop event listeners
+    li.draggable = true;
+    li.addEventListener('dragstart', handleDragStart);
+    li.addEventListener('dragend', handleDragEnd);
+
+
 
     li.appendChild(anchor);
     document.getElementById("robotList").appendChild(li);
@@ -258,19 +266,35 @@ connection.on("RobotLeft", (robot) => {
     liElement.remove();
 });
 
-//Robot vs Robot
 
-// ändern zu drag and drop statt click
 
-//var robotList = document.getElementById("robotList");
-//var selectedRobots = document.getElementById("selectedRobots");
+// TO DO: create groups for each robot list, so people cant start games against already dragged robots, 
+// also remove onklick on already dragged items, so we dont start a game against a robot
 
-//robotList.addEventListener("click", function (event) {
-//    var selectedRobot = event.target;
-//    var selectedRobotsCount = selectedRobots.children.length;
-//    if (selectedRobotsCount < 2 && selectedRobot.tagName === "LI") {
-//        // Clone the selected robot and append it to the selectedRobots list
-//        var clonedRobot = selectedRobot.cloneNode(true);
-//        selectedRobots.appendChild(clonedRobot);
-//    }
-//});
+// Drag and drop handlers
+function handleDragStart(event) {
+    event.dataTransfer.setData('text/plain', event.target.id);
+    event.target.style.opacity = '0.5';
+}
+
+function handleDragEnd(event) {
+    event.target.style.opacity = '';
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    const id = event.dataTransfer.getData('text/plain');
+    const draggableElement = document.getElementById(id);
+    const dropzone = event.target;
+    dropzone.appendChild(draggableElement);
+    event.dataTransfer.clearData();
+}
+
+// Set up the dropzone
+const selectedRobots = document.getElementById('selectedRobots');
+selectedRobots.addEventListener('dragover', handleDragOver);
+selectedRobots.addEventListener('drop', handleDrop);

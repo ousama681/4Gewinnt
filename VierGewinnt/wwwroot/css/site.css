@@ -120,11 +120,13 @@ nav {
     color: white;
 }
 
+
+
 /* Gamelobby */
 
 /* Player and Robot Lobby border frame */
 .lobby-container {
-    height: 50vh; /* Adjust height as needed */
+    height: 50vh; 
     overflow-y: auto;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -142,7 +144,7 @@ nav {
 
 /* Robot vs Robot Lobby */
 .lobby-container-small {
-    height: 20vh; /* Adjust height as needed */
+    height: 10vh; 
     overflow-y: auto;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -150,6 +152,17 @@ nav {
     max-width: 300px;
 }
 
+#selectedRobots {
+    height: 7vh;
+}
+
+.draggable {
+    cursor: move;
+}
+
+.droppable {
+    border: 2px dashed #ccc;
+}
 
 /* Challenge Modal */
 #challengeModal {
@@ -231,7 +244,6 @@ nav {
         align-items: center;
     }
 }
-
 
 #abortModal div {
     display: flex;
