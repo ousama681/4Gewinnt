@@ -150,6 +150,8 @@ nav {
     max-width: 300px;
 }
 
+
+/* Challenge Modal */
 #challengeModal {
     display: none;
     background-color: black;
@@ -183,7 +185,6 @@ nav {
         }
 }
 
-
 #challengeModal div {
     display: flex;
     flex-direction: column;
@@ -194,4 +195,47 @@ nav {
 #timer {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+}
+
+
+/* abortModal */
+#abortModal {
+    display: none;
+    background-color: black;
+    min-width: fit-content;
+    min-height: fit-content;
+    padding: 1rem;
+    border-radius: 5px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media (max-width: 768px) {
+    #abortModal {
+        width: 80vw;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    #abortModal {
+        width: 90vw;
+        height: auto;
+        padding: 0.5rem;
+    }
+
+    #challengeModal div {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+
+#abortModal div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
