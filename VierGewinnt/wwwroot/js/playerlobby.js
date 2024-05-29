@@ -283,18 +283,40 @@ function handleDragEnd(event) {
 
 function handleDragOver(event) {
     event.preventDefault();
+    // Only allow dropping on the drop zones
+    if (event.target && (event.target.id === 'selectedRobots' || event.target.id === 'robotList')) {
+        event.target.classList.add('droppable');
+    }
+}
+
+function handleDragLeave(event) {
+    // Only remove class if leaving the drop zones
+    if (event.target && (event.target.id === 'selectedRobots' || event.target.id === 'robotList')) {
+        event.target.classList.remove('droppable');
+    }
 }
 
 function handleDrop(event) {
     event.preventDefault();
-    const id = event.dataTransfer.getData('text/plain');
-    const draggableElement = document.getElementById(id);
-    const dropzone = event.target;
-    dropzone.appendChild(draggableElement);
-    event.dataTransfer.clearData();
+    // Only handle drop if it's on the drop zones
+    if (event.target && (event.target.id === 'selectedRobots' || event.target.id === 'robotList')) {
+        const id = event.dataTransfer.getData('text/plain');
+        const draggableElement = document.getElementById(id);
+        const dropzone = event.target;
+        dropzone.classList.remove('droppable');
+        dropzone.appendChild(draggableElement);
+        event.dataTransfer.clearData();
+    }
 }
 
-// Set up the dropzone
+// Set up the drop zones
 const selectedRobots = document.getElementById('selectedRobots');
+const robotList = document.getElementById('robotList');
+
 selectedRobots.addEventListener('dragover', handleDragOver);
+selectedRobots.addEventListener('dragleave', handleDragLeave);
 selectedRobots.addEventListener('drop', handleDrop);
+
+robotList.addEventListener('dragover', handleDragOver);
+robotList.addEventListener('dragleave', handleDragLeave);
+robotList.addEventListener('drop', handleDrop);
