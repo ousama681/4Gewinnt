@@ -26,7 +26,6 @@ connection.on("SetConID", function (playerOneId, playerOnename) {
 
 // Load Players
 connection.on("ReceiveAvailableUsers", function (players) {
-
     for (const [player, id] of Object.entries(players)) {
         createListelement(player, id);
     }
@@ -66,7 +65,6 @@ function createListelement(playerTwo, playerTwoId) {
     }
 
     li.appendChild(anchor);
-
     document.getElementById("playerList").appendChild(li);
 }
 
@@ -83,30 +81,37 @@ async function showPlayerTwoChallengeModal(payload, playerOneId, groupId) {
     const modal = document.getElementById("challengeModal");
     const label = document.getElementById("modalLabel");
     const timer = document.getElementById("timer");
+    let playerResponded = false;
+
     label.textContent = `${players[0]} wants to play a game. Do you accept the challenge?`;
     modal.style.display = "block";
 
-    for (let i = 15; i >= 0; i--) {
-        timer.textContent = i
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        if (i == 0) {
-            connection.invoke("AbortChallenge", groupId, playerName);
-            modal.style.display = "none";
-        }
-    }
-
     // When playerTwo confirms
     document.getElementById("confirmButton").onclick = function () {
+        playerResponded = true;
         connection.invoke("ConfirmChallenge", payload, playerOneId, groupId);
         modal.style.display = "none";
     }
 
     // When PlayerTwo aborts
     document.getElementById("abortButton").onclick = function () {
+        playerResponded = true;
         connection.invoke("AbortChallenge", groupId, playerName);
         modal.style.display = "none";
     }
 
+    // Timer
+    for (let i = 15; i >= 0; i--) {
+        timer.textContent = i
+        if (playerResponded) {
+            return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (i == 0) {
+            connection.invoke("AbortChallenge", groupId, playerName);
+            modal.style.display = "none";
+        }
+    }
 };
 
 connection.on("AcceptChallenge", function (payload, groupId) {
@@ -114,18 +119,40 @@ connection.on("AcceptChallenge", function (payload, groupId) {
     showPlayerOneChallengeModal(payload, groupId);
 });
 
-function showPlayerOneChallengeModal(payload, groupId) {
+async function showPlayerOneChallengeModal(payload, groupId) {
+    const players = payload.split(',');
     const modal = document.getElementById("challengeModal");
+    const label = document.getElementById("modalLabel");
+    const timer = document.getElementById("timer");
+    let playerResponded = false;
+
+    label.textContent = `${players[1]} is ready to start the game. Start?`;
     modal.style.display = "block";
+
     // When playerOne confirms
     document.getElementById("confirmButton").onclick = function () {
+        playerResponded = true;
         modal.style.display = "none";
         connection.invoke("StartGame", payload)
     }
     // When playerOne aborts
-    document.getElementById("abortButton").onclick = function () {        
+    document.getElementById("abortButton").onclick = function () {    
+        playerResponded = true;
         connection.invoke("AbortChallenge", groupId, playerName);
-        modal.style.display = "none";
+        modal.style.display = "none";       
+    }
+
+    // Timer
+    for (let i = 15; i >= 0; i--) {
+        timer.textContent = i
+        if (playerResponded) {
+            return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (i == 0) {
+            connection.invoke("AbortChallenge", groupId, playerName);
+            modal.style.display = "none";
+        }
     }
 };
 
@@ -142,6 +169,8 @@ function showAbortChallengeModal(player, groupId) {
         modal.style.display = "none";
     }
 };
+
+
 
 // Player leaves Lobby
 connection.on("PlayerLeft", (userName) => {

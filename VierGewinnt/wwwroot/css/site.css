@@ -120,8 +120,9 @@ nav {
     color: white;
 }
 
+/* Gamelobby */
 
-/* Player and Robot Lobby */
+/* Player and Robot Lobby border frame */
 .lobby-container {
     height: 50vh; /* Adjust height as needed */
     overflow-y: auto;
@@ -139,7 +140,7 @@ nav {
     display: inline-block;
 }
 
-/* Player and Robot Lobby */
+/* Robot vs Robot Lobby */
 .lobby-container-small {
     height: 20vh; /* Adjust height as needed */
     overflow-y: auto;
@@ -147,4 +148,50 @@ nav {
     border-radius: 5px;
     padding: 10px;
     max-width: 300px;
+}
+
+#challengeModal {
+    display: none;
+    background-color: black;
+    min-width: fit-content;
+    min-height: fit-content;
+    padding: 1rem;
+    border-radius: 5px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media (max-width: 768px) {
+    #challengeModal {
+        width: 80vw;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    #challengeModal {
+        width: 90vw;
+        height: auto;
+        padding: 0.5rem;
+    }
+
+        #challengeModal div {
+            flex-direction: column;
+            align-items: center;
+        }
+}
+
+
+#challengeModal div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#timer {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
 }
