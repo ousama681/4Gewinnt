@@ -11,8 +11,8 @@ var playerName;
 // Init
 connection.start().then(function () {
     var username = document.getElementById("userNameLabel").textContent;
-    connection.invoke("GetAvailableUsers");
     connection.invoke("AddUser", username);
+    connection.invoke("GetAvailableUsers");
     connection.invoke("SendNotification", username);
     connection.invoke("FillRobotLobby");
 });
@@ -27,7 +27,9 @@ connection.on("SetConID", function (playerOneId, playerOnename) {
 // Load Players
 connection.on("ReceiveAvailableUsers", function (players) {
     for (const [player, id] of Object.entries(players)) {
-        createListelement(player, id);
+        if (player != playerName) {
+            createListelement(player, id);
+        }
     }
 });
 

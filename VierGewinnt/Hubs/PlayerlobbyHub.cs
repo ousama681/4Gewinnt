@@ -25,7 +25,7 @@ namespace VierGewinnt.Hubs
 
         public async Task AddUser(string player)
         {
-            if (players.Contains(player))
+            if (onlineUsers.ContainsKey(player))
             {
                 return;
             }
@@ -50,9 +50,8 @@ namespace VierGewinnt.Hubs
 
         public async Task LeaveLobby(string userName)
         {
-            if (players.Contains(userName))
+            if (onlineUsers.ContainsKey(userName))
             {
-                players.Remove(userName);
                 onlineUsers.Remove(userName);
                 await Clients.Others.SendAsync("PlayerLeft", userName);
                 return;
