@@ -11,10 +11,8 @@ namespace VierGewinnt.Hubs
 {
     public class PlayerlobbyHub : Hub
     {
-        static readonly IList<string> players = new List<string>();
         static readonly IList<string> robots = new List<string>();
         static readonly IDictionary<string, string> onlineUsers = new Dictionary<string, string>();
-        
 
 
         //Player vs Player
@@ -32,7 +30,6 @@ namespace VierGewinnt.Hubs
             else
             {
                 onlineUsers.Add(player, Context.ConnectionId);
-                players.Add(Context.ConnectionId);
                 await SetConnectionId(player);
             }
             return;
@@ -56,18 +53,6 @@ namespace VierGewinnt.Hubs
                 await Clients.Others.SendAsync("PlayerLeft", userName);
                 return;
             }
-        }
-
-        public override async Task OnDisconnectedAsync(Exception exception)
-        {
-            var userName = Context.User?.Identity?.Name;
-            if (!string.IsNullOrEmpty(userName) && players.Contains(userName))
-            {
-                players.Remove(userName);
-                onlineUsers.Remove(userName);
-                await Clients.Others.SendAsync("PlayerLeft", userName);
-            }
-            await base.OnDisconnectedAsync(exception);
         }
 
         public async Task ChallengePlayer(string playerOneId, string playerTwoId, string playerOne, string playerTwo)
@@ -158,9 +143,5 @@ namespace VierGewinnt.Hubs
                 return;
             }
         }
-
-
-
-
     }
 }
