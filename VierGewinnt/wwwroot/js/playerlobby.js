@@ -64,12 +64,13 @@ function createListelement(playerTwo, playerTwoId) {
         event.preventDefault();
         console.log("ChallengePlayer invoked");
         connection.invoke("ChallengePlayer", connectionId, playerTwoId, playerName, playerTwo);
+        const info = document.getElementById("matchmakingInProgress");
+        info.style.display = "block"
     }
 
     li.appendChild(anchor);
     document.getElementById("playerList").appendChild(li);
 }
-
 
 
 // Initiate Game after clicking on Opponent and both players accept Modals
@@ -84,11 +85,12 @@ async function showPlayerTwoChallengeModal(payload, playerOneId, groupId) {
     const label = document.getElementById("modalLabel");
     const timer = document.getElementById("timer");
     let playerResponded = false;
-
+    const info = document.getElementById("matchmakingInProgress");
+    info.style.display = "block"
     label.textContent = `${players[0]} wants to play a game. Do you accept the challenge?`;
     modal.style.display = "block";
 
-    // When playerTwo confirms
+    // When playerTwo accepts
     document.getElementById("confirmButton").onclick = function () {
         playerResponded = true;
         connection.invoke("ConfirmChallenge", payload, playerOneId, groupId);
@@ -131,7 +133,7 @@ async function showPlayerOneChallengeModal(payload, groupId) {
     label.textContent = `${players[1]} is ready to start the game. Start?`;
     modal.style.display = "block";
 
-    // When playerOne confirms
+    // When playerOne accepts
     document.getElementById("confirmButton").onclick = function () {
         playerResponded = true;
         modal.style.display = "none";
@@ -141,7 +143,7 @@ async function showPlayerOneChallengeModal(payload, groupId) {
     document.getElementById("abortButton").onclick = function () {    
         playerResponded = true;
         connection.invoke("AbortChallenge", groupId, playerName);
-        modal.style.display = "none";       
+        modal.style.display = "none";   
     }
 
     // Timer
@@ -154,6 +156,7 @@ async function showPlayerOneChallengeModal(payload, groupId) {
         if (i == 0) {
             connection.invoke("AbortChallenge", groupId, playerName);
             modal.style.display = "none";
+            
         }
     }
 };
@@ -165,6 +168,9 @@ connection.on("ChallengeAborted", function (player, groupId) {
 function showAbortChallengeModal(player, groupId) {
     const modal = document.getElementById("abortModal");
     modal.style.display = "block";
+    const info = document.getElementById("matchmakingInProgress");
+    info.style.display = "none"
+
     // When playerOne confirms
     document.getElementById("okButton").onclick = function () {
         connection.invoke("RemoveFromGroup", groupId, connectionId)
@@ -187,18 +193,16 @@ window.addEventListener("beforeunload", () => {
 
 connection.on("NavigateToGame", (gameId) => {
     const baseUrl = "https://localhost:7102/Game/Board";
-    //const baseUrl = "https://localhost:8443/Game/Board";
     const params = new URLSearchParams();
     params.append("gameId", gameId);
-
     window.location.href = `${baseUrl}?${params.toString()}`;
 });
 
 
 
-// Robot Lobby
 
-// Test method
+
+// Test method to create Robots
 var testButton = document.getElementById("test")
 testButton.onclick = function () {
     var testText = document.getElementById("testtext").value
@@ -206,7 +210,7 @@ testButton.onclick = function () {
     connection.invoke("CreateRobot", testText);
 }
 
-
+// Robot Lobby
 
 connection.on("UpdateRobotLobby", function (robots) {
     document.getElementById("robotList").innerHTML = "";
@@ -271,7 +275,7 @@ connection.on("RobotLeft", (robot) => {
 
 
 // TO DO: create groups for each robot list, so people cant start games against already dragged robots, 
-// also remove onklick on already dragged items, so we dont start a game against a robot
+// also remove onklick on already dragged items in selectedRobots, so we dont accidently start a game against a robot
 
 // Drag and drop handlers
 function handleDragStart(event) {
