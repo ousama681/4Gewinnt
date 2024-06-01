@@ -4,7 +4,6 @@ namespace VierGewinnt.Services
 {
     public class ConnectFourAIService
     {
-
         //public void CalculateBestMove(GameBoard board, string color)
         //{
 

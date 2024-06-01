@@ -17,22 +17,55 @@
         </div>
         <div class="col">
             <h2 class="text-light">Robot Lobby</h2>
+            <form>
+                <input type="text" id="testtext"></input>
+                <button id="test" type="submit">Create Robot</button>
+            </form>
             <div class="lobby-container" style="max-width: 300px;">
                 <ul class="text-light list-group" id="robotList">
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Robot 1</a> <span class="dot bg-danger"></span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Robot 2</a> <span class="dot bg-success"></span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center"><a href="#" class="text-decoration-none">Robot 3</a> <span class="dot bg-success"></span></li>
                 </ul>
             </div>
         </div>
         <div class="col">
-            <h2 class="text-light">Choose 2 Robots</h2>
-            <div class="lobby-container-small" style="max-width: 300px; display: flex; flex-direction: column;">
+            <h2 class="text-light">Robot vs Robot Lobby</h2>
+            <div class="lobby-container-small" style="display: flex; flex-direction: column;">
                 <ul class="text-light list-group" id="selectedRobots"></ul>
-                <a type="button" asp-action="BoardEvE" asp-controller="Game" class="btn btn-primary mt-auto">Robot vs Robot</a>
+            </div>
+            <button class="success-btn btn btn-primary mt-2" id="RvsRButton">Robot vs Robot</button>
+            <div class="mt-3">
+                <h4 class="text-light">How to play</h4>
+                <p class="text-light">Player vs Player: </p>
+                <p class="text-light">Click on any Player in the Lobby to start the matchmaking</p>
+                <br />
+                <p class="text-light">Player vs Robot:</p>
+                <p class="text-light">Click on a robot in the Lobby to start a game immediately</p>
+                <br />
+                <p class="text-light">Robot vs Robot</p>
+                <p class="text-light">Drag 2 Robots from the Robot Lobby into the Robot vs Robot Lobby and start a game by clicking the button</p>
             </div>
         </div>
     </div>
 </div>
+
+<div id="challengeModal">
+    <div>
+        <label id="modalLabel" class="text-light">Do you accept the challenge?</label>
+        <label id="timer" class="text-light"></label>
+        <button class="success-btn btn btn-primary mt-2" id="confirmButton">Accept</button>
+        <button class="success-btn btn btn-primary mt-2" id="abortButton">Abort</button>
+    </div>
+</div>
+
+<div id="abortModal">
+    <div>
+        <label class="text-light">A Player was not ready for the game. Game aborted.</label>
+        <button class="success-btn btn btn-primary mt-2" id="okButton">Ok</button>
+    </div>
+</div>
+
+<div id="matchmakingInProgress">
+    <p class="text-light">Matchmaking in progress...</p>
+</div>
+
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/playerlobby.js"></script>

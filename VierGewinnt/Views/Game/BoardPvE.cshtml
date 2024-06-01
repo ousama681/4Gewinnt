@@ -8,7 +8,7 @@
 }
 <link rel="stylesheet" href="~/css/board.css" asp-append-version="true" />
 <div class="text-center">
-    <h1 class="display-4 text-light">Player vs Player</h1>
+    <h1 class="display-4 text-light">Player vs Roboking</h1>
 </div>
 <param id="userIDvalue" value="@userManager.GetUserId(@User)"/>
 
@@ -17,8 +17,10 @@
         <!-- Column for PlayerOne -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerOne">
-                <label class="text-light">PlayerOne:</label>
-                <!-- Your PlayerOne content here -->
+                <label class="text-light">Player One:</label>
+            </div>
+            <div>
+                <label class="text-light">@User.Identity.Name</label>
             </div>
             <div class="d-flex flex-column align-items-center">
                 <div class="red-stone"></div>
@@ -70,9 +72,12 @@
         <!-- Column for PlayerTwo -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerTwo">
-                <label class="text-light">PlayerTwo:</label>
+                <label class="text-light">Robot:</label>
             </div>
-            <div class ="d-flex flex-column align-items-center">
+            <div>
+                <label class="text-light">@Model.Board.PlayerTwoID</label>
+            </div>
+            <div class="d-flex flex-column align-items-center">
                 <div class="yellow-stone"></div>
                 <div class="text-light mb-2">Select a column: </div>
                 <form id="PlaceYellowStone" class="d-flex flex-column align-items-center">
@@ -85,16 +90,10 @@
         </div>
     </div>
 </div>
-@* 
-<div id="partialViewContainer">
-    @await Html.PartialAsync("_PartialViewName", Model)
-</div> *@
-
-
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/board.js" asp-append-version="true"></script>
-<script src="~/js/Game.js" asp-append-version="true"></script>
+<script src="~/js/GameAgainstRobot.js" asp-append-version="true"></script>
 
 <script>
     var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));
