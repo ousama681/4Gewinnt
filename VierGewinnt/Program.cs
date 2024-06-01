@@ -29,6 +29,7 @@ namespace VierGewinnt
             builder.Services.Configure<SMTPConfigModel>(builder.Configuration.GetSection("SMTPConfig"));
             builder.Services.AddScoped<IGameRepository, GameRepository>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<IPlayerInfoRepository, PlayerInfosRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
@@ -66,6 +67,8 @@ namespace VierGewinnt
             // SignalR Hub Mapping
             app.MapHub<PlayerlobbyHub>("/playerlobbyHub");
             app.MapHub<GameHub>("/gameHub");
+
+
             //SignalR Hub Mapping End
 
             app.Run();
@@ -96,7 +99,6 @@ namespace VierGewinnt
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-
                 options.SignIn.RequireConfirmedEmail = true;
 
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);

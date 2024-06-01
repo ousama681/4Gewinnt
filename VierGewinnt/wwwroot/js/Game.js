@@ -48,7 +48,7 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
                 moveNr++;
                 return;
             }
-        }    
+        }
     });
 
     if (moveNr % 2 != 0) {

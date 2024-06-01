@@ -51,10 +51,42 @@ namespace VierGewinnt.Hubs
         public async Task GameIsOver(string winnerId, int gameId)
         {
             runningGames.Remove(gameId);
+            await UpdatePlayerRanking(winnerId);
             await _hubClients.All.SendAsync("NotificateGameEnd", winnerId);
         }
 
-        public async Task RegisterGameInStaticProperty(string playerIdOne, string playerIdTwo, int gameId)
+        private static async Task UpdatePlayerRanking(string winnerId)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(GameHub.connectionString);
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    PlayerRanking pr = await dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(winnerId)).SingleAsync();
+
+                    if (pr == null)
+                    {
+                        PlayerRanking newPr = new PlayerRanking() { PlayerID = winnerId, Wins = 1 };
+                        await dbContext.AddAsync(newPr);
+                    } else
+                    {
+                        pr.Wins = pr.Wins + 1;
+                    }
+
+                    await dbContext.SaveChangesAsync();
+                    return;
+                    // Hier mal die Prüfung für den Win machen. 
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+        }
+
+        public void RegisterGameInStaticProperty(string playerIdOne, string playerIdTwo, int gameId)
         {
             runningGames.Add(gameId, new GameInfo(playerIdOne, playerIdTwo));
         }

@@ -26,7 +26,7 @@
                                 <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="Leaderboard">Bestenliste</a>
                             </li>
                             <li class="nav-item">
-                                <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="MatchHistory">Spielrückblick</a>
+                                <a class="navbar-brand text-light" asp-area="" asp-controller="Home" asp-action="MatchHistory" asp-route-username="@User.Identity.Name">Spielrückblick</a>
                             </li>
                         </ul>
                         <ul class="navbar-nav justify-content-end align-items-center">

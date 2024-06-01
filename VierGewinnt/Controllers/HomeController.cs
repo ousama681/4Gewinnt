@@ -1,16 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
+using System.Xml.Linq;
 using VierGewinnt.Data;
+using VierGewinnt.Data.Interfaces;
+using VierGewinnt.Data.Model;
 using VierGewinnt.Data.Models;
 using VierGewinnt.Hubs;
 using VierGewinnt.Models;
+using VierGewinnt.ViewModels;
 
 namespace VierGewinnt.Controllers
 {
@@ -20,14 +25,18 @@ namespace VierGewinnt.Controllers
         private IMqttClient mqttClient = null;
         private readonly ILogger<HomeController> _logger;
         private readonly IHubContext<PlayerlobbyHub> _hubContext;
+        private readonly IPlayerInfoRepository _playerInfoRepo;
+        private readonly IGameRepository _gameRepository;
         private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
         private static IList<string> playersInHub = new List<string>();
 
 
-        public HomeController(ILogger<HomeController> logger, IHubContext<PlayerlobbyHub> hubContext)
+        public HomeController(ILogger<HomeController> logger, IHubContext<PlayerlobbyHub> hubContext, IPlayerInfoRepository playerInfoRepository, IGameRepository gameRepository)
         {
             _logger = logger;
             _hubContext = hubContext;
+            _playerInfoRepo = playerInfoRepository;
+            _gameRepository = gameRepository;
         }
 
         public IActionResult Index()
@@ -41,7 +50,7 @@ namespace VierGewinnt.Controllers
             {
                 this.username = username;
                 playersInHub.Add(username);
-                await SubscribeAsync("Challenge");
+                await SubscribeToChallengeAsync("Challenge");
             }
             return View();
         }
@@ -49,12 +58,59 @@ namespace VierGewinnt.Controllers
 
         public IActionResult Leaderboard()
         {
-            return View();
+            LeaderboardViewModel vm = new LeaderboardViewModel();
+            vm.PlayerRankings = _playerInfoRepo.GetAllAsync().Result;
+            return View(vm);
         }
 
-        public IActionResult MatchHistory()
+        public IActionResult MatchHistory(string username)
         {
-            return View();
+            // ViewModel für MatchHistory
+
+            // Was brauche ich in MatchHistory
+
+            // Pro Spieler Alle Fertigen Spiele Laden inclusive Moves.
+
+            List<GameBoard> gameHistorie = _gameRepository.FindGamesByPlayerName(username).Result;
+
+
+
+            MatchHistoryViewModel vm = new MatchHistoryViewModel();
+
+            vm.GameHistories = gameHistorie;
+
+            return View(vm);
+        }
+
+        public IActionResult Replay(int gameId)
+        {
+
+            // ViewModel für MatchHistory
+
+            // Was brauche ich in MatchHistory
+
+            // Pro Spieler Alle Fertigen Spiele Laden inclusive Moves.
+
+            GameBoard gb = _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId }).Result;
+
+
+            SpielRueckblickViewModel vm = new SpielRueckblickViewModel();
+
+            vm.Game = gb;
+            vm.MovesLeft = new Stack<Move>();
+
+            for (int i = gb.Moves.Count()-1; i >= 0 ; i--)
+            {
+                vm.MovesLeft.Push(gb.Moves.ElementAt(i));
+            }
+
+            vm.MovesPlayed = new Queue<Move>();
+
+            // Moves in VM laden
+
+            // Dann Per JS das Spiel animieren ablaufen / simulieren.
+
+            return View(vm);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -65,7 +121,7 @@ namespace VierGewinnt.Controllers
 
         // MQTT METHODS
 
-        public async Task SubscribeAsync(string topic)
+        public async Task SubscribeToChallengeAsync(string topic)
         {
 
             string broker = "localhost";
@@ -104,6 +160,7 @@ namespace VierGewinnt.Controllers
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
+                    // Hier kommt man nur rein von Messages von /Challenge
                     var message = e.ApplicationMessage;
                     if (message.Retain) // Ignore retained messages
                     {

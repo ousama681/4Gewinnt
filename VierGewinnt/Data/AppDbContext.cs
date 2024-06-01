@@ -15,6 +15,7 @@ namespace VierGewinnt.Data
         public DbSet<ApplicationUser> Accounts { get; set; }
         public DbSet<GameBoard> GameBoards { get; set; }
         public DbSet<Move> Moves { get; set; }
+        public DbSet<PlayerRanking> PlayerRankings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,11 @@ namespace VierGewinnt.Data
                 .HasOne(m => m.Player)
                 .WithMany()
                 .HasForeignKey(m => m.PlayerID);
+
+            modelBuilder.Entity<PlayerRanking>()
+                .HasOne(pr => pr.Player)
+                .WithMany()
+                .HasForeignKey(pr => pr.PlayerID);
         }
     }
 }

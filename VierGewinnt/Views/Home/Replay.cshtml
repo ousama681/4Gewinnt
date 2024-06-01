@@ -1,4 +1,12 @@
-﻿@model VierGewinnt.ViewModels.GameViewModel
+﻿@* @model VierGewinnt.ViewModels.SpielRueckblickViewModel;
+@using VierGewinnt.Data.Models;
+
+@{
+    ViewData["Title"] = "Match History";
+}
+
+ *@
+@model VierGewinnt.ViewModels.SpielRueckblickViewModel
 @using Microsoft.AspNetCore.Identity;
 @using VierGewinnt.Data.Models
 @inject UserManager<ApplicationUser> userManager
@@ -10,7 +18,7 @@
 <div class="text-center">
     <h1 class="display-4 text-light">Player vs Roboking</h1>
 </div>
-<param id="userIDvalue" value="@userManager.GetUserId(@User)"/>
+<param id="userIDvalue" value="@userManager.GetUserId(@User)" />
 
 <div class="container">
     <div class="row align-items-center">
@@ -19,16 +27,6 @@
             <div id="playerOne">
                 <label class="text-light">PlayerOne:</label>
                 <!-- Your PlayerOne content here -->
-            </div>
-            <div class="d-flex flex-column align-items-center">
-                <div class="red-stone"></div>
-                <div class="text-light mb-2">Select a column: </div>
-                <form asp-area="" method="post" class="d-flex flex-column align-items-center">
-                    <input asp-for="Board.PlayerOneID" id="playerIdOne" name="userIdOne" type="hidden" />
-                    <input asp-for="Board.ID" name="boardIdOne" type="hidden" />
-                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
-                    <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Place Chip</button>
-                </form>
             </div>
         </div>
 
@@ -72,33 +70,21 @@
             <div id="playerTwo">
                 <label class="text-light">PlayerTwo:</label>
             </div>
-            <div class ="d-flex flex-column align-items-center">
-                <div class="yellow-stone"></div>
-                <div class="text-light mb-2">Select a column: </div>
-                <form id="PlaceYellowStone" class="d-flex flex-column align-items-center">
-                    <input asp-for="Board.PlayerTwoID" id="playerIdTwo" name="userIdTwo" type="hidden" />
-                    <input asp-for="Board.ID" name="boardIdTwo" type="hidden" />
-                    <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7">
-                    <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
-                </form>
-            </div>
         </div>
     </div>
 </div>
-@* 
-<div id="partialViewContainer">
-    @await Html.PartialAsync("_PartialViewName", Model)
-</div> *@
 
 
 
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/board.js" asp-append-version="true"></script>
-<script src="~/js/Game.js" asp-append-version="true"></script>
+<div>
+    <form asp-area="" method="post" class="d-flex flex-column align-items-center">
+        <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Nächster Spielzug</button>
+    </form>
+</div>
+
+<script src="~/js/replay.js" asp-append-version="true"></script>
 
 <script>
-    var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));
-    var playerOneID = @Json.Serialize(Model.Board.PlayerOneID);
-    var playerTwoID = @Json.Serialize(Model.Board.PlayerTwoID);
-    var gameId = @Json.Serialize(Model.Board.ID);
+    var movesToAssign = @Html.Raw(Json.Serialize(Model.Game.Moves));
+    assignMoves(movesToAssign);
 </script>

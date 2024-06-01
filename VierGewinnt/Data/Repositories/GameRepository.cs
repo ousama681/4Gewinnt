@@ -74,5 +74,20 @@ namespace VierGewinnt.Data.Repositories
             //&&
             //gb.IsFinished.Equals(0));
         }
+
+        public Task<List<GameBoard>> FindGamesByPlayerName(string playerName)
+        {
+            string playerId = _context.Accounts.Where(user => user.UserName.Equals(playerName)).SingleOrDefault().Id;
+
+            if (playerId == null)
+            {
+
+                string message = "Player with name " + playerName + "  doesnt exist!!!";
+                // hier eventuell exception schmeissen
+            }
+
+
+            return _context.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneID.Equals(playerId) || gb.PlayerTwoID.Equals(playerId)) && gb.IsFinished.Equals(true)).ToListAsync();
+        }
     }
 }

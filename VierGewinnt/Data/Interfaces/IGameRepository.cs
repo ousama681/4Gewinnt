@@ -13,5 +13,6 @@ namespace VierGewinnt.Data.Interfaces
         Task AddMoveAsync(Move move);
         Task AddGameBoardAsync(GameBoard board);
         Task<GameBoard> FindGameByPlayerNames(string playerOne, string playerTwo);
+        Task<List<GameBoard>> FindGamesByPlayerName(string playerName);
     }
 }

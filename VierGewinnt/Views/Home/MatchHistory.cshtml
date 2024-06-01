@@ -1,4 +1,7 @@
-﻿@{
+﻿@model VierGewinnt.ViewModels.MatchHistoryViewModel;
+@using VierGewinnt.Data.Models;
+
+@{
     ViewData["Title"] = "Match History";
 }
 <div class="container">
@@ -7,14 +10,23 @@
             <h2 class="text-light">Spielrückblick</h2>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col">
-            <ul class="list-group">
-                <li class="list-group-item">Match 1</li>
-                <li class="list-group-item">Match 2</li>
-                <li class="list-group-item">Match 3</li>
-                <!-- Add more list items as needed -->
-            </ul>
-        </div>
-    </div>
+
+    @* <ul class="list-group">
+    <li class="list-group-item">Match 1</li>
+    <li class="list-group-item">Match 2</li>
+    <li class="list-group-item">Match 3</li>
+    <!-- Add more list items as needed -->
+    </ul> *@
 </div>
+
+@foreach (GameBoard gb in Model.GameHistories)
+{
+    <tr>
+        <td>GameNumber: @gb.ID</td>
+        <form method="post" asp-action="Replay" asp-controller="Home">
+        <td>
+            <button asp-action="Replay" asp-controller="Home" asp-route-gameId="@gb.ID">Spiel Rueckblick</button>
+        </td>
+        </form>
+    </tr>
+}

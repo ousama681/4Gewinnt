@@ -1,4 +1,7 @@
-﻿@{
+﻿@model VierGewinnt.ViewModels.LeaderboardViewModel;
+@using VierGewinnt.Data.Model;
+
+@{
     ViewData["Title"] = "Leaderboard";
 }
 <div class="container">
@@ -7,14 +10,13 @@
             <h2 class="text-light">Bestenliste</h2>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col">
-            <ul class="list-group">
-                <li class="list-group-item">Match 1</li>
-                <li class="list-group-item">Match 2</li>
-                <li class="list-group-item">Match 3</li>
-                <!-- Add more list items as needed -->
-            </ul>
-        </div>
-    </div>
+ 
 </div>
+
+@foreach (PlayerRanking pr in Model.PlayerRankings)
+{
+    <tr>
+        <td>@pr.Player.UserName</td>
+        <td>@pr.Wins</td>
+    </tr>
+}
