@@ -167,6 +167,8 @@ connection.on("ChallengeAborted", function (player, groupId) {
 
 function showAbortChallengeModal(player, groupId) {
     const modal = document.getElementById("abortModal");
+    const label = document.getElementById("abortLabel");
+    label.textContent = `${player} was not ready for the game. Game aborted.`
     modal.style.display = "block";
     const info = document.getElementById("matchmakingInProgress");
     info.style.display = "none"
@@ -289,8 +291,9 @@ function handleDragEnd(event) {
 
 function handleDragOver(event) {
     event.preventDefault();
+    var robotCount = document.getElementById("selectedRobots").getElementsByTagName("li").length;
     // Only allow dropping on the drop zones
-    if (event.target && (event.target.id === 'selectedRobots' || event.target.id === 'robotList')) {
+    if (event.target && ((event.target.id === 'selectedRobots' && robotCount < 2) || event.target.id === 'robotList')) {
         event.target.classList.add('droppable');
     }
 }

@@ -57,8 +57,7 @@ namespace VierGewinnt.Controllers
             }
             if(countInstances == 0)
             {
-                await SubscribeRobotAsync("SubscribeRobot");
-               
+                await SubscribeRobotAsync("SubscribeRobot");              
             }
             countInstances++;
             return View();
