@@ -22,4 +22,8 @@
     <ProjectReference Include="..\MQTTBroker\MQTTBroker.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\beep.mp3" />
+  </ItemGroup>
+
 </Project>
