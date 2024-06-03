@@ -143,5 +143,10 @@ namespace VierGewinnt.Hubs
                 return;
             }
         }
+
+        public async Task ShowAvailableRobots()
+        {
+            await MQTTBroker.MQTTBrokerService.PublishAsync("RegisterRobot", "ShowAll");
+        }
     }
 }

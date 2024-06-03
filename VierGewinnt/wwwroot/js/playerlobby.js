@@ -6,8 +6,6 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/playerlobbyHub").b
 // Global variables
 var connectionId;
 var playerName;
-
-
 // Init
 connection.start().then(function () {
     var username = document.getElementById("userNameLabel").textContent;
@@ -306,6 +304,9 @@ function handleDrop(event) {
     event.preventDefault();
     // Only handle drop if it's on the drop zones
     if (event.target && (event.target.id === 'selectedRobots' || event.target.id === 'robotList')) {
+
+
+
         const id = event.dataTransfer.getData('text/plain');
         const draggableElement = document.getElementById(id);
         const dropzone = event.target;
@@ -326,3 +327,20 @@ selectedRobots.addEventListener('drop', handleDrop);
 robotList.addEventListener('dragover', handleDragOver);
 robotList.addEventListener('dragleave', handleDragLeave);
 robotList.addEventListener('drop', handleDrop);
+
+function startRobotGame() {
+    var robots = document.getElementById("selectedRobots");
+    var robotOne = robots.childNodes[0].textContent;
+    var robotTwo = robots.childNodes[1].textContent;
+
+    const baseUrl = "https://localhost:7102/Game/BoardEvE";
+    const params = new URLSearchParams();
+    params.append("robotOneName", robotOne);
+    params.append("robotTwoName", robotTwo);
+
+
+    window.location.href = `${baseUrl}?${params.toString()}`;
+
+
+
+}

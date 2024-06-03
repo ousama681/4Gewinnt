@@ -16,6 +16,7 @@ namespace VierGewinnt.Data
         public DbSet<GameBoard> GameBoards { get; set; }
         public DbSet<Move> Moves { get; set; }
         public DbSet<PlayerRanking> PlayerRankings { get; set; }
+        public DbSet<Robot> Robots { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +36,8 @@ namespace VierGewinnt.Data
                 .HasOne(pr => pr.Player)
                 .WithMany()
                 .HasForeignKey(pr => pr.PlayerID);
+
+            modelBuilder.Ignore<GameBoard.Board>();
         }
     }
 }

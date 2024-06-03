@@ -10,11 +10,12 @@ namespace VierGewinnt.Data.Models
         public string PlayerOneID { get; set; }
         public string PlayerTwoID { get; set; }
         public bool IsFinished { get; set; }
-
         public ICollection<Move> Moves { get; set; }
+        public Board board { get; set; }
 
         public class Board
         {
+            public IDictionary<int, Robot> Robots { get; set; }
             private readonly int?[,] _board;
 
             private int? _winner;
@@ -26,6 +27,7 @@ namespace VierGewinnt.Data.Models
                 Columns = cols;
                 Rows = rows;
                 _board = new int?[cols, rows];
+                Robots = new Dictionary<int, Robot>();
             }
 
             public int Columns { get; }

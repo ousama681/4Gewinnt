@@ -144,6 +144,16 @@ namespace VierGewinnt.Data.Repositories
         {
             return await _userManager.FindByNameAsync(username);
         }
+
+        public async Task<List<Robot>> GetAllRegisteredRobots()
+        {
+            return await context.Robots.ToListAsync();
+        }
+
+        public async Task<Robot> GetRobotByName(string robotName)
+        {
+            return await context.Robots.Where(r => r.Name.Equals(robotName)).SingleAsync();
+        }
     }
 }
 

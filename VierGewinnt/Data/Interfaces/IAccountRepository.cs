@@ -26,5 +26,8 @@ namespace VierGewinnt.Data.Interfaces
         //Task GenerateForgotPasswordTokenAsync(ApplicationUser user);
 
         //Task<IdentityResult> ResetPasswordAsync(ResetPasswordModel model);
+
+        Task<List<Robot>> GetAllRegisteredRobots();
+        Task<Robot> GetRobotByName(string robotName);
     }
 }

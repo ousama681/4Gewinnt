@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using MQTTBroker;
-using Microsoft.VisualBasic;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
-using System.Xml.Linq;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Data.Model;
@@ -28,19 +24,27 @@ namespace VierGewinnt.Controllers
         private readonly IHubContext<PlayerlobbyHub> _hubContext;
         private readonly IPlayerInfoRepository _playerInfoRepo;
         private readonly IGameRepository _gameRepository;
+        private readonly IAccountRepository _accountRepository;
         private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
         private static IList<string> playersInHub = new List<string>();
         private static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        public HomeController(ILogger<HomeController> logger, IHubContext<PlayerlobbyHub> hubContext, IPlayerInfoRepository playerInfoRepository, IGameRepository gameRepository)
+        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+
+        public HomeController(ILogger<HomeController> logger,
+            IHubContext<PlayerlobbyHub> hubContext,
+            IPlayerInfoRepository playerInfoRepository,
+            IGameRepository gameRepository,
+            IAccountRepository accountRepository)
         {
             _logger = logger;
             _hubContext = hubContext;
             _playerInfoRepo = playerInfoRepository;
             _gameRepository = gameRepository;
+            _accountRepository = accountRepository;
         }
-       
+
         public IActionResult Index()
         {
             return View();
@@ -55,13 +59,18 @@ namespace VierGewinnt.Controllers
                 await SubscribeAsync("Challenge");
                 await SubscribeAsync("ChallengeRobot");
             }
-            if(countInstances == 0)
+            if (countInstances == 0)
             {
                 await SubscribeRobotAsync("SubscribeRobot");
-               
+
             }
             countInstances++;
-            return View();
+
+            GameLobbyViewModel vm = new GameLobbyViewModel();
+
+            vm.Robots = await _accountRepository.GetAllRegisteredRobots();
+
+            return View(vm);
         }
 
         public IActionResult Leaderboard()
@@ -107,7 +116,7 @@ namespace VierGewinnt.Controllers
             vm.Game = gb;
             vm.MovesLeft = new Stack<Move>();
 
-            for (int i = gb.Moves.Count()-1; i >= 0 ; i--)
+            for (int i = gb.Moves.Count() - 1; i >= 0; i--)
             {
                 vm.MovesLeft.Push(gb.Moves.ElementAt(i));
             }
@@ -150,11 +159,11 @@ namespace VierGewinnt.Controllers
                 .WithClientId(clientId)
                 .WithCleanSession(true)
                 .Build();
-            if(topic == "Challenge")
+            if (topic == "Challenge")
             {
                 await ConnectToMQTTBroker(mqttClient, options, topic);
             }
-            else if(topic == "ChallengeRobot")
+            else if (topic == "ChallengeRobot")
             {
                 await ReceiveChallengeRobot(mqttClient, options, topic);
             }
@@ -277,8 +286,6 @@ namespace VierGewinnt.Controllers
 
         private async Task<GameBoard> CheckForExistingGame(string playerOne, string playerTwo)
         {
-            var connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
@@ -307,8 +314,6 @@ namespace VierGewinnt.Controllers
 
         private async Task<GameBoard> CheckForExistingGameAgainstRobot(string playerOne, string robotID)
         {
-            var connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
@@ -320,7 +325,7 @@ namespace VierGewinnt.Controllers
             {
                 try
                 {
-                    string playerOneID = GetUser(playerOne, dbContext).Result.Id;                   
+                    string playerOneID = GetUser(playerOne, dbContext).Result.Id;
 
                     GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneID.Equals(playerOneID) && gb.PlayerTwoID.Equals(robotID) && gb.IsFinished.Equals(false)) ||
                     (gb.PlayerOneID.Equals(robotID) && gb.PlayerTwoID.Equals(playerOneID) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
@@ -344,10 +349,6 @@ namespace VierGewinnt.Controllers
 
         private static async Task<GameBoard> CreateBoardEntityAsync(string playerOne, string playerTwo)
         {
-            // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            var connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
@@ -374,10 +375,6 @@ namespace VierGewinnt.Controllers
         }
         private static async Task<GameBoard> CreateBoardEntityAgainstRobotAsync(string playerOne, string robotID)
         {
-            // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            var connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
-
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
@@ -455,7 +452,7 @@ namespace VierGewinnt.Controllers
                     }
 
                     string robotID = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment); // nur Roboter ID wird gesendet
-                    
+
                     robotsInHub.Add(robotID);
                     await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
                 };
@@ -467,6 +464,8 @@ namespace VierGewinnt.Controllers
             }
         }
 
-       
+
+
+
     }
 }

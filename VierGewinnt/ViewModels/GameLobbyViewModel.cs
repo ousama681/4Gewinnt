@@ -7,6 +7,7 @@ namespace VierGewinnt.ViewModels
     {
         public IEnumerable<string> Playernames { get; set; }
         public ApplicationUser PlayerOne { get; set; }
+        public IEnumerable<Robot> Robots { get; set; }
 
         public GameLobbyViewModel()
         {
