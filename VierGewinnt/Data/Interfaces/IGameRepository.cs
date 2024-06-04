@@ -9,7 +9,7 @@ namespace VierGewinnt.Data.Interfaces
         Task<bool> DeleteAsync(GameBoard item);
         Task<List<GameBoard>> GetAllAsync();
         Task<GameBoard> GetByIdAsync(GameBoard item);
-        Task UpdateAsync(GameBoard item);
+        void Update(GameBoard item);
         Task AddMoveAsync(Move move);
         Task AddGameBoardAsync(GameBoard board);
         Task<GameBoard> FindGameByPlayerNames(string playerOne, string playerTwo);

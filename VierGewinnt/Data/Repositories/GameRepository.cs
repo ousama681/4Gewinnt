@@ -53,9 +53,10 @@ namespace VierGewinnt.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        Task IRepository<GameBoard>.UpdateAsync(GameBoard item)
+        public void Update(GameBoard item)
         {
-            throw new NotImplementedException();
+            _context.GameBoards.Update(item);
+            _context.SaveChanges();
         }
 
         public async Task<GameBoard> FindGameByPlayerNames(string playerOne, string playerTwo)

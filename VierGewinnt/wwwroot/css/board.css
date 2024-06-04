@@ -79,3 +79,10 @@
 .blinkRed {
     animation: blink-animation-red 2s infinite;
 }
+
+.abort-button {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    z-index: 1000;
+}

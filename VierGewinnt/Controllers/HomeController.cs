@@ -30,7 +30,7 @@ namespace VierGewinnt.Controllers
         private static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
@@ -71,6 +71,32 @@ namespace VierGewinnt.Controllers
             vm.Robots = await _accountRepository.GetAllRegisteredRobots();
 
             return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GameAborted(GameViewModel model)
+        {
+            GameBoard board = await _gameRepository.GetByIdAsync(model.Board);
+            if (board != null)
+            {
+                board.IsFinished = true;
+                _gameRepository.Update(board);
+            }
+            
+
+            if (!playersInHub.Contains(username))
+            {
+                this.username = username;
+                playersInHub.Add(username);
+                await SubscribeAsync("Challenge");
+                await SubscribeAsync("ChallengeRobot");
+            }
+
+            GameLobbyViewModel vm = new GameLobbyViewModel();
+
+            vm.Robots = await _accountRepository.GetAllRegisteredRobots();
+
+            return View("GameLobby", vm);
         }
 
         public IActionResult Leaderboard()

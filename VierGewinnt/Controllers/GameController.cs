@@ -166,7 +166,6 @@ namespace VierGewinnt.Controllers
                     //GameBoard.Board boardTest = new GameBoard.Board(7, 6);
                     //boardTest.DropCoin
 
-                    int bestMove = ConnectFourAIService.GetBestMove(gb.board);
 
 
                     //SaveMoveToDB(robotName, columnNR, gameId);
