@@ -131,12 +131,13 @@ async function animate(column, endRow, color) {
     var audio = document.getElementById("beep");
     var audioEndPos = document.getElementById("beepEnd");
     if (color == "yellow") {
+        disableButton("btnColYellow");
         for (let row = 1; row <= endRow; row++) {
             var selectedCell = document.getElementById(`${column}${row}`);
             if (selectedCell != null) {
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "yellow";
-                    audioEndPos.play();
+                    audioEndPos.play();                    
                     activateButton("btnColRed");
                     return;
                 }
@@ -149,12 +150,13 @@ async function animate(column, endRow, color) {
         }
     }
     else if (color == "red") {
+        disableButton("btnColRed");
         for (let row = 1; row <= endRow; row++) {
             var selectedCell = document.getElementById(`${column}${row}`);
             if (selectedCell != null) {
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "red";
-                    audioEndPos.play();
+                    audioEndPos.play();                   
                     activateButton("btnColYellow");
                     return;
                 }
