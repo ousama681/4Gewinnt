@@ -91,6 +91,15 @@
         <source src="/beepEnd.mp3" type="audio/mp3" />
     </audio>
 </div>
+
+<div class="abort-button">
+    <form asp-controller="Home" asp-action="GameAborted" method="post">
+        <input type="hidden" asp-for="Board.PlayerOneID" />
+        <input type="hidden" asp-for="Board.PlayerTwoID" />
+        <input type="hidden" asp-for="Board.ID" />
+        <button class="btn text-light" type="submit">Abort Game</button>
+    </form>
+</div>
 @* 
 <div id="partialViewContainer">
     @await Html.PartialAsync("_PartialViewName", Model)

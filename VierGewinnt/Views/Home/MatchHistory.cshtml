@@ -10,23 +10,21 @@
             <h2 class="text-light">Spielrückblick</h2>
         </div>
     </div>
+    <ul class="row mt-4">
+        @foreach (GameBoard gb in Model.GameHistories)
+        {
+            <li class="list-group-item" style="width:33%;">
+                <div class="d-flex flex-column align-items-center">
+                    <form method="post" asp-action="Replay" asp-controller="Home">
+                        <label class="fw-bold mb-2">GameNumber: @gb.ID</label>
+                        <br />
+                        <button asp-action="Replay" asp-controller="Home" asp-route-gameId="@gb.ID" class="btn text-light" style="margin: 0">Spiel Rückblick</button>
+                    </form>
+                </div>
+            </li>
 
-    @* <ul class="list-group">
-    <li class="list-group-item">Match 1</li>
-    <li class="list-group-item">Match 2</li>
-    <li class="list-group-item">Match 3</li>
-    <!-- Add more list items as needed -->
-    </ul> *@
+        }
+
+    </ul>
 </div>
 
-@foreach (GameBoard gb in Model.GameHistories)
-{
-    <tr>
-        <td>GameNumber: @gb.ID</td>
-        <form method="post" asp-action="Replay" asp-controller="Home">
-        <td>
-            <button asp-action="Replay" asp-controller="Home" asp-route-gameId="@gb.ID">Spiel Rueckblick</button>
-        </td>
-        </form>
-    </tr>
-}
