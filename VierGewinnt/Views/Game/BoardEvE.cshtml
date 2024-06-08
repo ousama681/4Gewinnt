@@ -69,6 +69,17 @@
         </div>
     </div>
 </div>
+
+
+
+<div id="gameoverModal">
+    <div>
+        <label id="modalLabel" class="text-light">Congratulation! You have won: </label>
+        <label id="timer" class="text-light"></label>
+        <button class="success-btn btn btn-primary mt-2" id="confirmButton">Zur Gamelobby</button>
+    </div>
+</div>
+
 @* 
 <script>
     var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));

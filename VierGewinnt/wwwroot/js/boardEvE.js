@@ -12,6 +12,8 @@ colDepth['5'] = 6;
 colDepth['6'] = 6;
 colDepth['7'] = 6;
 
+var movecounter = 0;
+
 
 connection.start().then(function () {
     var robotOne = document.getElementById("labelRobotOne");
@@ -20,14 +22,22 @@ connection.start().then(function () {
     connection.invoke("MakeFirstMove", robotOneName);
 });
 
-connection.on("AnimateMove", function (robotName, columnNr, gameId, color) {
+connection.on("AnimateMove", function (columnNr) {
     // wie finde ich heraus wer playeROne ist?
-    animate(columnNr, colDepth[columnNr], color)
+    movecounter++;
+
+    var color = movecounter % 2 != 0 ? "red" : "yellow";
+
+    animate(columnNr, colDepth[columnNr], color);
+
+    colDepth[columnNr] = colDepth[columnNr] - 1;
 });
 
 
-
-
+connection.on("NotificateGameEnd", function (winnerId) {
+    console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
+    showPlayerOneChallengeModal(winnerId);
+});
 
 function animate(column, endRow, color) {
     if (color == "yellow") {
@@ -52,16 +62,35 @@ function animate(column, endRow, color) {
     }
 }
 
+async function showPlayerOneChallengeModal(winnerId) {
+    const winner = winnerId;
+    const modal = document.getElementById("gameoverModal");
+    const label = document.getElementById("modalLabel");
+    label.innerText = label.innerText + winner;
+    const timer = document.getElementById("timer");
+    let playerResponded = false;
 
-// Sobald spiel anfängtr
-/**
- * 
- * 1. RobotOne Fängt an
- * -   Methode wird per MQTT an Roboter versendet.
- * - Dieser führt zug aus
- * - und 
- * 
- * 
- * 
- */
+    modal.style.display = "block";
 
+    // When player wants to go back to lobby
+    document.getElementById("confirmButton").onclick = function () {
+        playerResponded = true;
+        modal.style.display = "none";
+        const baseUrl = "https://localhost:7102/Home/GameLobby";
+        window.location.href = `${baseUrl}`;
+    }
+ }
+
+    //// Timer
+    //for (let i = 15; i >= 0; i--) {
+    //    timer.textContent = i
+    //    if (playerResponded) {
+    //        return;
+    //    }
+    //    await new Promise(resolve => setTimeout(resolve, 1000));
+    //    if (i == 0) {
+    //        connection.invoke("AbortChallenge", groupId, playerName);
+    //        modal.style.display = "none";
+
+    //    }
+    //}

@@ -29,6 +29,8 @@ namespace VierGewinnt.Hubs
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
 
 
+
+
         private BoardPlayer? currentMoveKey;
 
         public async Task SendPlayerMove(string playerId, string gameId, string column)

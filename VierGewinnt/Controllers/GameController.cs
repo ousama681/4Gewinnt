@@ -19,23 +19,23 @@ namespace VierGewinnt.Controllers
     public class GameController : Controller
     {
         private readonly IGameRepository _gameRepository;
-        private readonly IAccountRepository _accountRepository;
+        //private readonly IAccountRepository _accountRepository;
         private readonly IHubContext<BoardEvEHub> _hubContext;
-        private static readonly IList<GameBoard> runningGames;
+        //private static readonly IList<GameBoard> runningGames;
 
         private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
-        static GameController()
-        {
-            runningGames = new List<GameBoard>();
-        }
+        //static GameController()
+        //{
+        //    runningGames = new List<GameBoard>();
+        //}
 
         public GameController(IGameRepository gameRepository, IHubContext<BoardEvEHub> hubContext,
             IAccountRepository accountRepository)
         {
             _gameRepository = gameRepository;
             _hubContext = hubContext;
-            _accountRepository = accountRepository;
+            //_accountRepository = accountRepository;
         }
 
         [HttpGet]
@@ -63,124 +63,26 @@ namespace VierGewinnt.Controllers
 
             GameBoard gameBoard = new GameBoard();
 
-            Robot robotOne = await GetRobotByName(robotOneName);
-            Robot robotTwo = await GetRobotByName(robotTwoName);
+            Robot robotOne = new Robot() { Name = robotOneName };
+            Robot robotTwo = new Robot() { Name = robotTwoName };
 
-            gameBoard.PlayerOneID = robotOne.MacAdress;
-            gameBoard.PlayerTwoID = robotTwo.MacAdress;
+            RobotVsRobotManager.robotsInGame.Add(robotOneName, 1);
+            RobotVsRobotManager.robotsInGame.Add(robotTwoName, 2);
+
+            gameBoard.PlayerOneID = robotOne.Name;
+            gameBoard.PlayerTwoID = robotTwo.Name;
             gameViewModel.Board = gameBoard;
 
-            await _gameRepository.AddAsync(gameBoard);
+            await RobotVsRobotManager.SubscribeToFeedbackTopic();
+            RobotVsRobotManager.hubContext = _hubContext;
+            RobotVsRobotManager.moves = new Move[7, 6];
+            RobotVsRobotManager.currentGame = gameBoard;
+            RobotVsRobotManager.currentRobotMove = robotOne.Name;
 
-            await SubscribeAwaitBestMoveAsync("AwaitBestMove", gameBoard.ID);
 
-            GameBoard.Board board = new GameBoard.Board(7, 6);
-
-            gameBoard.board = board;
-            gameBoard.board.Robots.TryAdd(1, robotOne);
-            gameBoard.board.Robots.TryAdd(2, robotTwo);
-
-            runningGames.Add(gameBoard);
+            RobotVsRobotManager.InitColDepth();
 
             return View(gameViewModel);
-        }
-
-
-
-        public async Task SubscribeAwaitBestMoveAsync(string topic, int gameId)
-        {
-
-            string broker = "localhost";
-            int port = 1883;
-            string clientId = Guid.NewGuid().ToString();
-
-            // Create a MQTT client factory
-            var factory = new MqttFactory();
-
-            // Create a MQTT client instance
-            IMqttClient mqttClient = factory.CreateMqttClient();
-
-            // Create MQTT client options
-            var options = new MqttClientOptionsBuilder()
-                .WithTcpServer(broker, port)
-                .WithClientId(clientId)
-                .WithCleanSession(true)
-                .Build();
-
-                await ConnectToMQTTBroker(mqttClient, options, topic, gameId);
-        }
-
-        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic, int gameId)
-        {
-            // Connect to MQTT broker
-            var connectResult = await mqttClient.ConnectAsync(options);
-
-            int currGameId = gameId;
-
-            if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
-            {
-                // Subscribe to a topic
-                await mqttClient.SubscribeAsync(topic);
-
-                // Callback function when a message is received
-                mqttClient.ApplicationMessageReceivedAsync += async e =>
-                {
-                    // Hier kommt man nur rein von Messages von /Challenge
-                    var message = e.ApplicationMessage;
-                    if (message.Retain) // Ignore retained messages
-                    {
-                        return;
-                    }
-
-                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-
-                    string robotName = payload;
-                    int gameId = currGameId;
-                    // besten Move berechnen für Roboter
-                    ConnectFourAIService aiService = new ConnectFourAIService();
-                    Robot robot = await GetRobotByName(robotName);
-
-
-                    GameBoard gb = runningGames.Where(gb => gb.PlayerOneID.Equals(robot.MacAdress) || gb.PlayerTwoID.Equals(robot.MacAdress)).Single();
-
-
-
-                    //Move[,] moves = CreateMoveArrFromBoard(gb.Moves);
-                    //aiService.board = moves;
-                    //aiService.currentPlayer = robotName;
-
-                    //int columnNR = new Random().Next(1, 7);
-
-                    // Publish Message mit ColumnNr und Name des Roboters.
-
-                    string color;
-
-                    if (gb.PlayerOneID.Equals(robot.Id))
-                    {
-                        color = "red";
-                    } else
-                    {
-                        color = "yellow";
-                    }
-
-                    //GameBoard.Board boardTest = new GameBoard.Board(7, 6);
-                    //boardTest.DropCoin
-
-                    int bestMove = ConnectFourAIService.GetBestMove(gb.board);
-
-
-                    //SaveMoveToDB(robotName, columnNR, gameId);
-                    //AnimateMove(robotName, columnNR, gameId, color);
-
-                    await mqttClient.UnsubscribeAsync(topic);
-                    await mqttClient.DisconnectAsync();
-                };
-
-            }
-            else
-            {
-                Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
-            }
         }
 
         private async Task<Robot> GetRobotByName(string robotName)
