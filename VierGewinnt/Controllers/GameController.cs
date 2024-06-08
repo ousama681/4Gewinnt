@@ -87,100 +87,99 @@ namespace VierGewinnt.Controllers
 
 
 
-        public async Task SubscribeAwaitBestMoveAsync(string topic, int gameId)
-        {
+        //public async Task SubscribeAwaitBestMoveAsync(string topic, int gameId)
+        //{
 
-            string broker = "localhost";
-            int port = 1883;
-            string clientId = Guid.NewGuid().ToString();
+        //    string broker = "localhost";
+        //    int port = 1883;
+        //    string clientId = Guid.NewGuid().ToString();
 
-            // Create a MQTT client factory
-            var factory = new MqttFactory();
+        //    // Create a MQTT client factory
+        //    var factory = new MqttFactory();
 
-            // Create a MQTT client instance
-            IMqttClient mqttClient = factory.CreateMqttClient();
+        //    // Create a MQTT client instance
+        //    IMqttClient mqttClient = factory.CreateMqttClient();
 
-            // Create MQTT client options
-            var options = new MqttClientOptionsBuilder()
-                .WithTcpServer(broker, port)
-                .WithClientId(clientId)
-                .WithCleanSession(true)
-                .Build();
+        //    // Create MQTT client options
+        //    var options = new MqttClientOptionsBuilder()
+        //        .WithTcpServer(broker, port)
+        //        .WithClientId(clientId)
+        //        .WithCleanSession(true)
+        //        .Build();
 
-                await ConnectToMQTTBroker(mqttClient, options, topic, gameId);
-        }
+        //        await ConnectToMQTTBroker(mqttClient, options, topic, gameId);
+        //}
 
-        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic, int gameId)
-        {
-            // Connect to MQTT broker
-            var connectResult = await mqttClient.ConnectAsync(options);
+        //private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic, int gameId)
+        //{
+        //    // Connect to MQTT broker
+        //    var connectResult = await mqttClient.ConnectAsync(options);
 
-            int currGameId = gameId;
+        //    int currGameId = gameId;
 
-            if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
-            {
-                // Subscribe to a topic
-                await mqttClient.SubscribeAsync(topic);
+        //    if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
+        //    {
+        //        // Subscribe to a topic
+        //        await mqttClient.SubscribeAsync(topic);
 
-                // Callback function when a message is received
-                mqttClient.ApplicationMessageReceivedAsync += async e =>
-                {
-                    // Hier kommt man nur rein von Messages von /Challenge
-                    var message = e.ApplicationMessage;
-                    if (message.Retain) // Ignore retained messages
-                    {
-                        return;
-                    }
+        //        // Callback function when a message is received
+        //        mqttClient.ApplicationMessageReceivedAsync += async e =>
+        //        {
+        //            // Hier kommt man nur rein von Messages von /Challenge
+        //            var message = e.ApplicationMessage;
+        //            if (message.Retain) // Ignore retained messages
+        //            {
+        //                return;
+        //            }
 
-                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+        //            string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
 
-                    string robotName = payload;
-                    int gameId = currGameId;
-                    // besten Move berechnen für Roboter
-                    ConnectFourAIService aiService = new ConnectFourAIService();
-                    Robot robot = await GetRobotByName(robotName);
-
-
-                    GameBoard gb = runningGames.Where(gb => gb.PlayerOneID.Equals(robot.MacAdress) || gb.PlayerTwoID.Equals(robot.MacAdress)).Single();
+        //            string robotName = payload;
+        //            int gameId = currGameId;
+        //            // besten Move berechnen für Roboter
+        //            Robot robot = await ConnectFourAIService.GetRobotByName(robotName);
 
 
-
-                    //Move[,] moves = CreateMoveArrFromBoard(gb.Moves);
-                    //aiService.board = moves;
-                    //aiService.currentPlayer = robotName;
-
-                    //int columnNR = new Random().Next(1, 7);
-
-                    // Publish Message mit ColumnNr und Name des Roboters.
-
-                    string color;
-
-                    if (gb.PlayerOneID.Equals(robot.Id))
-                    {
-                        color = "red";
-                    } else
-                    {
-                        color = "yellow";
-                    }
-
-                    //GameBoard.Board boardTest = new GameBoard.Board(7, 6);
-                    //boardTest.DropCoin
+        //            GameBoard gb = runningGames.Where(gb => gb.PlayerOneID.Equals(robot.MacAdress) || gb.PlayerTwoID.Equals(robot.MacAdress)).Single();
 
 
 
-                    //SaveMoveToDB(robotName, columnNR, gameId);
-                    //AnimateMove(robotName, columnNR, gameId, color);
+        //            //Move[,] moves = CreateMoveArrFromBoard(gb.Moves);
+        //            //aiService.board = moves;
+        //            //aiService.currentPlayer = robotName;
 
-                    await mqttClient.UnsubscribeAsync(topic);
-                    await mqttClient.DisconnectAsync();
-                };
+        //            //int columnNR = new Random().Next(1, 7);
 
-            }
-            else
-            {
-                Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
-            }
-        }
+        //            // Publish Message mit ColumnNr und Name des Roboters.
+
+        //            string color;
+
+        //            if (gb.PlayerOneID.Equals(robot.Id))
+        //            {
+        //                color = "red";
+        //            } else
+        //            {
+        //                color = "yellow";
+        //            }
+
+        //            //GameBoard.Board boardTest = new GameBoard.Board(7, 6);
+        //            //boardTest.DropCoin
+
+
+
+        //            //SaveMoveToDB(robotName, columnNR, gameId);
+        //            //AnimateMove(robotName, columnNR, gameId, color);
+
+        //            await mqttClient.UnsubscribeAsync(topic);
+        //            await mqttClient.DisconnectAsync();
+        //        };
+
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
+        //    }
+        //}
 
         private async Task<Robot> GetRobotByName(string robotName)
         {
