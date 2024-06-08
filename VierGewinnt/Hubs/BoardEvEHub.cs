@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using MQTTBroker;
-using VierGewinnt.Data.Model;
-using VierGewinnt.Data.Models;
 using VierGewinnt.Services;
 
 namespace VierGewinnt.Hubs
@@ -16,6 +12,7 @@ namespace VierGewinnt.Hubs
         public async Task MakeFirstMove(string robotOneName)
         {
             string column = ConnectFourAIService.GetNextRandomMove().ToString();
+            RobotVsRobotManager.currentColumn = column;
             /**
              * Eigentlich dürften wir nur den zwei Robotern die Daten schicken, da sonst alle sich bewegen würden.
              */
