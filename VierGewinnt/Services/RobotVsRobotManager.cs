@@ -47,7 +47,7 @@ namespace VierGewinnt.Services
             set
             {
                 isBothFinished = value;
-                if (isBothFinished = true)
+                if (isBothFinished == true)
                 {
                     CallAnimateHandler();
                     if (CheckForWin())

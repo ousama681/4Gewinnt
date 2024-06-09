@@ -35,24 +35,16 @@ connection.on("AnimateMove", function (columnNr) {
 
 function animate(column, endRow, color) {
     if (color == "yellow") {
-        for (let row = 1; row <= endRow; row++) {
-            var selectedCell = document.getElementById(`${column}${row}`);
+            var selectedCell = document.getElementById(`${column}${endRow}`);
             if (selectedCell != null) {
-                if (row == endRow) {
-                    selectedCell.style.backgroundColor = "yellow";
-                }
+selectedCell.style.backgroundColor = "yellow";
             }
-        }
     }
     else if (color == "red") {
-        for (let row = 1; row <= endRow; row++) {
-            var selectedCell = document.getElementById(`${column}${row}`);
+            var selectedCell = document.getElementById(`${column}${endRow}`);
             if (selectedCell != null) {
-                if (row == endRow) {
                     selectedCell.style.backgroundColor = "red";
-                }
             }
-        }
     }
 }
 
