@@ -80,14 +80,6 @@
     </div>
 </div>
 
-@* 
-<script>
-    var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));
-    var playerOneID = @Json.Serialize(Model.Board.PlayerOneID);
-    var playerTwoID = @Json.Serialize(Model.Board.PlayerTwoID);
-    var gameId = @Json.Serialize(Model.Board.ID);
-</script> *@
-
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/boardEvE.js" asp-append-version="true"></script>
 

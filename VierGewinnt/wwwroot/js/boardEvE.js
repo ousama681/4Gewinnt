@@ -41,16 +41,16 @@ connection.on("NotificateGameEnd", function (winnerId) {
 
 function animate(column, endRow, color) {
     if (color == "yellow") {
-            var selectedCell = document.getElementById(`${column}${endRow}`);
-            if (selectedCell != null) {
-selectedCell.style.backgroundColor = "yellow";
-            }
+        var selectedCell = document.getElementById(`${column}${endRow}`);
+        if (selectedCell != null) {
+            selectedCell.style.backgroundColor = "yellow";
+        }
     }
     else if (color == "red") {
-            var selectedCell = document.getElementById(`${column}${endRow}`);
-            if (selectedCell != null) {
-                    selectedCell.style.backgroundColor = "red";
-            }
+        var selectedCell = document.getElementById(`${column}${endRow}`);
+        if (selectedCell != null) {
+            selectedCell.style.backgroundColor = "red";
+        }
     }
 }
 
@@ -68,21 +68,21 @@ async function showPlayerOneChallengeModal(winnerId) {
     document.getElementById("confirmButton").onclick = function () {
         playerResponded = true;
         modal.style.display = "none";
-        const baseUrl = "https://localhost:7102/Home/GameLobby";
+        const baseUrl = "https://roboking.win/Home/GameLobby";
         window.location.href = `${baseUrl}`;
     }
- }
+}
 
-    //// Timer
-    //for (let i = 15; i >= 0; i--) {
-    //    timer.textContent = i
-    //    if (playerResponded) {
-    //        return;
-    //    }
-    //    await new Promise(resolve => setTimeout(resolve, 1000));
-    //    if (i == 0) {
-    //        connection.invoke("AbortChallenge", groupId, playerName);
-    //        modal.style.display = "none";
+//// Timer
+//for (let i = 15; i >= 0; i--) {
+//    timer.textContent = i
+//    if (playerResponded) {
+//        return;
+//    }
+//    await new Promise(resolve => setTimeout(resolve, 1000));
+//    if (i == 0) {
+//        connection.invoke("AbortChallenge", groupId, playerName);
+//        modal.style.display = "none";
 
-    //    }
-    //}
+//    }
+//}

@@ -138,10 +138,10 @@ async function showPlayerOneChallengeModal(payload, groupId) {
         connection.invoke("StartGame", payload)
     }
     // When playerOne aborts
-    document.getElementById("abortButton").onclick = function () {    
+    document.getElementById("abortButton").onclick = function () {
         playerResponded = true;
         connection.invoke("AbortChallenge", groupId, playerName);
-        modal.style.display = "none";   
+        modal.style.display = "none";
     }
 
     // Timer
@@ -154,7 +154,7 @@ async function showPlayerOneChallengeModal(payload, groupId) {
         if (i == 0) {
             connection.invoke("AbortChallenge", groupId, playerName);
             modal.style.display = "none";
-            
+
         }
     }
 };
@@ -192,7 +192,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 connection.on("NavigateToGame", (gameId) => {
-    const baseUrl = "https://localhost:7102/Game/Board";
+    const baseUrl = "https://roboking.win/Game/Board";
     const params = new URLSearchParams();
     params.append("gameId", gameId);
     window.location.href = `${baseUrl}?${params.toString()}`;
@@ -260,7 +260,7 @@ function createListelementRobot(robot) {
 }
 
 connection.on("NavigateToGameAgainstRobot", (gameId) => {
-    const baseUrl = "https://localhost:7102/Game/BoardPvE";
+    const baseUrl = "https://roboking.win/Game/BoardPvE";
     const params = new URLSearchParams();
     params.append("gameId", gameId);
 
@@ -336,7 +336,7 @@ function startRobotGame() {
     var robotOne = robots.childNodes[0].textContent;
     var robotTwo = robots.childNodes[1].textContent;
 
-    const baseUrl = "https://localhost:7102/Game/BoardEvE";
+    const baseUrl = "https://roboking.win/Game/BoardEvE";
     const params = new URLSearchParams();
     params.append("robotOneName", robotOne);
     params.append("robotTwoName", robotTwo);

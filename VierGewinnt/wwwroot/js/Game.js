@@ -4,11 +4,10 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
 connection.start()
     .then(() => {
-        PlaceAlreadyPlayedMoves(movesToLoad); 
-        // Wenn playerOne immer Rot ist, dann heisst das, dass PlayerOne immer bei ungeraden Zahlen drann ist.
+        PlaceAlreadyPlayedMoves(movesToLoad);
         connection.invoke("RegisterGameInStaticProperty", playerOneID, playerTwoID, gameId)
     }
-);
+    );
 
 connection.on("NotificateGameEnd", function (winnerId) {
     console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
@@ -27,16 +26,16 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
     colDepth['7'] = 6;
 
     var moveNr = 1;
-    
+
     movesToLoad.forEach(m => {
         var column = m['column'];
         var key = `${column}`;
-        
+
         if (moveNr % 2 == 0) {
             var selectedCell = document.getElementById(`${column}${colDepth[key]}`);
             if (selectedCell != null) {
                 selectedCell.style.backgroundColor = "yellow";
-                array[column -1][(colDepth[key]) -1] = 1; // update virtual board
+                array[column - 1][(colDepth[key]) - 1] = 1; // update virtual board
                 colDepth[key] = colDepth[key] - 1;
                 moveNr++;
                 return;
@@ -45,7 +44,7 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
             var selectedCell = document.getElementById(`${column}${colDepth[key]}`);
             if (selectedCell != null) {
                 selectedCell.style.backgroundColor = "red";
-                array[column -1][(colDepth[key]) -1] = 1; // update virtual board
+                array[column - 1][(colDepth[key]) - 1] = 1; // update virtual board
                 colDepth[key] = colDepth[key] - 1;
                 moveNr++;
                 return;
@@ -56,7 +55,7 @@ function PlaceAlreadyPlayedMoves(movesToLoad) {
     if (moveNr % 2 != 0) {
         activateButton("btnColRed");
         disableButton("btnColYellow");
-    } else  {
+    } else {
         activateButton("btnColYellow");
         disableButton("btnColRed");
     }
@@ -77,7 +76,7 @@ connection.on("AnimatePlayerMove", async (column, playerId) => {
         else {
             activateButton("btnColYellow")
         }
-        
+
     }
     else if (playerIdOne == playerId) {
         animate(column, endRow, "red")
@@ -137,7 +136,7 @@ async function animate(column, endRow, color) {
             if (selectedCell != null) {
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "yellow";
-                    audioEndPos.play();                    
+                    audioEndPos.play();
                     activateButton("btnColRed");
                     return;
                 }
@@ -145,7 +144,7 @@ async function animate(column, endRow, color) {
                 audio.play();
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 selectedCell.classList.remove('blinkYellow');
- 
+
             }
         }
     }
@@ -156,7 +155,7 @@ async function animate(column, endRow, color) {
             if (selectedCell != null) {
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "red";
-                    audioEndPos.play();                   
+                    audioEndPos.play();
                     activateButton("btnColYellow");
                     return;
                 }

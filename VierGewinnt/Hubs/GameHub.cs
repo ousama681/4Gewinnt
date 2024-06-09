@@ -19,7 +19,7 @@ namespace VierGewinnt.Hubs
 {
     public class GameHub : Hub
     {
-        private static readonly string connectionString = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static readonly string connectionString = "Server=localhost;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
@@ -72,7 +72,8 @@ namespace VierGewinnt.Hubs
                     {
                         PlayerRanking newPr = new PlayerRanking() { PlayerID = winnerId, Wins = 1 };
                         await dbContext.AddAsync(newPr);
-                    } else
+                    }
+                    else
                     {
                         pr.Wins = pr.Wins + 1;
                     }
@@ -90,7 +91,10 @@ namespace VierGewinnt.Hubs
 
         public void RegisterGameInStaticProperty(string playerIdOne, string playerIdTwo, int gameId)
         {
-            runningGames.Add(gameId, new GameInfo(playerIdOne, playerIdTwo));
+            if (!runningGames.Keys.Contains(gameId))
+            {
+                runningGames.Add(gameId, new GameInfo(playerIdOne, playerIdTwo));
+            }
         }
 
         public async Task SubscribeAsync(string topic)
@@ -234,7 +238,7 @@ namespace VierGewinnt.Hubs
                 int row;
                 colDepth.TryGetValue(column.ToString(), out row);
                 // Minus 1 wegen Array startindex 0 bei colDepth aber nicht.
-                board[column-1, row-1] = move;
+                board[column - 1, row - 1] = move;
                 colDepth[column.ToString()] = row - 1;
             }
 
@@ -252,7 +256,7 @@ namespace VierGewinnt.Hubs
                 for (int row = 0; row < 6; row++)
                 {
                     string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row] != null && playerId.Equals(board[col + 1, row].PlayerID)) &&  (board[col + 2, row] != null && playerId.Equals(board[col + 2, row].PlayerID)) && (board[col + 3, row] != null && playerId.Equals(board[col + 3, row].PlayerID)))
+                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row] != null && playerId.Equals(board[col + 1, row].PlayerID)) && (board[col + 2, row] != null && playerId.Equals(board[col + 2, row].PlayerID)) && (board[col + 3, row] != null && playerId.Equals(board[col + 3, row].PlayerID)))
                     {
                         gameInfo.SetWinner(playerId);
                         return true;
@@ -266,7 +270,7 @@ namespace VierGewinnt.Hubs
                 for (int row = 0; row < 3; row++)
                 {
                     string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col, row + 1] != null && playerId.Equals(board[col, row + 1].PlayerID)) && (board[col, row + 2] != null && playerId.Equals(board[col, row + 2].PlayerID)) && (board[col, row + 3]!=null && playerId.Equals(board[col, row + 3].PlayerID)))
+                    if (!playerId.IsNullOrEmpty() && (board[col, row + 1] != null && playerId.Equals(board[col, row + 1].PlayerID)) && (board[col, row + 2] != null && playerId.Equals(board[col, row + 2].PlayerID)) && (board[col, row + 3] != null && playerId.Equals(board[col, row + 3].PlayerID)))
                     {
                         gameInfo.SetWinner(playerId);
                         return true;

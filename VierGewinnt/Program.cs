@@ -22,7 +22,7 @@ namespace VierGewinnt
 
             // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
             // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
+            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=localhost;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
 
             ConfigureIdentityOptions(builder);
 
@@ -36,7 +36,7 @@ namespace VierGewinnt
 
             // Adds Controllers
             builder.Services.AddControllersWithViews();
-           
+
             //Adds SignalR
             builder.Services.AddSignalR();
 
@@ -95,7 +95,7 @@ namespace VierGewinnt
             builder.Services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequiredLength = 5;
-                options.Password.RequiredUniqueChars = 1;
+                //options.Password.RequiredUniqueChars = 1;
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;

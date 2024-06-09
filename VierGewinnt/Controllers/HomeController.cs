@@ -30,7 +30,7 @@ namespace VierGewinnt.Controllers
         private static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=localhost;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
@@ -56,12 +56,12 @@ namespace VierGewinnt.Controllers
             {
                 this.username = username;
                 playersInHub.Add(username);
-                await SubscribeAsync("Challenge");
-                await SubscribeAsync("ChallengeRobot");
             }
             if (countInstances == 0)
             {
                 await SubscribeRobotAsync("SubscribeRobot");
+                await SubscribeAsync("Challenge");
+                await SubscribeAsync("ChallengeRobot");
 
             }
             countInstances++;
@@ -73,6 +73,14 @@ namespace VierGewinnt.Controllers
             return View(vm);
         }
 
+        public async Task<IActionResult> Test()
+        {
+            return View("GameLobby");
+        }
+
+
+
+
         [HttpPost]
         public async Task<IActionResult> GameAborted(GameViewModel model)
         {
@@ -82,7 +90,7 @@ namespace VierGewinnt.Controllers
                 board.IsFinished = true;
                 _gameRepository.Update(board);
             }
-            
+
 
             if (!playersInHub.Contains(username))
             {
@@ -237,17 +245,17 @@ namespace VierGewinnt.Controllers
                     }
 
 
-                    if (playerTwo.Equals(this.username))
-                    {
-                        game = await CreateBoardEntityAsync(playerOne, playerTwo);
+                    //if (playerTwo.Equals(this.username))
+                    //{
+                    game = await CreateBoardEntityAsync(playerOne, playerTwo);
 
-                        await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
-                        await AfterStartingGame(mqttClient, topic);
-                    }
-                    else if (playerOne.Equals(this.username))
-                    {
-                        await AfterStartingGame(mqttClient, topic);
-                    }
+                    await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
+                    await AfterStartingGame(mqttClient, topic);
+                    //}
+                    //else if (playerOne.Equals(this.username))
+                    //{
+                    //    await AfterStartingGame(mqttClient, topic);
+                    //}
                     await mqttClient.UnsubscribeAsync(topic);
                     await mqttClient.DisconnectAsync();
                 };
