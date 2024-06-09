@@ -137,7 +137,8 @@ namespace VierGewinnt.Controllers
         //            string robotName = payload;
         //            int gameId = currGameId;
         //            // besten Move berechnen für Roboter
-        //            Robot robot = await ConnectFourAIService.GetRobotByName(robotName);
+                    
+        //            Robot robot = await GetRobotByName(robotName);
 
 
         //            GameBoard gb = runningGames.Where(gb => gb.PlayerOneID.Equals(robot.MacAdress) || gb.PlayerTwoID.Equals(robot.MacAdress)).Single();

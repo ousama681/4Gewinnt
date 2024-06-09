@@ -12,11 +12,14 @@
     </div>
  
 </div>
-
-@foreach (PlayerRanking pr in Model.PlayerRankings)
-{
-    <tr>
-        <td>@pr.Player.UserName</td>
-        <td>@pr.Wins</td>
-    </tr>
-}
+<ul>
+    @foreach (PlayerRanking pr in Model.PlayerRankings)
+    {
+        <li class="list-group-item" style="width:33%;">
+            <div class="d-flex flex-column align-items-center">
+                <label class="fw-bold mb-2">@pr.Player.UserName</label>
+                <label>@pr.Wins</label>
+            </div>
+        </li>
+    }
+</ul>

@@ -11,7 +11,26 @@ connection.start()
 
 connection.on("NotificateGameEnd", function (winnerId) {
     console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
+    disableButton("btnColRed");
+    disableButton("btnColYellow");
+    var audio = document.getElementById("winSound");
+    audio.play();
+    showGameOverModal(winnerId);
 });
+
+async function showGameOverModal(winnerId) {
+    const modal = document.getElementById("gameoverModal");
+    const label = document.getElementById("modalLabel");
+    label.innerText = label.innerText + winnerId;
+    modal.style.display = "block";
+
+    // When player wants to go back to lobby
+    document.getElementById("confirmButton").onclick = function () {
+        modal.style.display = "none";
+        const baseUrl = "https://localhost:7102/Home/GameLobby";
+        window.location.href = `${baseUrl}`;
+    }
+}
 
 function PlaceAlreadyPlayedMoves(movesToLoad) {
     event.preventDefault();
@@ -143,8 +162,7 @@ async function animate(column, endRow, color) {
                 selectedCell.classList.add('blinkYellow');
                 audio.play();
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                selectedCell.classList.remove('blinkYellow');
-
+                selectedCell.classList.remove('blinkYellow'); 
             }
         }
     }

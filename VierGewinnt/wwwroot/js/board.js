@@ -65,3 +65,22 @@ async function animate(column, endRow, color) {
         }
     }
 }
+
+connection.on("NotificateGameEnd", function (winnerId) {
+    console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
+    showGameOverModal(winnerId);
+});
+
+async function showGameOverModal(winnerId) {
+    const modal = document.getElementById("gameoverModal");
+    const label = document.getElementById("modalLabel");
+    label.innerText = label.innerText + winnerId;
+    modal.style.display = "block";
+
+    // When player wants to go back to lobby
+    document.getElementById("confirmButton").onclick = function () {
+        modal.style.display = "none";
+        const baseUrl = "https://localhost:7102/Home/GameLobby";
+        window.location.href = `${baseUrl}`;
+    }
+}

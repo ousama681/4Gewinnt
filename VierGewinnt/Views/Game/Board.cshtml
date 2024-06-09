@@ -90,6 +90,9 @@
     <audio id="beepEnd">
         <source src="/beepEnd.mp3" type="audio/mp3" />
     </audio>
+    <audio id="winSound">
+        <source src="/winSound.mp3" type="audio/mp3" />
+    </audio>
 </div>
 
 <div class="abort-button">
@@ -100,11 +103,13 @@
         <button class="btn text-light" type="submit">Abort Game</button>
     </form>
 </div>
-@* 
-<div id="partialViewContainer">
-    @await Html.PartialAsync("_PartialViewName", Model)
-</div> *@
 
+<div id="gameoverModal">
+    <div>
+        <label id="modalLabel" class="text-light">Congratulation! You have won: </label>
+        <button class="success-btn btn btn-primary mt-2" id="confirmButton">Zur Gamelobby</button>
+    </div>
+</div>
 
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
