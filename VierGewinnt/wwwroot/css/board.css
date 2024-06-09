@@ -48,7 +48,7 @@
 }
 
 .blinkYellow {
-    animation: blink-animation-yellow 2s infinite;
+    animation: blink-animation-yellow 0.4s infinite;
 }
 
 .red-stone {
@@ -77,7 +77,7 @@
 }
 
 .blinkRed {
-    animation: blink-animation-red 2s infinite;
+    animation: blink-animation-red 0.4s infinite;
 }
 
 .abort-button {

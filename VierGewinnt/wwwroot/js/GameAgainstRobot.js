@@ -146,7 +146,7 @@ async function animate(column, endRow, color) {
                     return;
                 }
                 selectedCell.classList.add('blinkYellow');
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 200));
                 selectedCell.classList.remove('blinkYellow');
  
             }
@@ -162,7 +162,7 @@ async function animate(column, endRow, color) {
                     return;
                 }
                 selectedCell.classList.add('blinkRed');
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 200));
                 selectedCell.classList.remove('blinkRed');
             }
         }
