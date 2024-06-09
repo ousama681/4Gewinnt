@@ -43,7 +43,7 @@ async function animate(column, endRow, color) {
             var selectedCell = document.getElementById(`${column}${row}`);
             if (selectedCell != null) {
                 selectedCell.classList.add('blinkYellow');
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 200));
                 selectedCell.classList.remove('blinkYellow');
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "yellow";
@@ -56,7 +56,7 @@ async function animate(column, endRow, color) {
             var selectedCell = document.getElementById(`${column.value}${row}`);
             if (selectedCell != null) {
                 selectedCell.classList.add('blinkRed');
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 200));
                 selectedCell.classList.remove('blinkRed');
                 if (row == endRow) {
                     selectedCell.style.backgroundColor = "red";
