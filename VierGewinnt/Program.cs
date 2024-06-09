@@ -22,7 +22,7 @@ namespace VierGewinnt
 
             // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
             // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
+            builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer("Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"));
 
             ConfigureIdentityOptions(builder);
 

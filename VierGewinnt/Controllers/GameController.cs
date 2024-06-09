@@ -23,7 +23,7 @@ namespace VierGewinnt.Controllers
         private readonly IHubContext<BoardEvEHub> _hubContext;
         //private static readonly IList<GameBoard> runningGames;
 
-        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         //static GameController()
         //{
@@ -137,7 +137,8 @@ namespace VierGewinnt.Controllers
         //            string robotName = payload;
         //            int gameId = currGameId;
         //            // besten Move berechnen für Roboter
-        //            Robot robot = await ConnectFourAIService.GetRobotByName(robotName);
+                    
+        //            Robot robot = await GetRobotByName(robotName);
 
 
         //            GameBoard gb = runningGames.Where(gb => gb.PlayerOneID.Equals(robot.MacAdress) || gb.PlayerTwoID.Equals(robot.MacAdress)).Single();

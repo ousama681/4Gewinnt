@@ -86,3 +86,44 @@
     right: 50px;
     z-index: 1000;
 }
+
+/* gameoverModal */
+#gameoverModal {
+    display: none;
+    background-color: black;
+    min-width: fit-content;
+    min-height: fit-content;
+    padding: 1rem;
+    border-radius: 25px;
+    position: fixed;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media (max-width: 768px) {
+    #gameoverModal {
+        width: 80vw;
+        height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    #gameoverModal {
+        width: 90vw;
+        height: auto;
+        padding: 0.5rem;
+    }
+
+    #gameoverModal div {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+#gameoverModal div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

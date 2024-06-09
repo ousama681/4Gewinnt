@@ -81,8 +81,7 @@ namespace VierGewinnt.Controllers
             {
                 board.IsFinished = true;
                 _gameRepository.Update(board);
-            }
-            
+            }            
 
             if (!playersInHub.Contains(username))
             {
