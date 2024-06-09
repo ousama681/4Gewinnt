@@ -30,7 +30,7 @@ namespace VierGewinnt.Controllers
         private static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
