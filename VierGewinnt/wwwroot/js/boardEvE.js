@@ -62,7 +62,7 @@ async function showGameOverModal(winnerId) {
     // When player wants to go back to lobby
     document.getElementById("confirmButton").onclick = function () {
         modal.style.display = "none";
-        const baseUrl = "https://roboking.win/Home/GameLobby";
+        const baseUrl = "https://localhost:7102/Home/GameLobby";
         window.location.href = `${baseUrl}`;
     }
  }

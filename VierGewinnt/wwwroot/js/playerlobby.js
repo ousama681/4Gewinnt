@@ -192,7 +192,7 @@ window.addEventListener("beforeunload", () => {
 });
 
 connection.on("NavigateToGame", (gameId) => {
-    const baseUrl = "https://roboking.win/Game/Board";
+    const baseUrl = "https://localhost:7102/Game/Board";
     const params = new URLSearchParams();
     params.append("gameId", gameId);
     window.location.href = `${baseUrl}?${params.toString()}`;
@@ -260,7 +260,7 @@ function createListelementRobot(robot) {
 }
 
 connection.on("NavigateToGameAgainstRobot", (gameId) => {
-    const baseUrl = "https://roboking.win/Game/BoardPvE";
+    const baseUrl = "https://localhost:7102/Game/BoardPvE";
     const params = new URLSearchParams();
     params.append("gameId", gameId);
 
@@ -336,7 +336,7 @@ function startRobotGame() {
     var robotOne = robots.childNodes[0].textContent;
     var robotTwo = robots.childNodes[1].textContent;
 
-    const baseUrl = "https://roboking.win/Game/BoardEvE";
+    const baseUrl = "https://localhost:7102/Game/BoardEvE";
     const params = new URLSearchParams();
     params.append("robotOneName", robotOne);
     params.append("robotTwoName", robotTwo);
