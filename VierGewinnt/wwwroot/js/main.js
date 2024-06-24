@@ -22,11 +22,11 @@ camera.position.set(1, 1, 3);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
-controls.minDistance = 1.4;
+controls.minDistance = 1.2;
 controls.maxDistance = 4;
 controls.minPolarAngle = 0.0;
 controls.maxPolarAngle = 1.5;
-controls.autoRotate = false;
+controls.autoRotate = true;
 controls.target = new THREE.Vector3(0, 0.2, 0);
 controls.update();
 
@@ -60,7 +60,7 @@ spotLight3.shadow.bias = -0.0001;
 scene.add(spotLight3);
 
 const loader = new GLTFLoader().setPath('/Assets/roboking/');
-loader.load('RoboKing_3.glb', (gltf) => {
+loader.load('roboking.glb', (gltf) => {
     const mesh = gltf.scene;
 
     mesh.traverse((child) => {
@@ -69,8 +69,9 @@ loader.load('RoboKing_3.glb', (gltf) => {
             child.receiveShadow = true;
         }
     });
-
-    mesh.position.set(0, 0.3, -0.35);
+    
+    mesh.position.set(0, 0.2, -0.05);
+    mesh.rotateX(89.5);
     scene.add(mesh);
 
     document.getElementById('progress-container').style.display = 'none';

@@ -11,6 +11,8 @@ using VierGewinnt.Data.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 
 namespace VierGewinnt
 {
@@ -55,8 +57,25 @@ namespace VierGewinnt
 
 
             app.UseRouting();
-            app.UseAuthorization();
+            app.UseAuthorization();          
 
+            //Vorerst auskommentiert da das Laden damit viel länger dauert und das testen so auch länger.
+            //------------
+            // For 3D Homepage,  Set up custom content types - associating file extension to MIME type
+            FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
+
+            // The MIME type for .GLB and .GLTF files are registered with IANA under the 'model' heading
+            // https://www.iana.org/assignments/media-types/media-types.xhtml#model
+            provider.Mappings[".glb"] = "model/gltf+binary";
+            provider.Mappings[".gltf"] = "model/gltf+json";
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                   Path.Combine(Directory.GetCurrentDirectory(), "Assets/roboking")),
+                RequestPath = "/Assets/roboking",
+                ContentTypeProvider = provider
+            });
 
             // Default ControllerMapping
             app.MapControllerRoute(
@@ -112,22 +131,3 @@ namespace VierGewinnt
 }
 
 
-// For later Use
-
-// Vorerst auskommentiert da das Laden damit viel länger dauert und das testen so auch länger.
-//------------
-//// For 3D Homepage,  Set up custom content types - associating file extension to MIME type
-//FileExtensionContentTypeProvider provider = new FileExtensionContentTypeProvider();
-
-//// The MIME type for .GLB and .GLTF files are registered with IANA under the 'model' heading
-//// https://www.iana.org/assignments/media-types/media-types.xhtml#model
-//provider.Mappings[".glb"] = "model/gltf+binary";
-//provider.Mappings[".gltf"] = "model/gltf+json";
-
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(
-//       Path.Combine(Directory.GetCurrentDirectory(), "Assets/roboking")),
-//    RequestPath = "/Assets/roboking",
-//    ContentTypeProvider = provider
-//});
