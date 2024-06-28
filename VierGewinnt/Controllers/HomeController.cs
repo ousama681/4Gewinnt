@@ -41,7 +41,6 @@ namespace VierGewinnt.Controllers
         {
             _logger = logger;
             _hubContext = hubContext;
-            _hubContextRobotTest = hubContextRobotTest;
             _playerInfoRepo = playerInfoRepository;
             _gameRepository = gameRepository;
             _accountRepository = accountRepository;
