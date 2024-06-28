@@ -35,13 +35,6 @@ namespace VierGewinnt.Hubs
             return;
         }
 
-        public async Task SendRobotFeedback()
-        {
-            Clients.All.SendAsync("ReceiveRobotFeedback", "Robot is done!");
-
-            // erster Move
-        }
-
         public async Task SetConnectionId(string player)
         {
             await Clients.Caller.SendAsync("SetConID", Context.ConnectionId, player);

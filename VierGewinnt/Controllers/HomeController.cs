@@ -23,7 +23,6 @@ namespace VierGewinnt.Controllers
         private IMqttClient mqttClient = null;
         private readonly ILogger<HomeController> _logger;
         private readonly IHubContext<PlayerlobbyHub> _hubContext;
-        private readonly IHubContext<IndexHub> _hubContextRobotTest;
         private readonly IPlayerInfoRepository _playerInfoRepo;
         private readonly IGameRepository _gameRepository;
         private readonly IAccountRepository _accountRepository;
@@ -36,7 +35,6 @@ namespace VierGewinnt.Controllers
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
-            IHubContext<IndexHub> hubContextRobotTest,
             IPlayerInfoRepository playerInfoRepository,
             IGameRepository gameRepository,
             IAccountRepository accountRepository)
