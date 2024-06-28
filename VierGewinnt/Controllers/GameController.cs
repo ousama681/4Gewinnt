@@ -19,11 +19,11 @@ namespace VierGewinnt.Controllers
     public class GameController : Controller
     {
         private readonly IGameRepository _gameRepository;
-        //private readonly IAccountRepository _accountRepository;
+        private readonly IAccountRepository _accountRepository;
         private readonly IHubContext<BoardEvEHub> _hubContext;
         //private static readonly IList<GameBoard> runningGames;
 
-        private static string connectionstring = "Server=localhost;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         //static GameController()
         //{
@@ -35,7 +35,7 @@ namespace VierGewinnt.Controllers
         {
             _gameRepository = gameRepository;
             _hubContext = hubContext;
-            //_accountRepository = accountRepository;
+            _accountRepository = accountRepository;
         }
 
         [HttpGet]
@@ -43,6 +43,8 @@ namespace VierGewinnt.Controllers
         {
             GameViewModel gameViewModel = new GameViewModel();
             GameBoard gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
+            gameBoard.playerNames.PlayerOneName = _accountRepository.GetByIdAsync(new ApplicationUser() { Id = gameBoard.PlayerOneID }).Result.UserName;
+            gameBoard.playerNames.PlayerTwoName = _accountRepository.GetByIdAsync(new ApplicationUser() { Id = gameBoard.PlayerTwoID }).Result.UserName;
             gameViewModel.Board = gameBoard;
             return View(gameViewModel);
         }

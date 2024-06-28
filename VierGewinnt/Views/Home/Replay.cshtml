@@ -18,14 +18,13 @@
 <div class="text-center">
     <h1 class="display-4 text-light">Player vs Roboking</h1>
 </div>
-<param id="userIDvalue" value="@userManager.GetUserId(@User)" />
 
 <div class="container">
     <div class="row align-items-center">
         <!-- Column for PlayerOne -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerOne">
-                <label class="text-light">PlayerOne:</label>
+                <label class="text-light">PlayerOne: @Model.Game.PlayerOneName</label>
                 <!-- Your PlayerOne content here -->
             </div>
         </div>
@@ -68,7 +67,7 @@
         <!-- Column for PlayerTwo -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerTwo">
-                <label class="text-light">PlayerTwo:</label>
+                <label class="text-light">PlayerTwo: @Model.Game.PlayerTwoName</label>
             </div>
         </div>
     </div>

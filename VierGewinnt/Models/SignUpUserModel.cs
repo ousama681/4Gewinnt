@@ -9,6 +9,10 @@ namespace VierGewinnt.Models
         [EmailAddress(ErrorMessage = "Please enter a valid email")]
         public string Email { get; set; }
 
+        [Required(ErrorMessage = "Please enter your username")]
+        [Display(Name = "Username")]
+        public string Username { get; set; }
+
         [Required(ErrorMessage = "Please enter a strong password")]
         [Compare("ConfirmPassword", ErrorMessage = "Password does not match")]
         [Display(Name = "Password")]

@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices.Marshalling;
+using System.Text;
 using System.Xml.Linq;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Model;
@@ -19,7 +20,7 @@ namespace VierGewinnt.Hubs
 {
     public class GameHub : Hub
     {
-        private static readonly string connectionString = "Server=localhost;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static readonly string connectionString = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
@@ -47,7 +48,7 @@ namespace VierGewinnt.Hubs
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
             await SubscribeAsync("feedback");
             // TestMethode um nicht mit Postman den RobotStatus zu simulieren
-            await MQTTBrokerService.PublishAsync("feedback", "1");
+            //await MQTTBrokerService.PublishAsync("feedback", "1");
         }
 
         public async Task GameIsOver(string winnerId, int gameId)
@@ -135,6 +136,15 @@ namespace VierGewinnt.Hubs
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
                     var message = e.ApplicationMessage;
+
+
+                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+
+                    if (payload.Equals("0"))
+                    {
+                        return;
+                    }
+
                     if (message.Retain) // Ignore retained messages
                     {
                         return;

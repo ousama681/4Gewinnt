@@ -16,10 +16,10 @@
         <!-- Column for PlayerOne -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerOne">
-                <label class="text-light">Player One:</label>
+                <label class="text-light">Player One: @Model.Board.PlayerOneName</label>
             </div>
             <div>
-                <label id="labelRobotOne" class="text-light">@Model.Board.PlayerOneID</label>
+                <label id="labelRobotOne" class="text-light">@Model.Board.PlayerOneName</label>
             </div>
         </div>
 
@@ -61,10 +61,10 @@
         <!-- Column for PlayerTwo -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerTwo">
-                <label class="text-light">Player Two:</label>
+                <label class="text-light">Player Two: @Model.Board.PlayerTwoName</label>
             </div>
             <div>
-                <label id="labelRobotTwo" class="text-light">@Model.Board.PlayerTwoID</label>
+                <label id="labelRobotTwo" class="text-light">@Model.Board.PlayerTwoName</label>
             </div>
         </div>
     </div>

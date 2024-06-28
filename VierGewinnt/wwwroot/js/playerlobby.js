@@ -108,7 +108,7 @@ async function showPlayerTwoChallengeModal(payload, playerOneId, groupId) {
         if (playerResponded) {
             return;
         }
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         if (i == 0) {
             connection.invoke("AbortChallenge", groupId, playerName);
             modal.style.display = "none";
@@ -150,7 +150,7 @@ async function showPlayerOneChallengeModal(payload, groupId) {
         if (playerResponded) {
             return;
         }
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         if (i == 0) {
             connection.invoke("AbortChallenge", groupId, playerName);
             modal.style.display = "none";

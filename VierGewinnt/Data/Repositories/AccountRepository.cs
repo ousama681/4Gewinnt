@@ -43,7 +43,7 @@ namespace VierGewinnt.Data.Repositories
             var user = new ApplicationUser()
             {
                 Email = userModel.Email,
-                UserName = userModel.Email,
+                UserName = userModel.Username,
             };
             var result = await _userManager.CreateAsync(user, pw);
             if (result.Succeeded)
@@ -64,7 +64,7 @@ namespace VierGewinnt.Data.Repositories
 
         public async Task<SignInResult> PasswordSignInAsync(SignInModel signInModel)
         {
-            return await _signInManager.PasswordSignInAsync(signInModel.Email, signInModel.Password, signInModel.RememberMe, true);
+            return await _signInManager.PasswordSignInAsync(signInModel.Username, signInModel.Password, signInModel.RememberMe, true);
         }
 
         public async Task SignOutAsync()

@@ -38,6 +38,7 @@ namespace VierGewinnt.Data
                 .HasForeignKey(pr => pr.PlayerID);
 
             modelBuilder.Ignore<GameBoard.Board>();
+            modelBuilder.Ignore<GameBoard.PlayerNames>();
         }
     }
 }

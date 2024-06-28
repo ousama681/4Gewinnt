@@ -5,6 +5,7 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Interfaces;
@@ -22,6 +23,7 @@ namespace VierGewinnt.Controllers
         private IMqttClient mqttClient = null;
         private readonly ILogger<HomeController> _logger;
         private readonly IHubContext<PlayerlobbyHub> _hubContext;
+        private readonly IHubContext<IndexHub> _hubContextRobotTest;
         private readonly IPlayerInfoRepository _playerInfoRepo;
         private readonly IGameRepository _gameRepository;
         private readonly IAccountRepository _accountRepository;
@@ -30,16 +32,18 @@ namespace VierGewinnt.Controllers
         private static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = "Server=localhost;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
+            IHubContext<IndexHub> hubContextRobotTest,
             IPlayerInfoRepository playerInfoRepository,
             IGameRepository gameRepository,
             IAccountRepository accountRepository)
         {
             _logger = logger;
             _hubContext = hubContext;
+            _hubContextRobotTest = hubContextRobotTest;
             _playerInfoRepo = playerInfoRepository;
             _gameRepository = gameRepository;
             _accountRepository = accountRepository;
@@ -78,8 +82,74 @@ namespace VierGewinnt.Controllers
             return View("GameLobby");
         }
 
+        public async Task<IActionResult> TestRoboterMove()
+        {
+            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "3");
+            await SubscribeFeedbackAsync("feedback");
+            return View("Index");
+        }
+
+        public async Task SubscribeFeedbackAsync(string topic)
+        {
+
+            string broker = "localhost";
+            int port = 1883;
+            string clientId = Guid.NewGuid().ToString();
+
+            // Create a MQTT client factory
+            var factory = new MqttFactory();
+
+            // Create a MQTT client instance
+            var mqttClient = factory.CreateMqttClient();
+
+            // Create MQTT client options
+            var options = new MqttClientOptionsBuilder()
+                .WithTcpServer(broker, port)
+                .WithClientId(clientId)
+                .WithCleanSession()
+                .Build();
+
+            // Connect to MQTT broker
+            var connectResult = await mqttClient.ConnectAsync(options);
+
+            if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
+            {
+                Console.WriteLine("Connected to MQTT broker successfully.");
+
+                // Subscribe to a topic
+                await mqttClient.SubscribeAsync(topic);
+
+                // Callback function when a message is received
+                mqttClient.ApplicationMessageReceivedAsync += e =>
+                {
+                    var message = e.ApplicationMessage;
+                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+
+                    if (payload.Equals("0"))
+                    {
+                        return Task.CompletedTask;
+                    }
 
 
+                    if (message.Retain) // Ignore retained messages
+                    {
+                        return Task.CompletedTask;
+                    }
+
+
+
+                   _hubContext.Clients.All.SendAsync("SendRobotFeedback");
+
+
+                    Console.WriteLine($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
+                    return Task.CompletedTask;
+                };
+            }
+            else
+            {
+                Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> GameAborted(GameViewModel model)
@@ -230,9 +300,6 @@ namespace VierGewinnt.Controllers
                     string[] players = payload.Split(',');
 
                     // Search for Gameboard that has both player in it with gamefinished == 0.
-
-                    // IF found, return that gameId, else create new game.
-
                     string playerOne = players[0];
                     string playerTwo = players[1];
 
@@ -240,24 +307,19 @@ namespace VierGewinnt.Controllers
 
                     if (game != null)
                     {
+                        game.playerNames.PlayerOneName = playerOne;
+                        game.playerNames.PlayerTwoName = playerTwo;
                         await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
                         return;
                     }
 
-
-                    //if (playerTwo.Equals(this.username))
-                    //{
                     game = await CreateBoardEntityAsync(playerOne, playerTwo);
+
+                    game.playerNames.PlayerOneName = playerOne;
+                    game.playerNames.PlayerTwoName = playerTwo;
 
                     await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
                     await AfterStartingGame(mqttClient, topic);
-                    //}
-                    //else if (playerOne.Equals(this.username))
-                    //{
-                    //    await AfterStartingGame(mqttClient, topic);
-                    //}
-                    await mqttClient.UnsubscribeAsync(topic);
-                    await mqttClient.DisconnectAsync();
                 };
 
             }
@@ -334,8 +396,8 @@ namespace VierGewinnt.Controllers
                     string playerOneID = GetUser(playerOne, dbContext).Result.Id;
                     string playerTwoID = GetUser(playerTwo, dbContext).Result.Id;
 
-                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneID.Equals(playerOneID) && gb.PlayerTwoID.Equals(playerTwoID) && gb.IsFinished.Equals(false)) ||
-                    (gb.PlayerOneID.Equals(playerTwoID) && gb.PlayerTwoID.Equals(playerOneID) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
+                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(playerTwo) && gb.IsFinished.Equals(false)) ||
+                    (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(playerTwo) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
                     return existingGame;
                 }
                 catch (Exception e)
@@ -361,8 +423,8 @@ namespace VierGewinnt.Controllers
                 {
                     string playerOneID = GetUser(playerOne, dbContext).Result.Id;
 
-                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneID.Equals(playerOneID) && gb.PlayerTwoID.Equals(robotID) && gb.IsFinished.Equals(false)) ||
-                    (gb.PlayerOneID.Equals(robotID) && gb.PlayerTwoID.Equals(playerOneID) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
+                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(robotID) && gb.IsFinished.Equals(false)) ||
+                    (gb.PlayerOneName.Equals(robotID) && gb.PlayerTwoName.Equals(playerOne) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
                     return existingGame;
                 }
                 catch (Exception e)
@@ -394,8 +456,13 @@ namespace VierGewinnt.Controllers
             {
                 try
                 {
-                    game.PlayerOneID = GetUser(playerOne, dbContext).Result.Id;
-                    game.PlayerTwoID = GetUser(playerTwo, dbContext).Result.Id;
+                    var userOne = GetUser(playerOne, dbContext).Result;
+                    var userTwo = GetUser(playerTwo, dbContext).Result;
+
+                    game.PlayerOneID = userOne.Id;
+                    game.PlayerTwoID = userTwo.Id;
+                    game.PlayerOneName = userOne.UserName;
+                    game.PlayerTwoName = userTwo.UserName;
 
                     await dbContext.GameBoards.AddAsync(game);
                     await dbContext.SaveChangesAsync();
@@ -420,7 +487,11 @@ namespace VierGewinnt.Controllers
             {
                 try
                 {
-                    game.PlayerOneID = GetUser(playerOne, dbContext).Result.Id;
+                    var userOne = GetUser(playerOne, dbContext).Result;
+
+                    game.PlayerOneID = userOne.Id;
+                    game.PlayerOneName = userOne.UserName;
+
                     game.PlayerTwoID = robotID;
 
                     await dbContext.GameBoards.AddAsync(game);

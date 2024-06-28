@@ -9,9 +9,20 @@ namespace VierGewinnt.Data.Models
         public int ID {  get; set; }
         public string PlayerOneID { get; set; }
         public string PlayerTwoID { get; set; }
+        public PlayerNames playerNames = new PlayerNames();
+        public string PlayerOneName { get; set; }
+        public string PlayerTwoName { get; set; }
+
         public bool IsFinished { get; set; }
         public ICollection<Move> Moves { get; set; }
         public Board board { get; set; }
+
+        public class PlayerNames
+        {
+            public string PlayerOneName { get; set; }
+            public string PlayerTwoName { get; set; }
+
+        }
 
         public class Board
         {

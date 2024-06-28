@@ -136,16 +136,20 @@ connection.on("AnimatePlayerMove", async (column, playerId) => {
 });
 
 async function animate(column, endRow, color) {
+    var audio = document.getElementById("beep");
+    var audioEndPos = document.getElementById("beepEnd");
     if (color == "yellow") {
         for (let row = 1; row <= endRow; row++) {
             var selectedCell = document.getElementById(`${column}${row}`);
             if (selectedCell != null) {
                 if (row == endRow) {
+                    audioEndPos.play();
                     selectedCell.style.backgroundColor = "yellow";
                     activateButton("btnColRed");
                     return;
                 }
                 selectedCell.classList.add('blinkYellow');
+                audio.play();
                 await new Promise(resolve => setTimeout(resolve, 200));
                 selectedCell.classList.remove('blinkYellow');
  
@@ -157,11 +161,13 @@ async function animate(column, endRow, color) {
             var selectedCell = document.getElementById(`${column}${row}`);
             if (selectedCell != null) {
                 if (row == endRow) {
+                    audioEndPos.play();
                     selectedCell.style.backgroundColor = "red";
                     activateButton("btnColYellow");
                     return;
                 }
                 selectedCell.classList.add('blinkRed');
+                audio.play();
                 await new Promise(resolve => setTimeout(resolve, 200));
                 selectedCell.classList.remove('blinkRed');
             }

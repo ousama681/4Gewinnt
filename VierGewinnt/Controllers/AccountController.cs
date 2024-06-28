@@ -24,8 +24,11 @@ namespace VierGewinnt.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn(SignInModel signInModel)
         {
+            signInModel.Username = "placeholder";
             if (ModelState.IsValid)
             {
+                // Code ob user existiert
+                signInModel.Username = _accountRepository.GetUserByEmailAsync(signInModel.Email).Result.UserName;
                 var result = await _accountRepository.PasswordSignInAsync(signInModel);
                 if (result.Succeeded)
                 {

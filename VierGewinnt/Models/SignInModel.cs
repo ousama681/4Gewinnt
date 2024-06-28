@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace VierGewinnt.Models
 {
@@ -14,5 +16,9 @@ namespace VierGewinnt.Models
         public string Password { get; set; }
         [Display(Name = "Remember me")]
         public bool RememberMe { get; set; }
+
+
+        [ValidateNever]
+        public string Username { get; set; }
     }
 }

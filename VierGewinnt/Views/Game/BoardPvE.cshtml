@@ -17,7 +17,7 @@
         <!-- Column for PlayerOne -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerOne">
-                <label class="text-light">Player One:</label>
+                <label class="text-light">Player One: @Model.Board.PlayerOneName</label>
             </div>
             <div>
                 <label class="text-light">@User.Identity.Name</label>
@@ -72,7 +72,7 @@
         <!-- Column for PlayerTwo -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerTwo">
-                <label class="text-light">Robot:</label>
+                <label class="text-light">Robot: @Model.Board.PlayerTwoName</label>
             </div>
             <div>
                 <label class="text-light">@Model.Board.PlayerTwoID</label>
@@ -81,7 +81,7 @@
                 <div class="yellow-stone"></div>
                 <div class="text-light mb-2">Select a column: </div>
                 <form id="PlaceYellowStone" class="d-flex flex-column align-items-center">
-                    <input asp-for="Board.PlayerTwoID" id="playerIdTwo" name="userIdTwo" type="hidden" />
+                    <input asp-for="Board.PlayerTwoName" id="playerIdTwo" name="userIdTwo" type="hidden" />
                     <input asp-for="Board.ID" name="boardIdTwo" type="hidden" />
                     <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7">
                     <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
@@ -89,6 +89,15 @@
             </div>
         </div>
     </div>
+    <audio id="beep">
+        <source src="/beep.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="beepEnd">
+        <source src="/beepEnd.mp3" type="audio/mp3" />
+    </audio>
+    <audio id="winSound">
+        <source src="/winSound.mp3" type="audio/mp3" />
+    </audio>
 </div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
@@ -96,7 +105,7 @@
 
 <script>
     var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));
-    var playerOneID = @Json.Serialize(Model.Board.PlayerOneID);
-    var playerTwoID = @Json.Serialize(Model.Board.PlayerTwoID);
+    var playerOneID = @Json.Serialize(Model.Board.PlayerOneName);
+    var playerTwoID = @Json.Serialize(Model.Board.PlayerTwoName);
     var gameId = @Json.Serialize(Model.Board.ID);
 </script>

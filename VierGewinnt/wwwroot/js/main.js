@@ -22,11 +22,11 @@ camera.position.set(1, 1, 3);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
-controls.minDistance = 1.4;
+controls.minDistance = 1.2;
 controls.maxDistance = 4;
 controls.minPolarAngle = 0.0;
 controls.maxPolarAngle = 1.5;
-controls.autoRotate = false;
+controls.autoRotate = true;
 controls.target = new THREE.Vector3(0, 0.2, 0);
 controls.update();
 
@@ -41,17 +41,32 @@ groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
 scene.add(groundMesh);
 
-const spotLight = new THREE.SpotLight(0x0000fa, 1, 100, 0.22, 1);
-spotLight.position.set(0, 6, 0);
-spotLight.castShadow = true;
-spotLight.shadow.bias = -0.0001;
-scene.add(spotLight);
+// Spotlight 1
+const spotLight1 = new THREE.SpotLight(0x0000fa, 8, 100, 0.22, 1);
+spotLight1.position.set(0, 4.5, 8); // Adjust position to shine from the side
+spotLight1.castShadow = true;
+spotLight1.shadow.bias = -0.0001;
+spotLight1.target.position.set(0, 0.2, 0); // Ensure it points at the model
+scene.add(spotLight1);
+scene.add(spotLight1.target); // Add the target to the scene
 
-const spotLight2 = new THREE.SpotLight(0xffffff, 8, 100, 0.22, 1);
-spotLight2.position.set(0, 3, 0);
+// Spotlight 2
+const spotLight2 = new THREE.SpotLight(0xffffff, 10, 200, 0.18, 1);
+spotLight2.position.set(-2, 5, 2); // Adjust position to shine from another angle
 spotLight2.castShadow = true;
 spotLight2.shadow.bias = -0.0001;
+spotLight2.target.position.set(0, 0.2, 0); // Ensure it points at the model
 scene.add(spotLight2);
+scene.add(spotLight2.target);
+
+// Spotlight 3
+const spotLight3 = new THREE.SpotLight(0xffffff, 10, 200, 0.18, 1);
+spotLight3.position.set(0, 4.5, 8); // Adjust position to shine from a different angle
+spotLight3.castShadow = true;
+spotLight3.shadow.bias = -0.0001;
+spotLight3.target.position.set(0, 0.2, 0); // Ensure it points at the model
+scene.add(spotLight3);
+scene.add(spotLight3.target); // Add the target to the scene
 
 const spotLight3 = new THREE.SpotLight(0x00ffff, 1, 100, 0.22, 1);
 spotLight3.position.set(0, 4.5, 0);
@@ -60,7 +75,7 @@ spotLight3.shadow.bias = -0.0001;
 scene.add(spotLight3);
 
 const loader = new GLTFLoader().setPath('/Assets/roboking/');
-loader.load('RoboKing_3.glb', (gltf) => {
+loader.load('roboking.glb', (gltf) => {
     const mesh = gltf.scene;
 
     mesh.traverse((child) => {
@@ -70,7 +85,8 @@ loader.load('RoboKing_3.glb', (gltf) => {
         }
     });
 
-    mesh.position.set(0, 0.3, -0.35);
+    mesh.position.set(0, 0.2, -0.05);
+    mesh.rotateX(89.5);
     scene.add(mesh);
 
     document.getElementById('progress-container').style.display = 'none';
