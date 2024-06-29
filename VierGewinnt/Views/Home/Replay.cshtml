@@ -13,6 +13,8 @@
 
 @{
     ViewData["Title"] = "Player vs Robot";
+    var username = ViewBag.Username;
+    var username2 = ViewBag.Username2;
 }
 <link rel="stylesheet" href="~/css/board.css" asp-append-version="true" />
 <div class="text-center">
@@ -23,16 +25,17 @@
     <div class="row align-items-center">
         <!-- Column for PlayerOne -->
         <div class="col d-flex flex-column align-items-center">
-            <div id="playerOne">
-                <label class="text-light">PlayerOne: @Model.Game.PlayerOneName</label>
-                <!-- Your PlayerOne content here -->
+            <div id="playerTwo">
+                <label class="text-light">PlayerOne: @username</label>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <div class="red-stone"></div>
             </div>
         </div>
 
         <!-- Column for the game board -->
         <div class="col-md-6 d-flex justify-content-center">
             <div class="container mt-5">
-                <h2 class="text-center text-light">Turn 1: Player 1</h2>
 
                 <!-- Column numbers row -->
                 <div class="row justify-content-center">
@@ -67,7 +70,10 @@
         <!-- Column for PlayerTwo -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerTwo">
-                <label class="text-light">PlayerTwo: @Model.Game.PlayerTwoName</label>
+                <label class="text-light">PlayerTwo: @username2</label>
+            </div>
+            <div class="d-flex flex-column align-items-center">
+                <div class="yellow-stone"></div>
             </div>
         </div>
     </div>
@@ -79,6 +85,13 @@
     <form asp-area="" method="post" class="d-flex flex-column align-items-center">
         <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Nächster Spielzug</button>
     </form>
+</div>
+
+<div id="gameFinishedModal">
+    <div>
+        <label class="text-light">Spiel ist fertig</label>
+        <button class="success-btn btn btn-primary mt-2" id="confirmButton">Ok</button>
+    </div>
 </div>
 
 <script src="~/js/replay.js" asp-append-version="true"></script>

@@ -31,7 +31,7 @@ namespace VierGewinnt.Controllers
         private static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
@@ -191,7 +191,7 @@ namespace VierGewinnt.Controllers
             // Pro Spieler Alle Fertigen Spiele Laden inclusive Moves.
 
             List<GameBoard> gameHistorie = _gameRepository.FindGamesByPlayerName(username).Result;
-
+            ViewBag.Username = username;
 
 
             MatchHistoryViewModel vm = new MatchHistoryViewModel();
@@ -211,8 +211,8 @@ namespace VierGewinnt.Controllers
             // Pro Spieler Alle Fertigen Spiele Laden inclusive Moves.
 
             GameBoard gb = _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId }).Result;
-
-
+            ViewBag.Username = gb.PlayerOneName;
+            ViewBag.Username2 = gb.PlayerTwoName;
             SpielRueckblickViewModel vm = new SpielRueckblickViewModel();
 
             vm.Game = gb;
