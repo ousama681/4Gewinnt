@@ -8,9 +8,6 @@ using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Data;
 using VierGewinnt.Models;
 using VierGewinnt.Data.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 
@@ -22,9 +19,6 @@ namespace VierGewinnt
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
-            // "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;"
             builder.Services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer(DbUtility.connectionString));
 
             ConfigureIdentityOptions(builder);
