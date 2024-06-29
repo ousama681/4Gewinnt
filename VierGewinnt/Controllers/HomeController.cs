@@ -177,7 +177,7 @@ namespace VierGewinnt.Controllers
         public IActionResult Leaderboard()
         {
             LeaderboardViewModel vm = new LeaderboardViewModel();
-            vm.PlayerRankings = _playerInfoRepo.GetAllAsync().Result.OrderBy(pr => pr.Wins);
+            vm.PlayerRankings = _playerInfoRepo.GetAllAsync().Result.OrderByDescending(pr => pr.Wins);
             return View(vm);
         }
 
