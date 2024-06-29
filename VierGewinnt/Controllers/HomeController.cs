@@ -27,10 +27,10 @@ namespace VierGewinnt.Controllers
         private readonly IAccountRepository _accountRepository;
         private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
         private static IList<string> playersInHub = new List<string>();
-        private static IList<string> robotsInHub = new List<string>();
+        public static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = Program.connectionString;
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
@@ -558,11 +558,12 @@ namespace VierGewinnt.Controllers
                     if (!robotsInHub.Contains(robotID))
                     {
                         robotsInHub.Add(robotID);
+                    await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
                     } else
                     {
                         robotsInHub.Remove(robotID);
+                        await _hubContext.Clients.All.SendAsync("RemoveRobot", robotID);
                     }
-                    await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
                 };
 
             }

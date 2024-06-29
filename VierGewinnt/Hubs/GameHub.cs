@@ -14,7 +14,7 @@ namespace VierGewinnt.Hubs
 {
     public class GameHub : Hub
     {
-        private static readonly string connectionString = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static readonly string connectionString = Program.connectionString;
 
         private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 

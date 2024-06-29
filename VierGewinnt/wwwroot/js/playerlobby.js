@@ -202,13 +202,13 @@ connection.on("NavigateToGame", (gameId) => {
 
 
 
-// Test method to create Robots
-var testButton = document.getElementById("test")
-testButton.onclick = function () {
-    var testText = document.getElementById("testtext").value
-    event.preventDefault();
-    connection.invoke("CreateRobot", testText);
-}
+//// Test method to create Robots
+//var testButton = document.getElementById("test")
+//testButton.onclick = function () {
+//    var testText = document.getElementById("testtext").value
+//    event.preventDefault();
+//    connection.invoke("CreateRobot", testText);
+//}
 
 // Robot Lobby
 
