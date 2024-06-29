@@ -47,11 +47,11 @@ namespace VierGewinnt.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddGameBoardAsync(GameBoard board)
-        {
-            await _context.GameBoards.AddAsync(board);
-            await _context.SaveChangesAsync();
-        }
+        //public async Task AddGameBoardAsync(GameBoard board)
+        //{
+        //    await _context.GameBoards.AddAsync(board);
+        //    await _context.SaveChangesAsync();
+        //}
 
         public void Update(GameBoard item)
         {

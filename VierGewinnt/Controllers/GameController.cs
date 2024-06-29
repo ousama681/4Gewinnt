@@ -59,7 +59,14 @@ namespace VierGewinnt.Controllers
         public async Task<IActionResult> BoardPvE(int gameId)
         {
             GameViewModel gameViewModel = new GameViewModel();
-            GameBoard gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
+            GameBoard gameBoard;
+            gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
+
+            //else
+            //{
+            //    gameBoard = new GameBoard
+            //}
+            //gameViewModel.Board = ;
             gameViewModel.Board = gameBoard;
             return View(gameViewModel);
         }
@@ -213,7 +220,7 @@ namespace VierGewinnt.Controllers
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
                 try
-                {
+                { 
                     return await dbContext.Robots.Where(r => r.Name.Equals(robotName)).SingleAsync();
                 }
                 catch (Exception e)
