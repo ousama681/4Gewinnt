@@ -1,8 +1,9 @@
-﻿@model VierGewinnt.ViewModels.LeaderboardViewModel;
-@using VierGewinnt.Data.Model;
+﻿@model VierGewinnt.ViewModels.LeaderboardViewModel
+@using VierGewinnt.Data.Model
 
 @{
     ViewData["Title"] = "Leaderboard";
+    var playerRankings = Model.PlayerRankings.ToList(); // Convert to list to enable indexing
 }
 <div class="container">
     <div class="row mt-4">
@@ -10,16 +11,35 @@
             <h2 class="text-light">Bestenliste</h2>
         </div>
     </div>
- 
-<ul>
-    @foreach (PlayerRanking pr in Model.PlayerRankings)
-    {
-        <li class="list-group-item" style="width:33%;">
-            <div class="d-flex flex-column align-items-center">
-                <label class="fw-bold mb-2">@pr.Player.UserName</label>
-                <label>@pr.Wins</label>
-            </div>
-        </li>
-    }
-</ul>
+
+    <ul>
+        @for (int i = 0; i < playerRankings.Count; i++)
+        {
+            var pr = playerRankings[i];
+            string borderColor;
+
+            switch (i)
+            {
+                case 0:
+                    borderColor = "rgba(255, 215, 0, 1)"; // Gold
+                    break;
+                case 1:
+                    borderColor = "rgba(192, 192, 192, 1)"; // Silver
+                    break;
+                case 2:
+                    borderColor = "rgba(205, 127, 50, 1)"; // Bronze
+                    break;
+                default:
+                    borderColor = "rgba(255, 220, 50, .6)"; // Default
+                    break;
+            }
+
+            <li class="list-group-item" style="width:100%; border:4mm ridge; border-color:@borderColor;">
+                <div class="d-flex flex-column align-items-center">
+                    <label class="fw-bold mb-2">Player: @pr.Player.UserName</label>
+                    <label>Anzahl Siege: @pr.Wins</label>
+                </div>
+            </li>
+        }
+    </ul>
 </div>
