@@ -340,10 +340,5 @@ function startRobotGame() {
     const params = new URLSearchParams();
     params.append("robotOneName", robotOne);
     params.append("robotTwoName", robotTwo);
-
-
     window.location.href = `${baseUrl}?${params.toString()}`;
-
-
-
 }
