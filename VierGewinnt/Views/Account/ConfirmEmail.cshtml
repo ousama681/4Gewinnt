@@ -4,8 +4,6 @@
     ViewData["Title"] = "Confirm email";
 }
 
-<h1>Error</h1>
-
 <div class="container">
     <div class="row text-center">
         <div class="col-md-4">
@@ -14,26 +12,28 @@
             @if (Model.EmailVerified == true)
             {
                 <div class="alert alert-success" role="alert">
-                    <p>Your email has been verified successfully.</p>
+                    <h4>Your email has been verified successfully.</h4>
                 </div>
             }
             else
             {
                 if (Model.EmailSent)
                 {
-                    <p>Email sent on your registered email id.</p>
+                    <br />
+                    <h4 class="text-light">Email sent on your registered email id.</h4>
                 }
 
                 else
                 {
-                    <p>We have sent an email on your email id. Click on the link to login.</p>
+                    <br />
+                    <h4 class="text-light">We have sent an email to your mail account. Click on the link to login.</h4>
                 }
 
                 <form asp-action="ConfirmEmail">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="Email" />
-
-                    <p>Did not get any email of deleted by mistake?</p>
+                    <br />
+                    <h5 class="text-light">Did not get any email or deleted by mistake?</h5>
                     <div class="form-group">
                         <input type="submit" value="Resend confirmation email" class="btn btn-primary" />
                     </div>

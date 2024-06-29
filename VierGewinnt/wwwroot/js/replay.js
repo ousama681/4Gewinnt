@@ -62,7 +62,18 @@ function nextMove() {
 
     if (moveNr > totalMoves) {
         console.log("Alle Moves wurden gespielt!");
+        ShowGameFinishedModal()
     }
+    }
+}
+
+async function ShowGameFinishedModal() {
+    const modal = document.getElementById("gameFinishedModal");
+    modal.style.display = "block";
+
+    // When player wants to go back to MatchHistory 
+    document.getElementById("confirmButton").onclick = function () {
+        modal.style.display = "none";
     }
 }
 
