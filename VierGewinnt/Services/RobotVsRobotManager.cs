@@ -2,11 +2,14 @@
 using Microsoft.IdentityModel.Tokens;
 using MQTTnet;
 using MQTTnet.Client;
+using System.Diagnostics.Eventing.Reader;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using VierGewinnt.Data.Model;
 using VierGewinnt.Data.Models;
 using VierGewinnt.Hubs;
+using static Microsoft.EntityFrameworkCore.SqlServer.Query.Internal.SqlServerOpenJsonExpression;
 
 namespace VierGewinnt.Services
 {
@@ -16,15 +19,22 @@ namespace VierGewinnt.Services
 
         public static IHubContext<BoardEvEHub> hubContext;
 
-        public static Move[,] moves;
+        //public static Move[,] board;
         public static IDictionary<string, int> colDepth = new Dictionary<string, int>();
         public static int moveNr = 0;
         public static GameBoard currentGame;
         public static string currentRobotMove;
         public static IDictionary<string, int> robotsInGame = new Dictionary<string, int>();
+        public static IDictionary<string, int> robotMappingNr = new Dictionary<string, int>();
+        public static IDictionary<int, string> robotMappingReversed = new Dictionary<int, string>();
         public static string winner;
         public static bool firstMove = false;
         public static string currentColumn;
+        public static int[,] board = new int[6, 7];
+
+
+        public static int otherRobotNr;
+        public static int currRobotNr;
         public static int FeedBackCounter
         {
             get { return feedBackCounter; }
@@ -50,9 +60,12 @@ namespace VierGewinnt.Services
                 if (isBothFinished == true)
                 {
                     CallAnimateHandler();
-                    if (CheckForWin())
+                    int winner = CheckForWin();
+                    if (winner != 0)
                     {
+                        RobotVsRobotManager.robotMappingReversed.TryGetValue(winner, out RobotVsRobotManager.winner);
                         FinishGame();
+                        return;
                     }
                     MakeNextMove();
                     FeedBackCounter = 0;
@@ -66,27 +79,43 @@ namespace VierGewinnt.Services
             await GameIsOver();
         }
 
-        private static async Task MakeNextMove()
+        public static async Task MakeNextMove()
         {
-            string column = ConnectFourAIService.GetNextRandomMove().ToString();
-            currentColumn = column;
+            currentColumn = ConnectFourAIService.GetNextRandomMove(board).ToString();
+
+            //currentColumn = FindBestMove().ToString();
 
             // NextMove wird an beide Roboter verschickt.
-            await PublishToCoordinate(column);
+            await PublishToCoordinate(currentColumn);
             moveNr++;
-            await AddMoveToBoard(column);
+            await AddMoveToBoard();
+        }
 
-            string currentRobotMove = RobotVsRobotManager.currentRobotMove;
-            string robotOne = RobotVsRobotManager.currentGame.PlayerOneID;
-            string robotTwo = RobotVsRobotManager.currentGame.PlayerTwoID;
+        public static async Task AddMoveToBoard()
+        {
+
+            int columnInt = Int32.Parse(currentColumn);
+            int depth;
 
 
-            currentRobotMove = currentRobotMove.Equals(robotOne) ? robotTwo : robotOne;
+            colDepth.TryGetValue(currentColumn, out depth);
+            colDepth[currentColumn] = depth - 1;
+
+            board[depth - 1, columnInt - 1] = currRobotNr;
+
+            if (currRobotNr == 1)
+            {
+                currRobotNr = 2;
+            } else if (currRobotNr == 2)
+            {
+                currRobotNr = 1;
+            }
+
         }
 
         private static void CallAnimateHandler()
         {
-            hubContext.Clients.All.SendAsync("AnimateMove", currentColumn) ;
+            hubContext.Clients.All.SendAsync("AnimateMove", currentColumn);
         }
 
         static RobotVsRobotManager()
@@ -148,29 +177,6 @@ namespace VierGewinnt.Services
             string text = "Roboter " + winner + " hat gewonnen.";
             await hubContext.Clients.All.SendAsync("NotificateGameEnd", text);
         }
-        private static async Task SetIsFinished(int gameId)
-        {
-            //    var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            //    optionsBuilder.UseSqlServer(GameHub.connectionString);
-
-            //    using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            //    {
-            //        try
-            //        {
-            //            GameBoard gameboard = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).Single();
-            //            gameboard.IsFinished = true;
-            //            dbContext.GameBoards.Update(gameboard);
-            //            await dbContext.SaveChangesAsync();
-            //            return;
-            //            // Hier mal die Prüfung für den Win machen. 
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            Debug.WriteLine(e);
-            //        }
-            //    }
-        }
-
 
         public static async Task UnsubscribeAndCloseFromFeedback()
         {
@@ -183,18 +189,6 @@ namespace VierGewinnt.Services
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
         }
 
-
-        public static async Task AddMoveToBoard(string column)
-        {
-            int depth;
-            colDepth.TryGetValue(column, out depth);
-
-            int columnInt = Int32.Parse(column);
-
-            string robotNr = currentRobotMove;
-
-            moves[columnInt - 1, depth - 1] = new Move() { PlayerID = robotNr, MoveNr = moveNr, Column = columnInt };
-        }
 
         internal static void InitColDepth()
         {
@@ -209,28 +203,25 @@ namespace VierGewinnt.Services
             colDepth.Add("7", 6);
         }
 
-
-        private static bool CheckForWin()
+        private static int CheckForWin()
         {
-            return CheckForWinOrDraw(moves);
+            return CheckForWinOrDraw();
         }
 
-        private static bool CheckForWinOrDraw(Move[,] board)
+        public static int CheckForWinOrDraw()
         {
-            //GameInfo gameInfo;
-
             // Check horizontal
-            for (int col = 0; col < 4; col++)
+            for (int row = 0; row < 6; row++)
             {
-                // Prüfung einbauen, da hier im if Moves Null sein können.
-                for (int row = 0; row < 6; row++)
+                for (int col = 0; col < 7 - 3; col++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row] != null && playerId.Equals(board[col + 1, row].PlayerID)) && (board[col + 2, row] != null && playerId.Equals(board[col + 2, row].PlayerID)) && (board[col + 3, row] != null && playerId.Equals(board[col + 3, row].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row, col + 1] &&
+                        board[row, col] == board[row, col + 2] &&
+                        board[row, col] == board[row, col + 3])
                     {
-                        //gameInfo.SetWinner(playerId);
-                        winner = playerId;
-                        return true;
+                        //robotMappingReversed.TryGetValue(board[row, col], out winner);
+                        return board[row, col];
                     }
                 }
             }
@@ -238,50 +229,173 @@ namespace VierGewinnt.Services
             // Check vertical
             for (int col = 0; col < 7; col++)
             {
-                for (int row = 0; row < 3; row++)
+                for (int row = 0; row < 6 - 3; row++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col, row + 1] != null && playerId.Equals(board[col, row + 1].PlayerID)) && (board[col, row + 2] != null && playerId.Equals(board[col, row + 2].PlayerID)) && (board[col, row + 3] != null && playerId.Equals(board[col, row + 3].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row + 1, col] &&
+                        board[row, col] == board[row + 2, col] &&
+                        board[row, col] == board[row + 3, col])
                     {
-                        //gameInfo.SetWinner(playerId);
-                        winner = playerId;
-                        return true;
+                        return board[row, col];
                     }
                 }
             }
 
-            // Check diagonal (top-left to bottom-right)
-            for (int col = 0; col < 4; col++)
+            // Check positive diagonal (bottom-left to top-right)
+            for (int col = 0; col < 7 - 3; col++)
             {
-                for (int row = 0; row < 3; row++)
+                for (int row = 0; row < 6 - 3; row++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row + 1] != null && playerId.Equals(board[col + 1, row + 1].PlayerID)) && (board[col + 2, row + 2] != null && playerId.Equals(board[col + 2, row + 2].PlayerID)) && (board[col + 3, row + 3] != null && playerId.Equals(board[col + 3, row + 3].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row + 1, col + 1] &&
+                        board[row, col] == board[row + 2, col + 2] &&
+                        board[row, col] == board[row + 3, col + 3])
                     {
-                        //gameInfo.SetWinner(playerId);
-                        winner = playerId;
-                        return true;
+                        return board[row, col];
                     }
                 }
             }
 
-            // Check diagonal (bottom-left to top-right)
-            for (int col = 0; col < 4; col++)
+            // Check negative diagonal (top-left to bottom-right)
+            for (int col = 0; col < 7 - 3; col++)
             {
                 for (int row = 3; row < 6; row++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row - 1] != null && playerId.Equals(board[col + 1, row - 1].PlayerID)) && (board[col + 2, row - 2] != null && playerId.Equals(board[col + 2, row - 2].PlayerID)) && (board[col + 2, row - 2] != null && playerId.Equals(board[col + 3, row - 3].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row - 1, col + 1] &&
+                        board[row, col] == board[row - 2, col + 2] &&
+                        board[row, col] == board[row - 3, col + 3])
                     {
-                        //gameInfo.SetWinner(playerId);
-                        winner = playerId;
-                        return true;
+                        return board[row, col];
                     }
                 }
             }
 
+            // Check for draw (if no empty cells)
+            foreach (var cell in board)
+            {
+                if (cell == 0)
+                {
+                    return 0; // No winner yet
+                }
+            }
+
+            return -1; // Draw
+        }
+
+        public static int FindBestMove()
+        {
+            int bestScore = int.MinValue;
+            int bestCol = -1;
+
+            for (int col = 0; col < 7; col++)
+            {
+                int row = GetNextOpenRow(col);
+                if (row != -1)
+                {
+                    board[row, col] = otherRobotNr;
+                    // Hier aufpassen eventuell überschreibe ich alles
+                    int score = Minimax(board, 5, false);
+                    board[row, col] = 0;
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestCol = col;
+                    }
+                }
+            }
+
+            return bestCol+1;
+        }
+
+        static int Minimax(int[,] board, int depth, bool isMaximizing)
+        {
+
+
+            int score = EvaluateBoard(board);
+            if (Math.Abs(score) == 1000 || depth == 0)
+            {
+                return score;
+            }
+
+            if (isMaximizing)
+            {
+                int bestScore = int.MinValue;
+                for (int col = 0; col < 7; col++)
+                {
+                    int row = GetNextOpenRow(col);
+                    if (row != -1)
+                    {
+                        //int otherRobotNr;
+                        //string otherRobot = currentRobotMove.Equals(currentGame.PlayerOneName) ? currentGame.PlayerOneName : currentGame.PlayerTwoName;
+                        //robotMappingNr.TryGetValue(otherRobot, out otherRobotNr);
+                        board[row, col] = otherRobotNr;
+                        int newScore = Minimax(board, depth - 1, false);
+                        board[row, col] = 0;
+                        bestScore = Math.Max(bestScore, newScore);
+                    }
+                }
+                return bestScore;
+            }
+            else
+            {
+                int bestScore = int.MaxValue;
+                for (int col = 0; col < 7; col++)
+                {
+                    int row = GetNextOpenRow(col);
+                    if (row != -1)
+                    {
+                        board[row, col] = currRobotNr;
+                        int newScore = Minimax(board, depth - 1, true);
+                        board[row, col] = 0;
+                        bestScore = Math.Min(bestScore, newScore);
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        static int EvaluateBoard(int[,] board)
+        {
+            // Simple evaluation: +1000 for AI win, -1000 for player win
+            if (CheckWin(otherRobotNr)) return 1000;
+            if (CheckWin(currRobotNr)) return -1000;
+            return 0; // Neutral
+        }
+
+        static bool CheckWin(int player)
+        {
+            // Check for 4 in a row for the given player
+            // Horizontal, vertical, diagonal checks
+            // Simplified for brevity
+            for (int r = 0; r < 6; r++)
+            {
+                for (int c = 0; c < 7; c++)
+                {
+                    if (c + 3 < 7 && board[r, c] == player && board[r, c + 1] == player && board[r, c + 2] == player && board[r, c + 3] == player)
+                        return true;
+                    if (r + 3 < 6 && board[r, c] == player && board[r + 1, c] == player && board[r + 2, c] == player && board[r + 3, c] == player)
+                        return true;
+                    if (r + 3 < 6 && c + 3 < 7 && board[r, c] == player && board[r + 1, c + 1] == player && board[r + 2, c + 2] == player && board[r + 3, c + 3] == player)
+                        return true;
+                    if (r - 3 >= 0 && c + 3 < 7 && board[r, c] == player && board[r - 1, c + 1] == player && board[r - 2, c + 2] == player && board[r - 3, c + 3] == player)
+                        return true;
+                }
+            }
             return false;
         }
 
+        static int GetNextOpenRow(int col)
+        {
+            for (int row = 5; row >= 0; row--)
+            {
+                if (board[row, col] == 0)
+                {
+                    return row;
+                }
+            }
+            return -1; // Column is full
+        }
     }
 }

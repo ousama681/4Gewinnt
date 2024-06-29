@@ -16,7 +16,7 @@
         <!-- Column for PlayerOne -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerOne">
-                <label class="text-light">Player One: @Model.Board.PlayerOneName</label>
+                <label class="text-light">Robot One:</label>
             </div>
             <div>
                 <label id="labelRobotOne" class="text-light">@Model.Board.PlayerOneName</label>
@@ -26,7 +26,7 @@
         <!-- Column for the game board -->
         <div class="col-md-6 d-flex justify-content-center">
             <div class="container mt-5">
-                <h2 class="text-center text-light">Turn 1: Player 1</h2>
+                <h2 id="nextTurnName" class="text-center text-light">Next Turn: </h2>
 
                 <!-- Column numbers row -->
                 <div class="row justify-content-center">
@@ -61,7 +61,7 @@
         <!-- Column for PlayerTwo -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerTwo">
-                <label class="text-light">Player Two: @Model.Board.PlayerTwoName</label>
+                <label class="text-light">Robot Two:</label>
             </div>
             <div>
                 <label id="labelRobotTwo" class="text-light">@Model.Board.PlayerTwoName</label>
@@ -85,8 +85,7 @@
                 <script>
                     window.onload = function (robotOneName, robotTwoName) {
                         var robotOneName = document.getElementById("labelRobotOne").textContent;
-                        var robotTwoName = document.getElementById("labelRobotTwo").textContent;
-                        document.getElementById("playerOne").textContent = robotOneName;
-                        document.getElementById("playerTwo").textContent = robotTwoName;
+                        // var robotTwoName = document.getElementById("labelRobotTwo").textContent;
+                        document.getElementById("nextTurnName").textContent = "Next Turn: " + robotOneName;
                     }
                 </script>

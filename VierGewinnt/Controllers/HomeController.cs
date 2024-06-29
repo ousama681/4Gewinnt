@@ -60,6 +60,7 @@ namespace VierGewinnt.Controllers
             }
             if (countInstances == 0)
             {
+                
                 await SubscribeRobotAsync("SubscribeRobot");
                 await SubscribeAsync("Challenge");
                 await SubscribeAsync("ChallengeRobot");

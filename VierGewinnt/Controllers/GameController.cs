@@ -73,13 +73,24 @@ namespace VierGewinnt.Controllers
 
             gameBoard.PlayerOneID = robotOne.Name;
             gameBoard.PlayerTwoID = robotTwo.Name;
+            gameBoard.PlayerOneName = robotOne.Name;
+            gameBoard.PlayerTwoName = robotTwo.Name;
             gameViewModel.Board = gameBoard;
 
             await RobotVsRobotManager.SubscribeToFeedbackTopic();
             RobotVsRobotManager.hubContext = _hubContext;
-            RobotVsRobotManager.moves = new Move[7, 6];
+            //RobotVsRobotManager.board = new Move[6, 7];
+            RobotVsRobotManager.board = new int[6, 7];
             RobotVsRobotManager.currentGame = gameBoard;
             RobotVsRobotManager.currentRobotMove = robotOne.Name;
+            RobotVsRobotManager.currRobotNr = 1;
+            RobotVsRobotManager.otherRobotNr = 2;
+
+            RobotVsRobotManager.robotMappingNr.TryAdd(robotOne.Name, 1);
+            RobotVsRobotManager.robotMappingNr.TryAdd(robotTwo.Name, 2);
+
+            RobotVsRobotManager.robotMappingReversed.TryAdd(1, robotOne.Name);
+            RobotVsRobotManager.robotMappingReversed.TryAdd(2, robotTwo.Name);
 
 
             RobotVsRobotManager.InitColDepth();
@@ -147,8 +158,8 @@ namespace VierGewinnt.Controllers
 
 
 
-        //            //Move[,] moves = CreateMoveArrFromBoard(gb.Moves);
-        //            //aiService.board = moves;
+        //            //Move[,] board = CreateMoveArrFromBoard(gb.Moves);
+        //            //aiService.board = board;
         //            //aiService.currentPlayer = robotName;
 
         //            //int columnNR = new Random().Next(1, 7);

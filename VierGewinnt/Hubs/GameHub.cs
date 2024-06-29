@@ -308,7 +308,7 @@ namespace VierGewinnt.Hubs
                 for (int row = 3; row < 6; row++)
                 {
                     string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row - 1] != null && playerId.Equals(board[col + 1, row - 1].PlayerID)) && (board[col + 2, row - 2] != null && playerId.Equals(board[col + 2, row - 2].PlayerID)) && (board[col + 2, row - 2] != null && playerId.Equals(board[col + 3, row - 3].PlayerID)))
+                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row - 1] != null && playerId.Equals(board[col + 1, row - 1].PlayerID)) && (board[col + 2, row - 2] != null && playerId.Equals(board[col + 2, row - 2].PlayerID)) && (board[col + 3, row - 3] != null && playerId.Equals(board[col + 3, row - 3].PlayerID)))
                     {
                         gameInfo.SetWinner(playerId);
                         return true;

@@ -14,11 +14,17 @@ colDepth['7'] = 6;
 
 var movecounter = 0;
 
+var nextPlayer;
+
+var robotOneName = document.getElementById("labelRobotOne").textContent;
+var robotTwoName = document.getElementById("labelRobotTwo").textContent;
+
 
 connection.start().then(function () {
-    var robotOne = document.getElementById("labelRobotOne");
+    //var robotOne = document.getElementById("labelRobotOne");
 
-    var robotOneName = robotOne.textContent;
+    //var robotOneName = robotOne.textContent;
+    nextPlayer = document.getElementById("labelRobotOne").textContent;
     connection.invoke("MakeFirstMove", robotOneName);
 });
 
@@ -29,6 +35,14 @@ connection.on("AnimateMove", function (columnNr) {
     var color = movecounter % 2 != 0 ? "red" : "yellow";
 
     animate(columnNr, colDepth[columnNr], color);
+
+    if (nextPlayer == robotOneName) {
+        nextPlayer = robotTwoName;
+    } else if (nextPlayer == robotTwoName) {
+        nextPlayer = robotOneName;
+    }
+
+    document.getElementById("nextTurnName").textContent = "Next Turn: " + nextPlayer;
 
     colDepth[columnNr] = colDepth[columnNr] - 1;
 });
