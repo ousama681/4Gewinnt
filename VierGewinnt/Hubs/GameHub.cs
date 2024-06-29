@@ -14,7 +14,7 @@ namespace VierGewinnt.Hubs
 {
     public class GameHub : Hub
     {
-        private static readonly string connectionString = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static readonly string connectionString = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
@@ -91,7 +91,7 @@ namespace VierGewinnt.Hubs
             string playerID = HomeController.GetUser(winnerName, dbContext).Result.Id;
                 try
                 {
-                    PlayerRanking pr = await dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).SingleAsync();
+                    PlayerRanking pr = dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).FirstOrDefault();
 
                     if (pr == null)
                     {
@@ -100,7 +100,7 @@ namespace VierGewinnt.Hubs
                     }
                     else
                     {
-                        pr.Wins = pr.Wins + 1;
+                        pr.Wins = pr.Wins + 1; 
                     }
 
                     await dbContext.SaveChangesAsync();

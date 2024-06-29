@@ -24,7 +24,7 @@ namespace VierGewinnt.Controllers
         private readonly IHubContext<BoardEvEHub> _hubContext;
         //private static readonly IList<GameBoard> runningGames;
 
-        private static string connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = "Server=DESKTOP-PMVN625;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
 
         //static GameController()
         //{
