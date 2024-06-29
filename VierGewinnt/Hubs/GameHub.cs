@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client;
 using System.Diagnostics;
@@ -16,11 +15,10 @@ namespace VierGewinnt.Hubs
     {
         private static readonly string connectionString = DbUtility.connectionString;
 
-        private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
+        //private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
         private static IHubCallerClients _hubClients = null;
-        //Speichert die PlayerMoves die es auszuführen gilt. NAch dem Ausführen aus dem Dictionary entfernen.
-        //Key: playerName, gameId Value: column
+
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
         public static int[,] board = new int[6, 7];
         public static IDictionary<int, string> playerNrMappingReverse = new Dictionary<int, string>();
@@ -39,7 +37,7 @@ namespace VierGewinnt.Hubs
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(GameHub.connectionString);
             // Save the Moves to execute in Dictionary in Case the MQTTService somehow fails. We probably also need to save it in some File. In case the power goes off.
-                string playerId = null;
+            string playerId = null;
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
                 try
@@ -75,7 +73,7 @@ namespace VierGewinnt.Hubs
 
         public async Task GameIsOver(string winnerId, int gameId)
         {
-            runningGames.Remove(gameId);
+            //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
             await _hubClients.All.SendAsync("NotificateGameEnd", winnerId);
         }
@@ -88,7 +86,7 @@ namespace VierGewinnt.Hubs
 
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
-            string playerID = HomeController.GetUser(winnerName, dbContext).Result.Id;
+                string playerID = HomeController.GetUser(winnerName, dbContext).Result.Id;
                 try
                 {
                     PlayerRanking pr = dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).FirstOrDefault();
@@ -100,7 +98,7 @@ namespace VierGewinnt.Hubs
                     }
                     else
                     {
-                        pr.Wins = pr.Wins + 1; 
+                        pr.Wins = pr.Wins + 1;
                     }
 
                     await dbContext.SaveChangesAsync();
@@ -114,13 +112,13 @@ namespace VierGewinnt.Hubs
             }
         }
 
-        public void RegisterGameInStaticProperty(string playerIdOne, string playerIdTwo, int gameId)
-        {
-            if (!runningGames.Keys.Contains(gameId))
-            {
-                runningGames.Add(gameId, new GameInfo(playerIdOne, playerIdTwo));
-            }
-        }
+        //public void RegisterGameInStaticProperty(string playerIdOne, string playerIdTwo, int gameId)
+        //{
+        //    if (!runningGames.Keys.Contains(gameId))
+        //    {
+        //        runningGames.Add(gameId, new GameInfo(playerIdOne, playerIdTwo));
+        //    }
+        //}
 
         public async Task SubscribeAsync(string topic)
         {
@@ -156,7 +154,7 @@ namespace VierGewinnt.Hubs
                 // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
 
-                // Callback function when a message is received
+                // Die Methode welche ausgeführt wird, wenn de Roboter auf "feedback" published.
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
                     var message = e.ApplicationMessage;
@@ -169,7 +167,7 @@ namespace VierGewinnt.Hubs
                         return;
                     }
 
-                    if (message.Retain) // Ignore retained messages
+                    if (message.Retain)
                     {
                         return;
                     }
@@ -178,9 +176,6 @@ namespace VierGewinnt.Hubs
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
-                    // Robot did his Move, now we can save it do database
-                    // Hier könnte ich die playerID mitgeben, dann wissen wir, wer als nächstes dran ist.
-                    // Innerhalb der AnimatePlayerMove Methode wird auch enabled wer am Zug ist.
                     await _hubClients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
                     playerMoves.Remove(bpKey);
 
@@ -194,14 +189,13 @@ namespace VierGewinnt.Hubs
                         {
                             winnername = playerOne.PlayerName;
                             gameId = bpKey.GameId;
-                        } else if (winnerNr == 2)
+                        }
+                        else if (winnerNr == 2)
                         {
                             winnername = playerTwo.PlayerName;
                             gameId = bpKey.GameId;
 
                         }
-                        //GameInfo gi;
-                        //runningGames.TryGetValue(bpKey.GameId, out gi);
                         await GameIsOver(winnername, gameId);
                         await SendRobotGameFinishedMessage();
                         await SetIsFinished(gameId);
@@ -237,7 +231,6 @@ namespace VierGewinnt.Hubs
                     dbContext.GameBoards.Update(gameboard);
                     await dbContext.SaveChangesAsync();
                     return;
-                    // Hier mal die Prüfung für den Win machen. 
                 }
                 catch (Exception e)
                 {
@@ -256,25 +249,17 @@ namespace VierGewinnt.Hubs
             {
                 try
                 {
-                    //moves = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).First().Moves;
                     moves = dbContext.Moves.Include(m => m.Player).Where(m => m.GameBoardID.Equals(gameId)).ToList();
-
-
-                    //Move[,] board = FillBoard(moves);
                     board = new int[6, 7];
                     FillBoard(moves);
                     return CheckForWinOrDraw();
-                    // Hier mal die Prüfung für den Win machen. 
-                    //}
-                    //catch (Exception e)
-                    //{
-                    //    Debug.WriteLine(e);
-                    //}
-                } catch (Exception e)
+
+                }
+                catch (Exception e)
                 {
                     Debug.WriteLine(e);
                 }
-                }
+            }
             return 0;
         }
 
@@ -442,30 +427,30 @@ namespace VierGewinnt.Hubs
         }
 
 
-        private class GameInfo
-        {
-            private readonly string playerOneId;
-            private readonly string playerTwoId;
+        //private class GameInfo
+        //{
+        //    private readonly string playerOneId;
+        //    private readonly string playerTwoId;
 
-            private string winner;
+        //    private string winner;
 
-            public GameInfo(string playerOneId, string playerTwoId)
-            {
-                this.playerOneId = playerOneId;
-                this.playerTwoId = playerTwoId;
-            }
+        //    public GameInfo(string playerOneId, string playerTwoId)
+        //    {
+        //        this.playerOneId = playerOneId;
+        //        this.playerTwoId = playerTwoId;
+        //    }
 
 
-            public void SetWinner(string playerId)
-            {
-                winner = playerId;
-            }
+        //    public void SetWinner(string playerId)
+        //    {
+        //        winner = playerId;
+        //    }
 
-            public string GetWinner()
-            {
-                return winner;
-            }
-        }
+        //    public string GetWinner()
+        //    {
+        //        return winner;
+        //    }
+        //}
 
     }
 }
