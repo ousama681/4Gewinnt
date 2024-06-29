@@ -24,7 +24,7 @@ namespace VierGewinnt.Controllers
         private readonly IHubContext<BoardEvEHub> _hubContext;
         //private static readonly IList<GameBoard> runningGames;
 
-        private static string connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = DbUtility.connectionString;
 
         //static GameController()
         //{
@@ -74,8 +74,8 @@ namespace VierGewinnt.Controllers
             Robot robotOne = new Robot() { Name = robotOneName };
             Robot robotTwo = new Robot() { Name = robotTwoName };
 
-            RobotVsRobotManager.robotsInGame.Add(robotOneName, 1);
-            RobotVsRobotManager.robotsInGame.Add(robotTwoName, 2);
+            //RobotVsRobotManager.robotsInGame.Add(robotOneName, 1);
+            //RobotVsRobotManager.robotsInGame.Add(robotTwoName, 2);
 
             gameBoard.PlayerOneID = robotOne.Name;
             gameBoard.PlayerTwoID = robotTwo.Name;
@@ -97,6 +97,8 @@ namespace VierGewinnt.Controllers
 
             RobotVsRobotManager.robotMappingReversed.TryAdd(1, robotOne.Name);
             RobotVsRobotManager.robotMappingReversed.TryAdd(2, robotTwo.Name);
+
+            RobotVsRobotManager.FeedBackCounter = 0;
 
 
             RobotVsRobotManager.InitColDepth();

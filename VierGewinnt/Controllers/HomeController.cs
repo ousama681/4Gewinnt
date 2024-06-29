@@ -5,7 +5,6 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Interfaces;
@@ -28,10 +27,10 @@ namespace VierGewinnt.Controllers
         private readonly IAccountRepository _accountRepository;
         private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
         private static IList<string> playersInHub = new List<string>();
-        private static IList<string> robotsInHub = new List<string>();
+        public static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static string connectionstring = DbUtility.connectionString;
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
@@ -60,7 +59,7 @@ namespace VierGewinnt.Controllers
             }
             if (countInstances == 0)
             {
-                
+
                 await SubscribeRobotAsync("SubscribeRobot");
                 await SubscribeAsync("Challenge");
                 await SubscribeAsync("ChallengeRobot");
@@ -136,7 +135,7 @@ namespace VierGewinnt.Controllers
 
 
 
-                   _hubContext.Clients.All.SendAsync("SendRobotFeedback");
+                    _hubContext.Clients.All.SendAsync("SendRobotFeedback");
 
 
                     Console.WriteLine($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
@@ -556,8 +555,15 @@ namespace VierGewinnt.Controllers
 
                     string robotID = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment); // nur Roboter ID wird gesendet
 
-                    robotsInHub.Add(robotID);
+                    if (!robotsInHub.Contains(robotID))
+                    {
+                        robotsInHub.Add(robotID);
                     await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
+                    } else
+                    {
+                        robotsInHub.Remove(robotID);
+                        await _hubContext.Clients.All.SendAsync("RemoveRobot", robotID);
+                    }
                 };
 
             }

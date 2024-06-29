@@ -6,12 +6,13 @@ using System.Text;
 using VierGewinnt.Data.Interfaces;
 using MQTTBroker;
 using System.Diagnostics;
+using VierGewinnt.Controllers;
 
 namespace VierGewinnt.Hubs
 {
     public class PlayerlobbyHub : Hub
     {
-        static readonly IList<string> robots = new List<string>();
+        //static readonly IList<string> robots = new List<string>();
         static readonly IDictionary<string, string> onlineUsers = new Dictionary<string, string>();
 
 
@@ -100,22 +101,37 @@ namespace VierGewinnt.Hubs
 
         public async Task AddRobot(string robotID)
         {
-            if (robots.Contains(robotID))
-            {
-                Debug.WriteLine("ID already exists. Robot could not be added.");
-                return;
-            }
-            else
-            {
-                robots.Add(robotID);
-                await Clients.All.SendAsync("UpdateRobotLobby", robots);
-            }
+            //if (HomeController.robotsInHub.Contains(robotID))
+            //{
+            //    Debug.WriteLine("ID already exists. Robot could not be added.");
+            //    return;
+            //}
+            //else
+            //{
+            //    robots.Add(robotID);
+            await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);
+            //}
+            return;
+        }
+
+        public async Task RemoveRobot(string robotID)
+        {
+            //if (robots.Contains(robotID))
+            //{
+            //    Debug.WriteLine("ID already exists. Robot could not be added.");
+            //    return;
+            //}
+            //else
+            //{
+                //robots.Add(robotID);
+                await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);
+            //}
             return;
         }
 
         public async Task FillRobotLobby()
         {
-            await Clients.All.SendAsync("UpdateRobotLobby", robots);           
+            await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);           
         }
 
         public async Task SendNotificationRobot(string robot)
@@ -125,7 +141,7 @@ namespace VierGewinnt.Hubs
 
         public async Task GetAvailableRobots()
         {
-            await Clients.Caller.SendAsync("ReceiveAvailableRobots", robots);
+            await Clients.Caller.SendAsync("ReceiveAvailableRobots", HomeController.robotsInHub);
         }
 
         public async Task ChallengeRobot(string playerOne, string robot)
@@ -134,15 +150,15 @@ namespace VierGewinnt.Hubs
             await MQTTBrokerService.PublishAsync("ChallengeRobot", payload);
         }
 
-        public async Task LeaveLobbyRobot(string robot)
-        {
-            if (robots.Contains(robot))
-            {
-                robots.Remove(robot);
-                await Clients.Others.SendAsync("RobotLeft", robot);
-                return;
-            }
-        }
+        //public async Task LeaveLobbyRobot(string robot)
+        //{
+        //    if (robots.Contains(robot))
+        //    {
+        //        robots.Remove(robot);
+        //        await Clients.Others.SendAsync("RobotLeft", robot);
+        //        return;
+        //    }
+        //}
 
         public async Task ShowAvailableRobots()
         {

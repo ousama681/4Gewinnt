@@ -24,7 +24,7 @@ namespace VierGewinnt.Services
         public static int moveNr = 0;
         public static GameBoard currentGame;
         public static string currentRobotMove;
-        public static IDictionary<string, int> robotsInGame = new Dictionary<string, int>();
+        //public static IDictionary<string, int> robotsInGame = new Dictionary<string, int>();
         public static IDictionary<string, int> robotMappingNr = new Dictionary<string, int>();
         public static IDictionary<int, string> robotMappingReversed = new Dictionary<int, string>();
         public static string winner;
@@ -41,9 +41,10 @@ namespace VierGewinnt.Services
             set
             {
                 feedBackCounter = value;
-                if (feedBackCounter == 2)
+                if (feedBackCounter >= 2)
                 {
                     IsBothFinished = true;
+                    feedBackCounter = 0;
                 }
             }
         }
@@ -68,7 +69,6 @@ namespace VierGewinnt.Services
                         return;
                     }
                     MakeNextMove();
-                    FeedBackCounter = 0;
                 }
             }
         }
@@ -151,14 +151,18 @@ namespace VierGewinnt.Services
 
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
-
                     var message = e.ApplicationMessage;
-                    if (message.Retain)
+                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+
+                    if (payload.Equals("0"))
                     {
                         return;
                     }
 
-                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+                    if (message.Retain)
+                    {
+                        return;
+                    }
 
                     if (payload.Equals("1"))
                     {

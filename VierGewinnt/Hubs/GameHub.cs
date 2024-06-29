@@ -14,7 +14,7 @@ namespace VierGewinnt.Hubs
 {
     public class GameHub : Hub
     {
-        private static readonly string connectionString = "Server=Koneko\\KONEKO;Database=4Gewinnt;Trusted_connection=True;TrustServerCertificate=True;";
+        private static readonly string connectionString = DbUtility.connectionString;
 
         private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
@@ -91,7 +91,7 @@ namespace VierGewinnt.Hubs
             string playerID = HomeController.GetUser(winnerName, dbContext).Result.Id;
                 try
                 {
-                    PlayerRanking pr = await dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).SingleAsync();
+                    PlayerRanking pr = dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).FirstOrDefault();
 
                     if (pr == null)
                     {
@@ -100,7 +100,7 @@ namespace VierGewinnt.Hubs
                     }
                     else
                     {
-                        pr.Wins = pr.Wins + 1;
+                        pr.Wins = pr.Wins + 1; 
                     }
 
                     await dbContext.SaveChangesAsync();
@@ -203,6 +203,7 @@ namespace VierGewinnt.Hubs
                         //GameInfo gi;
                         //runningGames.TryGetValue(bpKey.GameId, out gi);
                         await GameIsOver(winnername, gameId);
+                        await SendRobotGameFinishedMessage();
                         await SetIsFinished(gameId);
                     }
 
@@ -215,6 +216,11 @@ namespace VierGewinnt.Hubs
             {
                 Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
             }
+        }
+
+        private async Task SendRobotGameFinishedMessage()
+        {
+            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "9");
         }
 
         private async Task SetIsFinished(int gameId)
