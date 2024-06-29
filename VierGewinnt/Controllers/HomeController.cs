@@ -5,7 +5,6 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Server;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Interfaces;
@@ -60,7 +59,7 @@ namespace VierGewinnt.Controllers
             }
             if (countInstances == 0)
             {
-                
+
                 await SubscribeRobotAsync("SubscribeRobot");
                 await SubscribeAsync("Challenge");
                 await SubscribeAsync("ChallengeRobot");
@@ -136,7 +135,7 @@ namespace VierGewinnt.Controllers
 
 
 
-                   _hubContext.Clients.All.SendAsync("SendRobotFeedback");
+                    _hubContext.Clients.All.SendAsync("SendRobotFeedback");
 
 
                     Console.WriteLine($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
@@ -556,7 +555,13 @@ namespace VierGewinnt.Controllers
 
                     string robotID = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment); // nur Roboter ID wird gesendet
 
-                    robotsInHub.Add(robotID);
+                    if (!robotsInHub.Contains(robotID))
+                    {
+                        robotsInHub.Add(robotID);
+                    } else
+                    {
+                        robotsInHub.Remove(robotID);
+                    }
                     await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
                 };
 
