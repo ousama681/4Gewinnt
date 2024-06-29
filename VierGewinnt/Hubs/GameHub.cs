@@ -1,17 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using MQTTBroker;
+using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client;
-using System;
 using System.Diagnostics;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices.Marshalling;
 using System.Text;
-using System.Xml.Linq;
+using VierGewinnt.Controllers;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Model;
 using VierGewinnt.Data.Models;
@@ -26,18 +20,46 @@ namespace VierGewinnt.Hubs
 
         private static IHubCallerClients _hubClients = null;
         //Speichert die PlayerMoves die es auszuführen gilt. NAch dem Ausführen aus dem Dictionary entfernen.
-        //Key: playerId, gameId Value: column
+        //Key: playerName, gameId Value: column
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
+        public static int[,] board = new int[6, 7];
+        public static IDictionary<int, string> playerNrMappingReverse = new Dictionary<int, string>();
+        public static IDictionary<string, int> playerNrMapping = new Dictionary<string, int>();
+        public static BoardPlayer playerOne = new BoardPlayer();
+        public static BoardPlayer playerTwo = new BoardPlayer();
 
 
 
 
         private BoardPlayer? currentMoveKey;
 
-        public async Task SendPlayerMove(string playerId, string gameId, string column)
+        public async Task SendPlayerMove(string playerName, string gameId, string column)
         {
+
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(GameHub.connectionString);
             // Save the Moves to execute in Dictionary in Case the MQTTService somehow fails. We probably also need to save it in some File. In case the power goes off.
-            BoardPlayer bp = new BoardPlayer(playerId, Int32.Parse(gameId));
+                string playerId = null;
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    playerId = HomeController.GetUser(playerName, dbContext).Result.Id;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+
+
+            BoardPlayer bp = new BoardPlayer()
+            {
+                PlayerId = playerId,
+                PlayerName = playerName,
+                GameId = Int32.Parse(gameId)
+            };
+
             int columnNr = Int32.Parse(column);
 
             currentMoveKey = bp;
@@ -58,20 +80,22 @@ namespace VierGewinnt.Hubs
             await _hubClients.All.SendAsync("NotificateGameEnd", winnerId);
         }
 
-        private static async Task UpdatePlayerRanking(string winnerId)
+        private static async Task UpdatePlayerRanking(string winnerName)
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(GameHub.connectionString);
 
+
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
+            string playerID = HomeController.GetUser(winnerName, dbContext).Result.Id;
                 try
                 {
-                    PlayerRanking pr = await dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(winnerId)).SingleAsync();
+                    PlayerRanking pr = await dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).SingleAsync();
 
                     if (pr == null)
                     {
-                        PlayerRanking newPr = new PlayerRanking() { PlayerID = winnerId, Wins = 1 };
+                        PlayerRanking newPr = new PlayerRanking() { PlayerID = playerID, Wins = 1 };
                         await dbContext.AddAsync(newPr);
                     }
                     else
@@ -157,16 +181,29 @@ namespace VierGewinnt.Hubs
                     // Robot did his Move, now we can save it do database
                     // Hier könnte ich die playerID mitgeben, dann wissen wir, wer als nächstes dran ist.
                     // Innerhalb der AnimatePlayerMove Methode wird auch enabled wer am Zug ist.
-                    await _hubClients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerId);
-
+                    await _hubClients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
                     playerMoves.Remove(bpKey);
 
-                    if (CheckForWin(bpKey.GameId))
+                    int winnerNr = CheckForWin(bpKey.GameId);
+
+                    if (winnerNr != 0)
                     {
-                        GameInfo gi;
-                        runningGames.TryGetValue(bpKey.GameId, out gi);
-                        await GameIsOver(gi.GetWinner(), bpKey.GameId);
-                        await SetIsFinished(bpKey.GameId);
+                        string winnername = "";
+                        int gameId = 0;
+                        if (winnerNr == 1)
+                        {
+                            winnername = playerOne.PlayerName;
+                            gameId = bpKey.GameId;
+                        } else if (winnerNr == 2)
+                        {
+                            winnername = playerTwo.PlayerName;
+                            gameId = bpKey.GameId;
+
+                        }
+                        //GameInfo gi;
+                        //runningGames.TryGetValue(bpKey.GameId, out gi);
+                        await GameIsOver(winnername, gameId);
+                        await SetIsFinished(gameId);
                     }
 
                     await mqttClient.UnsubscribeAsync(topic);
@@ -203,7 +240,7 @@ namespace VierGewinnt.Hubs
             }
         }
 
-        private bool CheckForWin(int gameId)
+        private int CheckForWin(int gameId)
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(GameHub.connectionString);
@@ -213,21 +250,30 @@ namespace VierGewinnt.Hubs
             {
                 try
                 {
-                    moves = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).First().Moves;
+                    //moves = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).First().Moves;
+                    moves = dbContext.Moves.Include(m => m.Player).Where(m => m.GameBoardID.Equals(gameId)).ToList();
 
-                    Move[,] board = FillBoard(moves);
-                    return CheckForWinOrDraw(board, gameId);
+
+                    //Move[,] board = FillBoard(moves);
+                    board = new int[6, 7];
+                    FillBoard(moves);
+                    return CheckForWinOrDraw();
                     // Hier mal die Prüfung für den Win machen. 
-                }
-                catch (Exception e)
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Debug.WriteLine(e);
+                    //}
+                } catch (Exception e)
                 {
                     Debug.WriteLine(e);
                 }
-            }
-            return false;
+                }
+            return 0;
         }
 
-        private Move[,] FillBoard(ICollection<Move> moves)
+
+        private int[,] FillBoard(ICollection<Move> moves)
         {
             IDictionary<string, int> colDepth = new Dictionary<string, int>
             {
@@ -240,36 +286,48 @@ namespace VierGewinnt.Hubs
                 { "7", 6 }
             };
 
-            Move[,] board = new Move[7, 6];
+            int[,] board = new int[6, 7];
 
-            foreach (var move in moves)
+            foreach (Move move in moves)
             {
-                int column = move.Column;
-                int row;
-                colDepth.TryGetValue(column.ToString(), out row);
-                // Minus 1 wegen Array startindex 0 bei colDepth aber nicht.
-                board[column - 1, row - 1] = move;
-                colDepth[column.ToString()] = row - 1;
-            }
+                int depth;
+                colDepth.TryGetValue(move.Column.ToString(), out depth);
 
+                colDepth[move.Column.ToString()] = depth - 1;
+
+                int column = move.Column;
+
+                int playerNr = 0;
+
+                if (move.Player.UserName.Equals(playerOne.PlayerName))
+                {
+                    playerNr = playerOne.PlayerNr;
+                }
+                else if (move.Player.UserName.Equals(playerTwo.PlayerName))
+                {
+                    playerNr = playerTwo.PlayerNr;
+                }
+
+                GameHub.board[depth - 1, column - 1] = playerNr;
+
+            }
             return board;
         }
 
-        private bool CheckForWinOrDraw(Move[,] board, int gameId)
+        public static int CheckForWinOrDraw()
         {
-            GameInfo gameInfo;
-            runningGames.TryGetValue(gameId, out gameInfo);
             // Check horizontal
-            for (int col = 0; col < 4; col++)
+            for (int row = 0; row < 6; row++)
             {
-                // Prüfung einbauen, da hier im if Moves Null sein können.
-                for (int row = 0; row < 6; row++)
+                for (int col = 0; col < 7 - 3; col++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row] != null && playerId.Equals(board[col + 1, row].PlayerID)) && (board[col + 2, row] != null && playerId.Equals(board[col + 2, row].PlayerID)) && (board[col + 3, row] != null && playerId.Equals(board[col + 3, row].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row, col + 1] &&
+                        board[row, col] == board[row, col + 2] &&
+                        board[row, col] == board[row, col + 3])
                     {
-                        gameInfo.SetWinner(playerId);
-                        return true;
+                        //robotMappingReversed.TryGetValue(board[row, col], out winner);
+                        return board[row, col];
                     }
                 }
             }
@@ -277,47 +335,60 @@ namespace VierGewinnt.Hubs
             // Check vertical
             for (int col = 0; col < 7; col++)
             {
-                for (int row = 0; row < 3; row++)
+                for (int row = 0; row < 6 - 3; row++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col, row + 1] != null && playerId.Equals(board[col, row + 1].PlayerID)) && (board[col, row + 2] != null && playerId.Equals(board[col, row + 2].PlayerID)) && (board[col, row + 3] != null && playerId.Equals(board[col, row + 3].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row + 1, col] &&
+                        board[row, col] == board[row + 2, col] &&
+                        board[row, col] == board[row + 3, col])
                     {
-                        gameInfo.SetWinner(playerId);
-                        return true;
+                        return board[row, col];
                     }
                 }
             }
 
-            // Check diagonal (top-left to bottom-right)
-            for (int col = 0; col < 4; col++)
+            // Check positive diagonal (bottom-left to top-right)
+            for (int col = 0; col < 7 - 3; col++)
             {
-                for (int row = 0; row < 3; row++)
+                for (int row = 0; row < 6 - 3; row++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row + 1] != null && playerId.Equals(board[col + 1, row + 1].PlayerID)) && (board[col + 2, row + 2] != null && playerId.Equals(board[col + 2, row + 2].PlayerID)) && (board[col + 3, row + 3] != null && playerId.Equals(board[col + 3, row + 3].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row + 1, col + 1] &&
+                        board[row, col] == board[row + 2, col + 2] &&
+                        board[row, col] == board[row + 3, col + 3])
                     {
-                        gameInfo.SetWinner(playerId);
-                        return true;
+                        return board[row, col];
                     }
                 }
             }
 
-            // Check diagonal (bottom-left to top-right)
-            for (int col = 0; col < 4; col++)
+            // Check negative diagonal (top-left to bottom-right)
+            for (int col = 0; col < 7 - 3; col++)
             {
                 for (int row = 3; row < 6; row++)
                 {
-                    string playerId = board[col, row] == null ? null : board[col, row].PlayerID;
-                    if (!playerId.IsNullOrEmpty() && (board[col + 1, row - 1] != null && playerId.Equals(board[col + 1, row - 1].PlayerID)) && (board[col + 2, row - 2] != null && playerId.Equals(board[col + 2, row - 2].PlayerID)) && (board[col + 3, row - 3] != null && playerId.Equals(board[col + 3, row - 3].PlayerID)))
+                    if (board[row, col] != 0 &&
+                        board[row, col] == board[row - 1, col + 1] &&
+                        board[row, col] == board[row - 2, col + 2] &&
+                        board[row, col] == board[row - 3, col + 3])
                     {
-                        gameInfo.SetWinner(playerId);
-                        return true;
+                        return board[row, col];
                     }
                 }
             }
 
-            return false;
+            // Check for draw (if no empty cells)
+            foreach (var cell in board)
+            {
+                if (cell == 0)
+                {
+                    return 0; // No winner yet
+                }
+            }
+
+            return -1; // Draw
         }
+
 
         private static async Task<Move> SaveMove(BoardPlayer boardPlayer, int column)
         {
@@ -345,15 +416,22 @@ namespace VierGewinnt.Hubs
         }
 
 
-        private class BoardPlayer
+        public class BoardPlayer
         {
-            public readonly string PlayerId;
-            public readonly int GameId;
+            public string PlayerId;
+            public int GameId;
+            public string PlayerName;
+            public int PlayerNr;
 
             public BoardPlayer(string playerId, int gameId)
             {
                 PlayerId = playerId;
                 GameId = gameId;
+            }
+
+            public BoardPlayer()
+            {
+
             }
         }
 

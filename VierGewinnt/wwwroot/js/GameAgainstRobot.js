@@ -7,7 +7,7 @@ connection.start()
     .then(() => {
         PlaceAlreadyPlayedMoves(movesToLoad); 
         // Wenn playerOne immer Rot ist, dann heisst das, dass PlayerOne immer bei ungeraden Zahlen drann ist.
-        connection.invoke("RegisterGameInStaticProperty", playerOneID, playerTwoID, gameId)
+        connection.invoke("RegisterGameInStaticProperty", playerOneName, playerTwoID, gameId)
     }
 );
 

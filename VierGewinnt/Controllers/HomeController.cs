@@ -503,7 +503,7 @@ namespace VierGewinnt.Controllers
             return game;
         }
 
-        private static async Task<ApplicationUser> GetUser(string playerName, AppDbContext context)
+        public static async Task<ApplicationUser> GetUser(string playerName, AppDbContext context)
         {
             return await context.Accounts.FirstAsync(u => u.UserName.Equals(playerName));
         }

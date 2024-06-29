@@ -5,7 +5,8 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 connection.start()
     .then(() => {
         PlaceAlreadyPlayedMoves(movesToLoad);
-        connection.invoke("RegisterGameInStaticProperty", playerOneID, playerTwoID, gameId)
+        connection.invoke("RegisterGameInStaticProperty", playerOneName, playerTwoName, gameId);
+        DisableComponentsForOtherPlayer();
     }
     );
 
@@ -17,6 +18,20 @@ connection.on("NotificateGameEnd", function (winnerId) {
     audio.play();
     showGameOverModal(winnerId);
 });
+
+async function DisableComponentsForOtherPlayer() {
+    if (userName == playerOneName) {
+        var columnTwoLabel = document.getElementById("labelColumnPlayerTwo");
+        columnTwoLabel.style.display = "none";
+        var formPlaceYellowStone = document.getElementById("divPlaceYellowStone");
+        formPlaceYellowStone.style.display = "none";
+    } else if (userName == playerTwoName) {
+        var columnOneLabel = document.getElementById("labelColumnPlayerOne");
+            columnOneLabel.style.display = "none";
+        var formPlaceRedStone = document.getElementById("divPlaceRedStone");
+        formPlaceRedStone.style.display = "none";
+    }
+}
 
 async function showGameOverModal(winnerId) {
     const modal = document.getElementById("gameoverModal");

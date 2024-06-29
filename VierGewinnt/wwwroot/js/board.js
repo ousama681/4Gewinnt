@@ -19,7 +19,7 @@ async function BlinkTopRow(column, btnId) {
         }
         else {
             selectedCell.classList.add('blinkRed');
-            return "red"
+            return "red";
         }
     }
     return null;
@@ -77,7 +77,7 @@ async function showGameOverModal(winnerId) {
     label.innerText = label.innerText + winnerId;
     modal.style.display = "block";
 
-    // When player wants to go back to lobby
+    // When player wants to go back to Lobby
     document.getElementById("confirmButton").onclick = function () {
         modal.style.display = "none";
         const baseUrl = "https://localhost:7102/Home/GameLobby";

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.SignalR;
 using VierGewinnt.Hubs;
 using Microsoft.EntityFrameworkCore;
 using VierGewinnt.Data;
+using System.Linq;
 
 namespace VierGewinnt.Controllers
 {
@@ -46,6 +47,11 @@ namespace VierGewinnt.Controllers
             gameBoard.playerNames.PlayerOneName = _accountRepository.GetByIdAsync(new ApplicationUser() { Id = gameBoard.PlayerOneID }).Result.UserName;
             gameBoard.playerNames.PlayerTwoName = _accountRepository.GetByIdAsync(new ApplicationUser() { Id = gameBoard.PlayerTwoID }).Result.UserName;
             gameViewModel.Board = gameBoard;
+
+            GameHub.playerOne = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerOneName, PlayerNr = 1};
+            GameHub.playerTwo = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerTwoName, PlayerNr = 2};
+
+            GameHub.board = new int[6,7];
             return View(gameViewModel);
         }
 
