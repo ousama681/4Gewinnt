@@ -24,7 +24,7 @@ namespace VierGewinnt.Controllers
         private readonly IHubContext<BoardEvEHub> _hubContext;
         //private static readonly IList<GameBoard> runningGames;
 
-        private static string connectionstring = Program.connectionString;
+        private static string connectionstring = DbUtility.connectionString;
 
         //static GameController()
         //{

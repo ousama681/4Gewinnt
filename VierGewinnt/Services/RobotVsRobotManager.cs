@@ -151,14 +151,18 @@ namespace VierGewinnt.Services
 
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
-
                     var message = e.ApplicationMessage;
-                    if (message.Retain)
+                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+
+                    if (payload.Equals("0"))
                     {
                         return;
                     }
 
-                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+                    if (message.Retain)
+                    {
+                        return;
+                    }
 
                     if (payload.Equals("1"))
                     {

@@ -30,7 +30,7 @@ namespace VierGewinnt.Controllers
         public static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
 
-        private static string connectionstring = Program.connectionString;
+        private static string connectionstring = DbUtility.connectionString;
 
         public HomeController(ILogger<HomeController> logger,
             IHubContext<PlayerlobbyHub> hubContext,
