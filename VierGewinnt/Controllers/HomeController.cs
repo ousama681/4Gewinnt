@@ -25,7 +25,7 @@ namespace VierGewinnt.Controllers
         private readonly IPlayerInfoRepository _playerInfoRepo;
         private readonly IGameRepository _gameRepository;
         private readonly IAccountRepository _accountRepository;
-        private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
+        //private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
         private static IList<string> playersInHub = new List<string>();
         public static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
@@ -59,7 +59,7 @@ namespace VierGewinnt.Controllers
             }
             if (countInstances == 0)
             {
-
+                // Wir könnten das eigentlich in den Konstruktor packen. 
                 await SubscribeRobotAsync("SubscribeRobot");
                 await SubscribeAsync("Challenge");
                 await SubscribeAsync("ChallengeRobot");
@@ -72,18 +72,6 @@ namespace VierGewinnt.Controllers
             vm.Robots = await _accountRepository.GetAllRegisteredRobots();
 
             return View(vm);
-        }
-
-        public async Task<IActionResult> Test()
-        {
-            return View("GameLobby");
-        }
-
-        public async Task<IActionResult> TestRoboterMove()
-        {
-            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "3");
-            await SubscribeFeedbackAsync("feedback");
-            return View("Index");
         }
 
         public async Task SubscribeFeedbackAsync(string topic)
@@ -174,6 +162,7 @@ namespace VierGewinnt.Controllers
             return View("GameLobby", vm);
         }
 
+
         public IActionResult Leaderboard()
         {
             LeaderboardViewModel vm = new LeaderboardViewModel();
@@ -183,18 +172,9 @@ namespace VierGewinnt.Controllers
 
         public IActionResult MatchHistory(string username)
         {
-            // ViewModel für MatchHistory
-
-            // Was brauche ich in MatchHistory
-
-            // Pro Spieler Alle Fertigen Spiele Laden inclusive Moves.
-
             List<GameBoard> gameHistorie = _gameRepository.FindGamesByPlayerName(username).Result;
             ViewBag.Username = username;
-
-
             MatchHistoryViewModel vm = new MatchHistoryViewModel();
-
             vm.GameHistories = gameHistorie;
 
             return View(vm);
@@ -202,18 +182,11 @@ namespace VierGewinnt.Controllers
 
         public IActionResult Replay(int gameId)
         {
-
-            // ViewModel für MatchHistory
-
-            // Was brauche ich in MatchHistory
-
-            // Pro Spieler Alle Fertigen Spiele Laden inclusive Moves.
-
             GameBoard gb = _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId }).Result;
             ViewBag.Username = gb.PlayerOneName;
             ViewBag.Username2 = gb.PlayerTwoName;
-            SpielRueckblickViewModel vm = new SpielRueckblickViewModel();
 
+            SpielRueckblickViewModel vm = new SpielRueckblickViewModel();
             vm.Game = gb;
             vm.MovesLeft = new Stack<Move>();
 
@@ -223,10 +196,6 @@ namespace VierGewinnt.Controllers
             }
 
             vm.MovesPlayed = new Queue<Move>();
-
-            // Moves in VM laden
-
-            // Dann Per JS das Spiel animieren ablaufen / simulieren.
 
             return View(vm);
         }
@@ -281,7 +250,7 @@ namespace VierGewinnt.Controllers
                 await mqttClient.SubscribeAsync(topic);
 
                 // Hier adde ich den Client zur statischen Liste der clients
-                connectedMqttClients.Add(mqttClient);
+                //connectedMqttClients.Add(mqttClient);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
@@ -337,7 +306,7 @@ namespace VierGewinnt.Controllers
                 await mqttClient.SubscribeAsync(topic);
 
                 // Hier adde ich den Client zur statischen Liste der clients
-                connectedMqttClients.Add(mqttClient);
+                //connectedMqttClients.Add(mqttClient);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
@@ -350,11 +319,6 @@ namespace VierGewinnt.Controllers
 
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
                     string[] players = payload.Split(',');
-
-                    // Search for Gameboard that has both player in it with gamefinished == 0.
-
-                    // IF found, return that gameId, else create new game.
-
                     string playerOne = players[0];
                     string robotID = players[1];
 
@@ -435,7 +399,7 @@ namespace VierGewinnt.Controllers
         private async Task AfterStartingGame(IMqttClient mqttClient, string topic)
         {
 
-            connectedMqttClients.Remove(mqttClient);
+            //connectedMqttClients.Remove(mqttClient);
             playersInHub.Remove(this.username);
             this.username = null;
         }
@@ -490,6 +454,7 @@ namespace VierGewinnt.Controllers
                     game.PlayerOneName = userOne.UserName;
 
                     game.PlayerTwoID = robotID;
+                    game.PlayerTwoName = robotID;
 
                     await dbContext.GameBoards.AddAsync(game);
                     await dbContext.SaveChangesAsync();
@@ -542,7 +507,7 @@ namespace VierGewinnt.Controllers
                 await mqttClient.SubscribeAsync(topic);
 
                 // Hier adde ich den Client zur statischen Liste der clients
-                connectedMqttClients.Add(mqttClient);
+                //connectedMqttClients.Add(mqttClient);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
