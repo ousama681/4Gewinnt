@@ -68,12 +68,6 @@ spotLight3.target.position.set(0, 0.2, 0); // Ensure it points at the model
 scene.add(spotLight3);
 scene.add(spotLight3.target); // Add the target to the scene
 
-const spotLight3 = new THREE.SpotLight(0x00ffff, 1, 100, 0.22, 1);
-spotLight3.position.set(0, 4.5, 0);
-spotLight3.castShadow = true;
-spotLight3.shadow.bias = -0.0001;
-scene.add(spotLight3);
-
 const loader = new GLTFLoader().setPath('/Assets/roboking/');
 loader.load('roboking.glb', (gltf) => {
     const mesh = gltf.scene;
