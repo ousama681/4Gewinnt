@@ -16,7 +16,7 @@ namespace VierGewinnt.Hubs
     {
         //private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
-        private static IHubContext<GameHub> _hubContextPvP = null;
+        private static IHubCallerClients _hubContextPvP = null;
 
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
         public static int[,] board = new int[6, 7];
@@ -78,7 +78,7 @@ namespace VierGewinnt.Hubs
         {
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
-            await _hubContextPvP.Clients.All.SendAsync("NotificateGameEnd", winnerId);
+            await _hubContextPvP.All.SendAsync("NotificateGameEnd", winnerId);
             await RobotVsRobotManager.UnsubscribeAndCloseFromFeedback();
         }
 
@@ -124,7 +124,7 @@ namespace VierGewinnt.Hubs
         //    }
         //}
 
-        public static async Task SubscribeToFeedbackAsync(string topic, IHubContext<GameHub> hubContextPvP)
+        public static async Task SubscribeToFeedbackAsync(string topic, IHubCallerClients hubContextPvP)
         {
 
             _hubContextPvP = hubContextPvP;
@@ -180,7 +180,7 @@ namespace VierGewinnt.Hubs
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
-                    await _hubContextPvP.Clients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
+                    await _hubContextPvP.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
                     playerMoves.Remove(bpKey);
 
                     int winnerNr = GameManager.CheckForWin(bpKey.GameId);

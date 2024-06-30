@@ -76,7 +76,7 @@ namespace VierGewinnt.Hubs
         public async Task StartGame(string payload)
         {
             //PlayerOne also has accepted the Challenge, we can now start the game
-            await GameHub.SubscribeToFeedbackAsync("feedback", (IHubContext<GameHub>)this.Context);
+            await GameHub.SubscribeToFeedbackAsync("feedback", this.Clients);
             await MQTTBrokerService.PublishAsync("Challenge", payload);
         }
 
