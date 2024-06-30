@@ -32,8 +32,9 @@ namespace VierGewinnt.Services
         public static int[,] board = new int[6, 7];
 
 
+        public static int playerNr;
         public static int otherRobotNr;
-        public static int currRobotNr;
+        public static int currPlayerNr;
         public static int FeedBackCounter
         {
             get { return feedBackCounter; }
@@ -107,14 +108,14 @@ namespace VierGewinnt.Services
             colDepth.TryGetValue(currentColumn, out depth);
             colDepth[currentColumn] = depth - 1;
 
-            board[depth - 1, columnInt - 1] = currRobotNr;
+            board[depth - 1, columnInt - 1] = currPlayerNr;
 
-            if (currRobotNr == 1)
+            if (currPlayerNr == 1)
             {
-                currRobotNr = 2;
-            } else if (currRobotNr == 2)
+                currPlayerNr = 2;
+            } else if (currPlayerNr == 2)
             {
-                currRobotNr = 1;
+                currPlayerNr = 1;
             }
         }
 

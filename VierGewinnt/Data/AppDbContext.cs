@@ -27,15 +27,15 @@ namespace VierGewinnt.Data
                 .WithOne()
                 .HasForeignKey(m => m.GameBoardID);
 
-            modelBuilder.Entity<Move>()
-                .HasOne(m => m.Player)
-                .WithMany()
-                .HasForeignKey(m => m.PlayerID);
+            //modelBuilder.Entity<Move>()
+            //    .HasOne(m => m.Player)
+            //    .WithMany()
+            //    .HasForeignKey(m => m.PlayerID);
 
-            modelBuilder.Entity<PlayerRanking>()
-                .HasOne(pr => pr.Player)
-                .WithMany()
-                .HasForeignKey(pr => pr.PlayerID);
+            //modelBuilder.Entity<PlayerRanking>()
+            //    .HasOne(pr => pr.Player)
+            //    .WithMany()
+            //    .HasForeignKey(pr => pr.PlayerID);
 
             modelBuilder.Ignore<GameBoard.Board>();
             modelBuilder.Ignore<GameBoard.PlayerNames>();

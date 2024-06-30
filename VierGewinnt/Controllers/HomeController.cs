@@ -427,9 +427,9 @@ namespace VierGewinnt.Controllers
                     game.PlayerOneName = userOne.UserName;
                     game.PlayerTwoName = userTwo.UserName;
 
-                    BoardPvEHub.robotName = playerTwo;
-                    BoardPvEHub.playerName = playerOne;
-                    BoardPvEHub.currentPlayer = playerOne;
+                    //BoardPvEHub.robotName = playerTwo;
+                    //BoardPvEHub.playerName = playerOne;
+                    //BoardPvEHub.currentPlayer = playerOne;
 
                     await dbContext.GameBoards.AddAsync(game);
                     await dbContext.SaveChangesAsync();

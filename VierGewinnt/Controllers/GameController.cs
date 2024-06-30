@@ -1,19 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MQTTnet.Client;
-using MQTTnet;
 using VierGewinnt.Data.Interfaces;
 using VierGewinnt.Data.Models;
 using VierGewinnt.ViewModels;
-using System.Text;
 using VierGewinnt.Services;
-using VierGewinnt.Data.Model;
-using System.Diagnostics;
-using MQTTBroker;
 using Microsoft.AspNetCore.SignalR;
 using VierGewinnt.Hubs;
-using Microsoft.EntityFrameworkCore;
 using VierGewinnt.Data;
-using System.Linq;
 
 namespace VierGewinnt.Controllers
 {
@@ -51,6 +43,9 @@ namespace VierGewinnt.Controllers
             GameHub.playerOne = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerOneName, PlayerNr = 1};
             GameHub.playerTwo = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerTwoName, PlayerNr = 2};
 
+            GameManager.playerOneName = gameBoard.PlayerOneName;
+            GameManager.playerTwoName = gameBoard.PlayerTwoName;
+
             GameHub.board = new int[6,7];
             return View(gameViewModel);
         }
@@ -63,7 +58,25 @@ namespace VierGewinnt.Controllers
             RobotVsRobotManager.hubContext = _hubContext;
             gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
             gameViewModel.Board = gameBoard;
+            BoardPvEHub.currentPlayer = gameBoard.PlayerOneName;
+            BoardPvEHub.playerName = gameBoard.PlayerOneName;
+            BoardPvEHub.robotName = gameBoard.PlayerTwoName;
             await BoardPvEHub.SubscribeToFeedbackAsync("feedback", _hubContext);
+
+            RobotVsRobotManager.currPlayerNr = 1;
+            RobotVsRobotManager.otherRobotNr = 2;
+            BoardPvEHub.currGameId = gameId;
+
+            RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerOneName, 1);
+            RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerTwoName, 2);
+
+            RobotVsRobotManager.robotMappingReversed.TryAdd(1, gameBoard.PlayerOneName);
+            RobotVsRobotManager.robotMappingReversed.TryAdd(2, gameBoard.PlayerTwoName);
+
+            GameManager.playerOneName = gameBoard.PlayerOneName;
+            GameManager.playerTwoName = gameBoard.PlayerTwoName;
+
+            RobotVsRobotManager.InitColDepth();
             return View(gameViewModel);
         }
 
@@ -91,7 +104,7 @@ namespace VierGewinnt.Controllers
             RobotVsRobotManager.board = new int[6, 7];
             RobotVsRobotManager.currentGame = gameBoard;
             RobotVsRobotManager.currentRobotMove = robotOne.Name;
-            RobotVsRobotManager.currRobotNr = 1;
+            RobotVsRobotManager.currPlayerNr = 1;
             RobotVsRobotManager.otherRobotNr = 2;
 
             RobotVsRobotManager.robotMappingNr.TryAdd(robotOne.Name, 1);

@@ -89,11 +89,11 @@ namespace VierGewinnt.Hubs
                 string playerID = HomeController.GetUser(winnerName, dbContext).Result.Id;
                 try
                 {
-                    PlayerRanking pr = dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).FirstOrDefault();
+                    PlayerRanking pr = dbContext.PlayerRankings.Where(pr => pr.PlayerName.Equals(winnerName)).FirstOrDefault();
 
                     if (pr == null)
                     {
-                        PlayerRanking newPr = new PlayerRanking() { PlayerID = playerID, Wins = 1 };
+                        PlayerRanking newPr = new PlayerRanking() { PlayerName = winnerName, Wins = 1 };
                         await dbContext.AddAsync(newPr);
                     }
                     else
@@ -187,12 +187,12 @@ namespace VierGewinnt.Hubs
                         int gameId = 0;
                         if (winnerNr == 1)
                         {
-                            winnername = playerOne.PlayerName;
+                            winnername = GameManager.playerOneName;
                             gameId = bpKey.GameId;
                         }
                         else if (winnerNr == 2)
                         {
-                            winnername = playerTwo.PlayerName;
+                            winnername = GameManager.playerTwoName;
                             gameId = bpKey.GameId;
 
                         }

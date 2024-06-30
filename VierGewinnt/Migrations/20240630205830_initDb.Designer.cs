@@ -12,8 +12,8 @@ using VierGewinnt.Data;
 namespace VierGewinnt.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240616150346_addedPlayerNameToBoard")]
-    partial class addedPlayerNameToBoard
+    [Migration("20240630205830_initDb")]
+    partial class initDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -175,15 +175,13 @@ namespace VierGewinnt.Migrations
                     b.Property<int>("MoveNr")
                         .HasColumnType("int");
 
-                    b.Property<string>("PlayerID")
+                    b.Property<string>("PlayerName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ID");
 
                     b.HasIndex("GameBoardID");
-
-                    b.HasIndex("PlayerID");
 
                     b.ToTable("Moves");
                 });
@@ -196,16 +194,14 @@ namespace VierGewinnt.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<string>("PlayerID")
+                    b.Property<string>("PlayerName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Wins")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("PlayerID");
 
                     b.ToTable("PlayerRankings");
                 });
@@ -386,25 +382,6 @@ namespace VierGewinnt.Migrations
                         .HasForeignKey("GameBoardID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Player");
-                });
-
-            modelBuilder.Entity("VierGewinnt.Data.Model.PlayerRanking", b =>
-                {
-                    b.HasOne("VierGewinnt.Data.Models.ApplicationUser", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("VierGewinnt.Data.Models.GameBoard", b =>

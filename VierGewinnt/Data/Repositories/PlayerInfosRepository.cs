@@ -25,7 +25,7 @@ namespace VierGewinnt.Data.Repositories
 
         public Task<List<PlayerRanking>> GetAllAsync()
         {
-            return _context.PlayerRankings.Include(pr => pr.Player).OrderBy(pr => pr.Wins).ToListAsync();
+            return _context.PlayerRankings.OrderBy(pr => pr.Wins).ToListAsync();
         }
 
         public Task<PlayerRanking> GetByIdAsync(PlayerRanking item)

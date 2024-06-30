@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using VierGewinnt.Controllers;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Model;
+using VierGewinnt.Data.Models;
 using VierGewinnt.Hubs;
 using static VierGewinnt.Hubs.GameHub;
 
@@ -9,6 +11,12 @@ namespace VierGewinnt.Services
 {
     public class GameManager
     {
+        public static string playerOneName = "";
+        public static string playerTwoName = "";
+        public static int playerOneNr = 1;
+        public static int playerTwoNr = 2;
+
+
 
         public static int[,] FillBoard(ICollection<Move> moves)
         {
@@ -36,13 +44,36 @@ namespace VierGewinnt.Services
 
                 int playerNr = 0;
 
-                if (move.Player.UserName.Equals(GameHub.playerOne.PlayerName))
+                var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+                optionsBuilder.UseSqlServer(DbUtility.connectionString);
+                ApplicationUser user = null;
+
+                using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
                 {
-                    playerNr = GameHub.playerOne.PlayerNr;
+                    try
+                    {
+
+                user = HomeController.GetUser(move.PlayerName, dbContext).Result;
+
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e);
+                    }
                 }
-                else if (move.Player.UserName.Equals(GameHub.playerTwo.PlayerName))
+
+                if (user != null)
                 {
-                    playerNr = GameHub.playerTwo.PlayerNr;
+                //move.Player = user.Id;
+                }
+
+                if (move.PlayerName.Equals(playerOneName))
+                {
+                    playerNr = playerOneNr;
+                }
+                else if (move.PlayerName.Equals(playerTwoName))
+                {
+                    playerNr = playerTwoNr;
                 }
 
                 board[depth - 1, column - 1] = playerNr;
@@ -138,7 +169,7 @@ namespace VierGewinnt.Services
             {
                 try
                 {
-                    moves = dbContext.Moves.Include(m => m.Player).Where(m => m.GameBoardID.Equals(gameId)).ToList();
+                    moves = dbContext.Moves.Where(m => m.GameBoardID.Equals(gameId)).ToList();
                     //board = new int[6, 7];
                     //FillBoard(moves);
                     board = GameManager.FillBoard(moves);
@@ -167,7 +198,7 @@ namespace VierGewinnt.Services
                     move.MoveNr = dbContext.Moves.Where(m => m.GameBoardID.Equals(boardPlayer.GameId)).Count() + 1;
                     move.Column = column;
                     move.GameBoardID = boardPlayer.GameId;
-                    move.PlayerID = boardPlayer.PlayerId;
+                    move.PlayerName = boardPlayer.PlayerName;
                     await dbContext.Moves.AddAsync(move);
                     await dbContext.SaveChangesAsync();
                 }

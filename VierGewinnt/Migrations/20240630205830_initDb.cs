@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VierGewinnt.Migrations
 {
     /// <inheritdoc />
-    public partial class initDB : Migration
+    public partial class initDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,11 +57,42 @@ namespace VierGewinnt.Migrations
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PlayerOneID = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PlayerTwoID = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PlayerTwoID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlayerOneName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlayerTwoName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsFinished = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GameBoards", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PlayerRankings",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PlayerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Wins = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlayerRankings", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Robots",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MacAdress = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Robots", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -177,19 +208,13 @@ namespace VierGewinnt.Migrations
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MoveNr = table.Column<int>(type: "int", nullable: false),
-                    PlayerID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PlayerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     GameBoardID = table.Column<int>(type: "int", nullable: false),
                     Column = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Moves", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Moves_AspNetUsers_PlayerID",
-                        column: x => x.PlayerID,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Moves_GameBoards_GameBoardID",
                         column: x => x.GameBoardID,
@@ -241,11 +266,6 @@ namespace VierGewinnt.Migrations
                 name: "IX_Moves_GameBoardID",
                 table: "Moves",
                 column: "GameBoardID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Moves_PlayerID",
-                table: "Moves",
-                column: "PlayerID");
         }
 
         /// <inheritdoc />
@@ -268,6 +288,12 @@ namespace VierGewinnt.Migrations
 
             migrationBuilder.DropTable(
                 name: "Moves");
+
+            migrationBuilder.DropTable(
+                name: "PlayerRankings");
+
+            migrationBuilder.DropTable(
+                name: "Robots");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

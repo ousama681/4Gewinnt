@@ -24,7 +24,7 @@ namespace VierGewinnt.Hubs
         public static string currentcolumn;
         public static string robotName = "";
         public static string playerName = "";
-
+        public static int currGameId = 0;
 
         public async Task MakeFirstMove(string robotOneName)
         {
@@ -146,12 +146,20 @@ namespace VierGewinnt.Hubs
  
                     if (currentPlayer.Equals(playerName))
                     {
-                        currentPlayer = robotName;
+                        RobotVsRobotManager.currentColumn = column.ToString();
+                        await RobotVsRobotManager.AddMoveToBoard();
                         await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", column, playerName);
                     }
                     else
                     {
-                        currentPlayer = playerName;
+                        await GameManager.SaveMove(new BoardPlayer()
+                        {
+                            GameId = currGameId,
+                            PlayerId = robotName,
+                            PlayerName = robotName,
+                            PlayerNr = 0
+
+                        }, Int32.Parse(currentcolumn));
                         await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", currentcolumn, robotName);
                     }
                     playerMoves.Remove(bpKey);
@@ -164,12 +172,12 @@ namespace VierGewinnt.Hubs
                         int gameId = 0;
                         if (winnerNr == 1)
                         {
-                            winnername = playerOne.PlayerName;
+                            winnername = GameManager.playerOneName;
                             gameId = bpKey.GameId;
                         }
                         else if (winnerNr == 2)
                         {
-                            winnername = playerTwo.PlayerName;
+                            winnername = GameManager.playerTwoName;
                             gameId = bpKey.GameId;
 
                         }
@@ -180,9 +188,18 @@ namespace VierGewinnt.Hubs
 
 
 
-                    if (currentPlayer.Equals(robotName))
+                    if (!currentPlayer.Equals(robotName))
                     {
                         await RobotVsRobotManager.MakeNextMove();
+                    }
+
+                    if (currentPlayer.Equals(playerName))
+                    {
+                        currentPlayer = robotName;
+                    }
+                    else
+                    {
+                        currentPlayer = playerName;
                     }
 
                     //await mqttClient.UnsubscribeAsync(topic);
@@ -240,14 +257,16 @@ namespace VierGewinnt.Hubs
 
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
-                string playerID = HomeController.GetUser(winnerName, dbContext).Result.Id;
+
+
+
                 try
                 {
-                    PlayerRanking pr = dbContext.PlayerRankings.Include(pr => pr.Player).Where(pr => pr.PlayerID.Equals(playerID)).FirstOrDefault();
+                    PlayerRanking pr = dbContext.PlayerRankings.Where(pr => pr.PlayerName.Equals(winnerName)).FirstOrDefault();
 
                     if (pr == null)
                     {
-                        PlayerRanking newPr = new PlayerRanking() { PlayerID = playerID, Wins = 1 };
+                        PlayerRanking newPr = new PlayerRanking() { PlayerName = winnerName, Wins = 1 };
                         await dbContext.AddAsync(newPr);
                     }
                     else

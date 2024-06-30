@@ -7,9 +7,9 @@ namespace VierGewinnt.Data.Model
     {
         public int ID { get; set; }
         public int MoveNr { get; set; }
-        public string PlayerID { get; set; }
+        public string PlayerName { get; set; }
         public int GameBoardID { get; set; }
         public int Column {  get; set; }
-        public ApplicationUser Player { get; set; }
+        //public ApplicationUser Player { get; set; }
     }
 }
