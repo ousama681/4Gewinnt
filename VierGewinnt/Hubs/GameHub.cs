@@ -203,8 +203,8 @@ namespace VierGewinnt.Hubs
                         await SetIsFinished(gameId);
                     }
 
-                    await mqttClient.UnsubscribeAsync(topic);
-                    await mqttClient.DisconnectAsync();
+                    //await mqttClient.UnsubscribeAsync(topic);
+                    //await mqttClient.DisconnectAsync();
                     await Task.CompletedTask;
                 };
             }
