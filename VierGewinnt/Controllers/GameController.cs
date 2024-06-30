@@ -46,11 +46,10 @@ namespace VierGewinnt.Controllers
             GameHub.playerOne = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerOneName, PlayerNr = 1};
             GameHub.playerTwo = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerTwoName, PlayerNr = 2};
 
-            RobotVsRobotManager.hubContextPvE = _hubContextPvE;
+            //RobotVsRobotManager.hubContextPvE = _hubContextPvE;
 
             GameManager.playerOneName = gameBoard.PlayerOneName;
             GameManager.playerTwoName = gameBoard.PlayerTwoName;
-            await GameHub.SubscribeToFeedbackAsync("feedback", _hubContextPvP);
 
             GameHub.board = new int[6,7];
             return View(gameViewModel);

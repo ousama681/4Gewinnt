@@ -19,6 +19,7 @@ namespace VierGewinnt.Services
 
         public static IHubContext<BoardPvEHub> hubContextPvE;
 
+
         public static IDictionary<string, int> colDepth = new Dictionary<string, int>();
         public static int moveNr = 0;
         public static GameBoard currentGame;

@@ -15,6 +15,8 @@ namespace VierGewinnt.Hubs
         //static readonly IList<string> robots = new List<string>();
         static readonly IDictionary<string, string> onlineUsers = new Dictionary<string, string>();
 
+        public static readonly IHubContext<GameHub> _hubContextPvP;
+
 
         //Player vs Player
         public async Task SendNotification(string player)
@@ -74,6 +76,7 @@ namespace VierGewinnt.Hubs
         public async Task StartGame(string payload)
         {
             //PlayerOne also has accepted the Challenge, we can now start the game
+            await GameHub.SubscribeToFeedbackAsync("feedback", (IHubContext<GameHub>)this.Context);
             await MQTTBrokerService.PublishAsync("Challenge", payload);
         }
 

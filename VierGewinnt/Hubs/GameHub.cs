@@ -32,6 +32,8 @@ namespace VierGewinnt.Hubs
 
         private static BoardPlayer? currentMoveKey;
 
+
+
         public async Task SendPlayerMove(string playerName, string gameId, string column)
         {
 
