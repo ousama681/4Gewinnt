@@ -21,7 +21,7 @@ namespace VierGewinnt.Controllers
     {
         private readonly IGameRepository _gameRepository;
         private readonly IAccountRepository _accountRepository;
-        private readonly IHubContext<BoardEvEHub> _hubContext;
+        private readonly IHubContext<BoardPvEHub> _hubContext;
         //private static readonly IList<GameBoard> runningGames;
 
         private static string connectionstring = DbUtility.connectionString;
@@ -31,7 +31,7 @@ namespace VierGewinnt.Controllers
         //    runningGames = new List<GameBoard>();
         //}
 
-        public GameController(IGameRepository gameRepository, IHubContext<BoardEvEHub> hubContext,
+        public GameController(IGameRepository gameRepository, IHubContext<BoardPvEHub> hubContext,
             IAccountRepository accountRepository)
         {
             _gameRepository = gameRepository;
@@ -60,14 +60,10 @@ namespace VierGewinnt.Controllers
         {
             GameViewModel gameViewModel = new GameViewModel();
             GameBoard gameBoard;
+            RobotVsRobotManager.hubContext = _hubContext;
             gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
-
-            //else
-            //{
-            //    gameBoard = new GameBoard
-            //}
-            //gameViewModel.Board = ;
             gameViewModel.Board = gameBoard;
+            await BoardPvEHub.SubscribeToFeedbackAsync("feedback", _hubContext);
             return View(gameViewModel);
         }
 
@@ -81,9 +77,6 @@ namespace VierGewinnt.Controllers
             Robot robotOne = new Robot() { Name = robotOneName };
             Robot robotTwo = new Robot() { Name = robotTwoName };
 
-            //RobotVsRobotManager.robotsInGame.Add(robotOneName, 1);
-            //RobotVsRobotManager.robotsInGame.Add(robotTwoName, 2);
-
             gameBoard.PlayerOneID = robotOne.Name;
             gameBoard.PlayerTwoID = robotTwo.Name;
             gameBoard.PlayerOneName = robotOne.Name;
@@ -91,8 +84,10 @@ namespace VierGewinnt.Controllers
             gameViewModel.Board = gameBoard;
 
             await RobotVsRobotManager.SubscribeToFeedbackTopic();
-            RobotVsRobotManager.hubContext = _hubContext;
-            //RobotVsRobotManager.board = new Move[6, 7];
+
+            // Roboter Vs Roboter funktioniert nicht.
+
+            //RobotVsRobotManager.hubContext = _hubContext;
             RobotVsRobotManager.board = new int[6, 7];
             RobotVsRobotManager.currentGame = gameBoard;
             RobotVsRobotManager.currentRobotMove = robotOne.Name;
@@ -148,7 +143,7 @@ namespace VierGewinnt.Controllers
         //    if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
         //    {
         //        // Subscribe to a topic
-        //        await mqttClient.SubscribeAsync(topic);
+        //        await mqttClient.SubscribeToFeedbackAsync(topic);
 
         //        // Callback function when a message is received
         //        mqttClient.ApplicationMessageReceivedAsync += async e =>
@@ -210,78 +205,78 @@ namespace VierGewinnt.Controllers
         //    }
         //}
 
-        private async Task<Robot> GetRobotByName(string robotName)
-        {
+        //private async Task<Robot> GetRobotByName(string robotName)
+        //{
 
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                { 
-                    return await dbContext.Robots.Where(r => r.Name.Equals(robotName)).SingleAsync();
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-
-            return null;
-        }
-
-        private void AnimateMove(string robotName, int columnNR, int gameId, string color)
-        {
-            _hubContext.Clients.All.SendAsync("AnimateMove", robotName, columnNR, gameId, color);
-        }
-
-        private void SaveMoveToDB(string robotName, int columnNR, int gameId)
-        {
-            Debug.WriteLine("Move Saved To DB");
-        }
-
-        private Move[,] CreateMoveArrFromBoard(ICollection<Move> moves)
-        {
-            try
-            {
-                Move[,] movesArr = new Move[7, 6];
-
-                Dictionary<string, int> colDepth = new Dictionary<string, int>();
-                colDepth.Add("1", 6);
-                colDepth.Add("2", 6);
-                colDepth.Add("3", 6);
-                colDepth.Add("4", 6);
-                colDepth.Add("5", 6);
-                colDepth.Add("6", 6);
-                colDepth.Add("7", 6);
-
-                foreach (Move move in moves)
-                {
-                    int depth;
-                    colDepth.TryGetValue("" + move.Column, out depth);
-                    movesArr[(move.Column - 1), depth - 1] = move;
-                    colDepth["" + move.Column] = depth - 1;
-                }
-
-                return movesArr;
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                Debug.WriteLine(e);
-            }
-            return null;
-        }
+        //    var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+        //    optionsBuilder.UseSqlServer(connectionstring);
 
 
+        //    using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+        //    {
+        //        try
+        //        { 
+        //            return await dbContext.Robots.Where(r => r.Name.Equals(robotName)).SingleAsync();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Debug.WriteLine(e);
+        //        }
+        //    }
 
-        private class BoardParticipants
-        {
-            public Robot RobotOne { get; set; }
-            public Robot RobotTwo { get; set; }
+        //    return null;
+        //}
 
-            public GameBoard Board { get; set; }
-        }
+        //private void AnimateMove(string robotName, int columnNR, int gameId, string color)
+        //{
+        //    _hubContext.Clients.All.SendAsync("AnimateMove", robotName, columnNR, gameId, color);
+        //}
+
+        //private void SaveMoveToDB(string robotName, int columnNR, int gameId)
+        //{
+        //    Debug.WriteLine("Move Saved To DB");
+        //}
+
+        //private Move[,] CreateMoveArrFromBoard(ICollection<Move> moves)
+        //{
+        //    try
+        //    {
+        //        Move[,] movesArr = new Move[7, 6];
+
+        //        Dictionary<string, int> colDepth = new Dictionary<string, int>();
+        //        colDepth.Add("1", 6);
+        //        colDepth.Add("2", 6);
+        //        colDepth.Add("3", 6);
+        //        colDepth.Add("4", 6);
+        //        colDepth.Add("5", 6);
+        //        colDepth.Add("6", 6);
+        //        colDepth.Add("7", 6);
+
+        //        foreach (Move move in moves)
+        //        {
+        //            int depth;
+        //            colDepth.TryGetValue("" + move.Column, out depth);
+        //            movesArr[(move.Column - 1), depth - 1] = move;
+        //            colDepth["" + move.Column] = depth - 1;
+        //        }
+
+        //        return movesArr;
+        //    }
+        //    catch (IndexOutOfRangeException e)
+        //    {
+        //        Debug.WriteLine(e);
+        //    }
+        //    return null;
+        //}
+
+
+
+        //private class BoardParticipants
+        //{
+        //    public Robot RobotOne { get; set; }
+        //    public Robot RobotTwo { get; set; }
+
+        //    public GameBoard Board { get; set; }
+        //}
     }
 }

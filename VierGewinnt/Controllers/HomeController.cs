@@ -59,7 +59,7 @@ namespace VierGewinnt.Controllers
             }
             if (countInstances == 0)
             {
-                // Wir könnten das eigentlich in den Konstruktor packen. 
+                // Wir könnten das eigentlich in den Konstruktor packen.
                 await SubscribeRobotAsync("SubscribeRobot");
                 await SubscribeAsync("Challenge");
                 await SubscribeAsync("ChallengeRobot");

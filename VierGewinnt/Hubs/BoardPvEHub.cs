@@ -1,34 +1,47 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet;
 using System.Diagnostics;
-using System.Text;
 using VierGewinnt.Controllers;
 using VierGewinnt.Data;
-using VierGewinnt.Data.Model;
-using VierGewinnt.Data.Models;
 using VierGewinnt.Services;
+using static VierGewinnt.Hubs.GameHub;
+using System.Text;
+using VierGewinnt.Data.Models;
+using VierGewinnt.Data.Model;
 
 namespace VierGewinnt.Hubs
 {
-    public class GameHub : Hub
+    public class BoardPvEHub : Hub
     {
-        //private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
-        private static IHubCallerClients _hubClients = null;
+        private static IHubContext<BoardPvEHub> _hubContext = null;
 
+        private static BoardPlayer? currentMoveKey;
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
-        public static int[,] board = new int[6, 7];
-        public static IDictionary<int, string> playerNrMappingReverse = new Dictionary<int, string>();
-        public static IDictionary<string, int> playerNrMapping = new Dictionary<string, int>();
-        public static BoardPlayer playerOne = new BoardPlayer();
-        public static BoardPlayer playerTwo = new BoardPlayer();
 
 
+        public async Task MakeFirstMove(string robotOneName)
+        {
+            await RobotVsRobotManager.MakeNextMove();
+        }
 
+        public static async Task CallAnimateHandler(string currentColumn)
+        {
+            await RobotVsRobotManager.hubContext.Clients.All.SendAsync("AnimateMove", currentColumn);
+        }
 
-        private BoardPlayer? currentMoveKey;
+        public static async Task GameIsOver()
+        {
+            string text = "Roboter " + RobotVsRobotManager.winner + " hat gewonnen.";
+            await RobotVsRobotManager.hubContext.Clients.All.SendAsync("NotificateGameEnd", text);
+        }
+
+        public static async Task PublishToCoordinate(string column)
+        {
+            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
+        }
 
         public async Task SendPlayerMove(string playerName, string gameId, string column)
         {
@@ -65,18 +78,139 @@ namespace VierGewinnt.Hubs
             playerMoves.Add(bp, columnNr);
 
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
-            await SubscribeAsync("feedback");
+            //await SubscribeToFeedbackAsync("feedback");
             // TestMethode um nicht mit Postman den RobotStatus zu simulieren
             //await MQTTBrokerService.PublishAsync("feedback", "1");
         }
 
-        public async Task GameIsOver(string winnerId, int gameId)
+        public static async Task SubscribeToFeedbackAsync(string topic, IHubContext<BoardPvEHub> hubContextPvE)
+        {
+
+            _hubContext = hubContextPvE;
+            string broker = "localhost";
+            int port = 1883;
+            string clientId = Guid.NewGuid().ToString();
+
+            // Create a MQTT client factory
+            var factory = new MqttFactory();
+
+            // Create a MQTT client instance
+            IMqttClient mqttClient = factory.CreateMqttClient();
+
+            // Create MQTT client options
+            var options = new MqttClientOptionsBuilder()
+                .WithTcpServer(broker, port)
+                .WithClientId(clientId)
+                .WithCleanSession()
+                .Build();
+
+            // Connect to MQTT broker
+            await ConnectToMQTTBroker(mqttClient, options, topic);
+        }
+
+        private static async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
+        {
+            var connectResult = await mqttClient.ConnectAsync(options);
+
+            if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
+            {
+                // Subscribe to a topic
+                await mqttClient.SubscribeAsync(topic);
+
+                // Die Methode welche ausgeführt wird, wenn de Roboter auf "feedback" published.
+                mqttClient.ApplicationMessageReceivedAsync += async e =>
+                {
+                    var message = e.ApplicationMessage;
+
+
+                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+
+                    if (payload.Equals("0"))
+                    {
+                        return;
+                    }
+
+                    if (message.Retain)
+                    {
+                        return;
+                    }
+
+                    BoardPlayer bpKey = currentMoveKey;
+                    int column = 0;
+                    playerMoves.TryGetValue(bpKey, out column);
+
+                    await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
+                    playerMoves.Remove(bpKey);
+
+                    int winnerNr = GameManager.CheckForWin(bpKey.GameId);
+
+                    if (winnerNr != 0)
+                    {
+                        string winnername = "";
+                        int gameId = 0;
+                        if (winnerNr == 1)
+                        {
+                            winnername = playerOne.PlayerName;
+                            gameId = bpKey.GameId;
+                        }
+                        else if (winnerNr == 2)
+                        {
+                            winnername = playerTwo.PlayerName;
+                            gameId = bpKey.GameId;
+
+                        }
+                        await GameIsOver(winnername, gameId);
+                        await SendRobotGameFinishedMessage();
+                        await SetIsFinished(gameId);
+                    }
+
+                    await RobotVsRobotManager.MakeNextMove();
+                    //await mqttClient.UnsubscribeAsync(topic);
+                    //await mqttClient.DisconnectAsync();
+                    await Task.CompletedTask;
+                };
+            }
+            else
+            {
+                Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
+            }
+        }
+
+        public static async Task GameIsOver(string winnerId, int gameId)
         {
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
-            await _hubClients.All.SendAsync("NotificateGameEnd", winnerId);
+            await _hubContext.Clients.All.SendAsync("NotificateGameEnd", winnerId);
             await RobotVsRobotManager.UnsubscribeAndCloseFromFeedback();
         }
+
+        private static async Task SendRobotGameFinishedMessage()
+        {
+            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "9");
+        }
+
+        private static async Task SetIsFinished(int gameId)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(DbUtility.connectionString);
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    GameBoard gameboard = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).Single();
+                    gameboard.IsFinished = true;
+                    dbContext.GameBoards.Update(gameboard);
+                    await dbContext.SaveChangesAsync();
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+        }
+
 
         private static async Task UpdatePlayerRanking(string winnerName)
         {
@@ -111,178 +245,6 @@ namespace VierGewinnt.Hubs
                 }
             }
         }
-
-        //public void RegisterGameInStaticProperty(string playerIdOne, string playerIdTwo, int gameId)
-        //{
-        //    if (!runningGames.Keys.Contains(gameId))
-        //    {
-        //        runningGames.Add(gameId, new GameInfo(playerIdOne, playerIdTwo));
-        //    }
-        //}
-
-        public async Task SubscribeAsync(string topic)
-        {
-
-            _hubClients = this.Clients;
-            string broker = "localhost";
-            int port = 1883;
-            string clientId = Guid.NewGuid().ToString();
-
-            // Create a MQTT client factory
-            var factory = new MqttFactory();
-
-            // Create a MQTT client instance
-            IMqttClient mqttClient = factory.CreateMqttClient();
-
-            // Create MQTT client options
-            var options = new MqttClientOptionsBuilder()
-                .WithTcpServer(broker, port)
-                .WithClientId(clientId)
-                .WithCleanSession()
-                .Build();
-
-            // Connect to MQTT broker
-            await ConnectToMQTTBroker(mqttClient, options, topic);
-        }
-
-        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
-        {
-            var connectResult = await mqttClient.ConnectAsync(options);
-
-            if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
-            {
-                // Subscribe to a topic
-                await mqttClient.SubscribeAsync(topic);
-
-                // Die Methode welche ausgeführt wird, wenn de Roboter auf "feedback" published.
-                mqttClient.ApplicationMessageReceivedAsync += async e =>
-                {
-                    var message = e.ApplicationMessage;
-
-
-                    string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-
-                    if (payload.Equals("0"))
-                    {
-                        return;
-                    }
-
-                    if (message.Retain)
-                    {
-                        return;
-                    }
-
-                    BoardPlayer bpKey = currentMoveKey;
-                    int column = 0;
-                    playerMoves.TryGetValue(bpKey, out column);
-
-                    await _hubClients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
-                    playerMoves.Remove(bpKey);
-
-                    int winnerNr = GameManager.CheckForWin(bpKey.GameId);
-
-                    if (winnerNr != 0)
-                    {
-                        string winnername = "";
-                        int gameId = 0;
-                        if (winnerNr == 1)
-                        {
-                            winnername = playerOne.PlayerName;
-                            gameId = bpKey.GameId;
-                        }
-                        else if (winnerNr == 2)
-                        {
-                            winnername = playerTwo.PlayerName;
-                            gameId = bpKey.GameId;
-
-                        }
-                        await GameIsOver(winnername, gameId);
-                        await SendRobotGameFinishedMessage();
-                        await SetIsFinished(gameId);
-                    }
-
-                    await mqttClient.UnsubscribeAsync(topic);
-                    await mqttClient.DisconnectAsync();
-                    await Task.CompletedTask;
-                };
-            }
-            else
-            {
-                Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
-            }
-        }
-
-        private async Task SendRobotGameFinishedMessage()
-        {
-            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "9");
-        }
-
-        private async Task SetIsFinished(int gameId)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(DbUtility.connectionString);
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    GameBoard gameboard = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).Single();
-                    gameboard.IsFinished = true;
-                    dbContext.GameBoards.Update(gameboard);
-                    await dbContext.SaveChangesAsync();
-                    return;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-        }
-
-        public class BoardPlayer
-        {
-            public string PlayerId;
-            public int GameId;
-            public string PlayerName;
-            public int PlayerNr;
-
-            public BoardPlayer(string playerId, int gameId)
-            {
-                PlayerId = playerId;
-                GameId = gameId;
-            }
-
-            public BoardPlayer()
-            {
-
-            }
-        }
-
-
-        //private class GameInfo
-        //{
-        //    private readonly string playerOneId;
-        //    private readonly string playerTwoId;
-
-        //    private string winner;
-
-        //    public GameInfo(string playerOneId, string playerTwoId)
-        //    {
-        //        this.playerOneId = playerOneId;
-        //        this.playerTwoId = playerTwoId;
-        //    }
-
-
-        //    public void SetWinner(string playerId)
-        //    {
-        //        winner = playerId;
-        //    }
-
-        //    public string GetWinner()
-        //    {
-        //        return winner;
-        //    }
-        //}
 
     }
 }

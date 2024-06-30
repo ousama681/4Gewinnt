@@ -17,20 +17,20 @@
         <!-- Column for PlayerOne -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerOne">
-                <label class="text-light">Player One: @Model.Board.PlayerOneName</label>
-            </div>
-            <div>
-                <label class="text-light">@User.Identity.Name</label>
+                <label class="text-light">PlayerOne: @Model.Board.PlayerOneName</label>
+                <!-- Your PlayerOne content here -->
             </div>
             <div class="d-flex flex-column align-items-center">
                 <div class="red-stone"></div>
-                <div class="text-light mb-2">Select a column: </div>
-                <form asp-area="" method="post" class="d-flex flex-column align-items-center">
-                    <input asp-for="Board.PlayerOneID" id="playerIdOne" name="userIdOne" type="hidden" />
-                    <input asp-for="Board.ID" name="boardIdOne" type="hidden" />
-                    <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
-                    <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Place Chip</button>
-                </form>
+                <div id="labelColumnPlayerOne" class="text-light mb-2">Select a column: </div>
+                <div id="divPlaceRedStone">
+                    <form id="PlaceRedStone" asp-area="" method="post" class="d-flex flex-column align-items-center">
+                        <input asp-for="Board.PlayerOneName" id="playerIdOne" name="userIdOne" type="hidden" />
+                        <input asp-for="Board.ID" name="boardIdOne" type="hidden" />
+                        <input type="number" id="colNumberRed" name="colNumberRed" value="1" min="1" max="7">
+                        <button id="btnColRed" class="btn btn-primary mt-2" type="submit">Place Chip</button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -72,20 +72,19 @@
         <!-- Column for PlayerTwo -->
         <div class="col d-flex flex-column align-items-center">
             <div id="playerTwo">
-                <label class="text-light">Robot: @Model.Board.PlayerTwoName</label>
-            </div>
-            <div>
-                <label class="text-light">@Model.Board.PlayerTwoID</label>
+                <label class="text-light">PlayerTwo: @Model.Board.PlayerTwoName</label>
             </div>
             <div class="d-flex flex-column align-items-center">
                 <div class="yellow-stone"></div>
-                <div class="text-light mb-2">Select a column: </div>
-                <form id="PlaceYellowStone" class="d-flex flex-column align-items-center">
-                    <input asp-for="Board.PlayerTwoName" id="playerIdTwo" name="userIdTwo" type="hidden" />
-                    <input asp-for="Board.ID" name="boardIdTwo" type="hidden" />
-                    <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7">
-                    <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
-                </form>
+                <div id="labelColumnPlayerTwo" class="text-light mb-2">Select a column: </div>
+                <div id="divPlaceYellowStone">
+                    <form id="PlaceYellowStone" class="d-flex flex-column align-items-center">
+                        <input asp-for="Board.PlayerTwoName" id="playerIdTwo" name="userIdTwo" type="hidden" />
+                        <input asp-for="Board.ID" name="boardIdTwo" type="hidden" />
+                        <input type="number" id="colNumberYellow" name="colNumberYel" value="1" min="1" max="7">
+                        <button id="btnColYellow" class="btn btn-primary mt-2" type="submit">Place Chip</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -105,7 +104,8 @@
 
 <script>
     var movesToLoad = @Html.Raw(Json.Serialize(Model.Board.Moves));
-    var playerOneID = @Json.Serialize(Model.Board.PlayerOneName);
-    var playerTwoID = @Json.Serialize(Model.Board.PlayerTwoName);
+    var playerOneName = @Json.Serialize(Model.Board.PlayerOneName);
+    var playerTwoName = @Json.Serialize(Model.Board.PlayerTwoName);
+    var userName = @Json.Serialize(User.Identity.Name);
     var gameId = @Json.Serialize(Model.Board.ID);
 </script>

@@ -1,15 +1,199 @@
 "use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
+var connection = new signalR.HubConnectionBuilder().withUrl("/boardPvEHub").build();
 
 // Prepare Game
 connection.start()
     .then(() => {
         PlaceAlreadyPlayedMoves(movesToLoad); 
         // Wenn playerOne immer Rot ist, dann heisst das, dass PlayerOne immer bei ungeraden Zahlen drann ist.
-        connection.invoke("RegisterGameInStaticProperty", playerOneName, playerTwoID, gameId)
+        connection.invoke("RegisterGameInStaticProperty", playerOneName, playerTwoName, gameId)
     }
 );
+
+let colDepth = {};
+
+colDepth['1'] = 6;
+colDepth['2'] = 6;
+colDepth['3'] = 6;
+colDepth['4'] = 6;
+colDepth['5'] = 6;
+colDepth['6'] = 6;
+colDepth['7'] = 6;
+
+var movecounter = 0;
+
+var nextPlayer;
+
+connection.start().then(function () {
+    //var robotOne = document.getElementById("labelRobotOne");
+
+    //var robotOneName = robotOne.textContent;
+    //nextPlayer = document.getElementById("labelRobotOne").textContent;
+    connection.invoke("MakeFirstMove", player);
+});
+
+connection.on("AnimateMove", function (columnNr) {
+    // wie finde ich heraus wer playeROne ist?
+    movecounter++;
+
+    var color = movecounter % 2 != 0 ? "red" : "yellow";
+
+    animate(columnNr, colDepth[columnNr], color);
+
+    if (nextPlayer == robotOneName) {
+        nextPlayer = robotTwoName;
+    } else if (nextPlayer == robotTwoName) {
+        nextPlayer = robotOneName;
+    }
+
+    document.getElementById("nextTurnName").textContent = "Next Turn: " + nextPlayer;
+
+    colDepth[columnNr] = colDepth[columnNr] - 1;
+});
+
+function animate(column, endRow, color) {
+    if (color == "yellow") {
+        var selectedCell = document.getElementById(`${column}${endRow}`);
+        if (selectedCell != null) {
+            selectedCell.style.backgroundColor = "yellow";
+        }
+    }
+    else if (color == "red") {
+        var selectedCell = document.getElementById(`${column}${endRow}`);
+        if (selectedCell != null) {
+            selectedCell.style.backgroundColor = "red";
+        }
+    }
+}
+
+connection.on("NotificateGameEnd", function (winnerId) {
+    console.log(`Gratuliere ${winnerId}!! Du hast gewonnen!`);
+    showGameOverModal(winnerId);
+});
+
+async function showGameOverModal(winnerId) {
+    const modal = document.getElementById("gameoverModal");
+    const label = document.getElementById("modalLabel");
+    label.innerText = label.innerText + winnerId;
+    modal.style.display = "block";
+
+    // When player wants to go back to lobby
+    document.getElementById("confirmButton").onclick = function () {
+        modal.style.display = "none";
+        const baseUrl = "https://localhost:7102/Home/GameLobby";
+        window.location.href = `${baseUrl}`;
+    }
+}
+
+window.onload = function () {
+    //var YellowBtn = document.getElementById("btnColYellow");
+    //YellowBtn.onclick = function () {
+    //    event.preventDefault();
+    //    disableButton("btnColYellow");
+    //    var arr = $('form').serializeArray();
+    //    var dataObj = {};
+
+    //    $(arr).each(function (i, field) {
+    //        dataObj[field.name] = field.value;
+    //    });
+
+    //    var playerIdOne = dataObj['userIdTwo'];
+    //    var boardIdOne = dataObj['boardIdTwo'];
+    //    var columnYellow = dataObj['colNumberYel'];
+
+    //    connection.invoke("SendPlayerMove", playerIdOne, boardIdOne, columnYellow);
+    //}
+
+    var RedBtn = document.getElementById("btnColRed");
+
+    RedBtn.onclick = function () {
+        event.preventDefault();
+        disableButton("btnColRed");
+        var arr = $('form').serializeArray();
+        var dataObj = {};
+
+        $(arr).each(function (i, field) {
+            dataObj[field.name] = field.value;
+        });
+
+        var playerIdTwo = dataObj['userIdOne'];
+        var boardIdTwo = dataObj['boardIdOne'];
+        var columnRed = dataObj['colNumberRed'];
+
+        connection.invoke("SendPlayerMove", playerIdTwo, boardIdTwo, columnRed);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function PlaceAlreadyPlayedMoves(movesToLoad) {
     event.preventDefault();
