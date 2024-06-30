@@ -20,6 +20,7 @@ namespace VierGewinnt.Hubs
 
         private static BoardPlayer? currentMoveKey;
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
+        private static string currentPlayer = "";
 
 
         public async Task MakeFirstMove(string robotOneName)
@@ -136,6 +137,7 @@ namespace VierGewinnt.Hubs
                     }
 
                     BoardPlayer bpKey = currentMoveKey;
+                    currentPlayer = bpKey.PlayerName;
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
@@ -164,7 +166,24 @@ namespace VierGewinnt.Hubs
                         await SetIsFinished(gameId);
                     }
 
-                    await RobotVsRobotManager.MakeNextMove();
+                    var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+                    optionsBuilder.UseSqlServer(DbUtility.connectionString);
+
+                    using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+                    {
+                        try
+                        {
+                            if (HomeController.GetUser(currentPlayer, dbContext).Result != null)
+                            {
+                                await RobotVsRobotManager.MakeNextMove();
+                            }
+                            return;
+                        }
+                        catch (Exception exception)
+                        {
+                            Debug.WriteLine(exception);
+                        }
+                    }
                     //await mqttClient.UnsubscribeAsync(topic);
                     //await mqttClient.DisconnectAsync();
                     await Task.CompletedTask;

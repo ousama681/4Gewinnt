@@ -30,7 +30,8 @@ connection.start().then(function () {
 
     //var robotOneName = robotOne.textContent;
     //nextPlayer = document.getElementById("labelRobotOne").textContent;
-    connection.invoke("MakeFirstMove", player);
+    nextPlayer = playerOneName;
+    //connection.invoke("MakeFirstMove", player);
 });
 
 connection.on("AnimateMove", function (columnNr) {
@@ -41,10 +42,10 @@ connection.on("AnimateMove", function (columnNr) {
 
     animate(columnNr, colDepth[columnNr], color);
 
-    if (nextPlayer == robotOneName) {
-        nextPlayer = robotTwoName;
-    } else if (nextPlayer == robotTwoName) {
-        nextPlayer = robotOneName;
+    if (nextPlayer == playerOneName) {
+        nextPlayer = playerTwoName;
+    } else if (nextPlayer == playerTwoName) {
+        nextPlayer = playerOneName;
     }
 
     document.getElementById("nextTurnName").textContent = "Next Turn: " + nextPlayer;

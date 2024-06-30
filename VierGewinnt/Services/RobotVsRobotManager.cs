@@ -67,7 +67,7 @@ namespace VierGewinnt.Services
                         FinishGame();
                         return;
                     }
-                    MakeNextMove();
+                    //MakeNextMove();
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace VierGewinnt.Services
 
         private static async Task FinishGame()
         {
-            await BoardEvEHub.GameIsOver();
+            await BoardPvEHub.GameIsOver();
         }
 
         public static async Task MakeNextMove()
