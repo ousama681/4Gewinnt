@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Server;
 using System.Diagnostics;
 using System.Text;
 using VierGewinnt.Controllers;
@@ -25,6 +26,8 @@ namespace VierGewinnt.Hubs
         public static string robotName = "";
         public static string playerName = "";
         public static int currGameId = 0;
+        private static IMqttClient hubMqttClient = null;
+
 
         public async Task MakeFirstMove(string robotOneName)
         {
@@ -100,6 +103,7 @@ namespace VierGewinnt.Hubs
 
             // Create a MQTT client instance
             IMqttClient mqttClient = factory.CreateMqttClient();
+            
 
             // Create MQTT client options
             var options = new MqttClientOptionsBuilder()
@@ -120,6 +124,7 @@ namespace VierGewinnt.Hubs
             {
                 // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
+                hubMqttClient = mqttClient;
 
                 // Die Methode welche ausgeführt wird, wenn de Roboter auf "feedback" published.
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
@@ -218,8 +223,15 @@ namespace VierGewinnt.Hubs
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
             await _hubContext.Clients.All.SendAsync("NotificateGameEnd", winnerId);
-            await RobotVsRobotManager.UnsubscribeAndCloseFromFeedback();
+            await UnsubscribeAndCloseFromFeedback();
         }
+
+        public static async Task UnsubscribeAndCloseFromFeedback()
+        {
+            await hubMqttClient.UnsubscribeAsync("feedback");
+            await hubMqttClient.DisconnectAsync();
+        }
+
 
         private static async Task SendRobotGameFinishedMessage()
         {
