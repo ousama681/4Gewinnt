@@ -17,7 +17,7 @@ namespace VierGewinnt.Hubs
     public class BoardPvEHub : Hub
     {
 
-        private static IHubContext<BoardPvEHub> _hubContext = null;
+        private static IHubContext<BoardPvEHub> _hubcontextPvE = null;
 
         private static BoardPlayer? currentMoveKey;
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
@@ -36,13 +36,13 @@ namespace VierGewinnt.Hubs
 
         public static async Task CallAnimateHandler(string currentColumn)
         {
-            await RobotVsRobotManager.hubContext.Clients.All.SendAsync("AnimateMove", currentColumn);
+            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimateMove", currentColumn);
         }
 
         public static async Task GameIsOver()
         {
             string text = "Roboter " + RobotVsRobotManager.winner + " hat gewonnen.";
-            await RobotVsRobotManager.hubContext.Clients.All.SendAsync("NotificateGameEnd", text);
+            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("NotificateGameEnd", text);
         }
 
         public static async Task PublishToCoordinate(string column)
@@ -93,7 +93,7 @@ namespace VierGewinnt.Hubs
         public static async Task SubscribeToFeedbackAsync(string topic, IHubContext<BoardPvEHub> hubContextPvE)
         {
 
-            _hubContext = hubContextPvE;
+            _hubcontextPvE = hubContextPvE;
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
@@ -153,7 +153,7 @@ namespace VierGewinnt.Hubs
                     {
                         RobotVsRobotManager.currentColumn = column.ToString();
                         await RobotVsRobotManager.AddMoveToBoard();
-                        await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", column, playerName);
+                        await _hubcontextPvE.Clients.All.SendAsync("AnimatePlayerMove", column, playerName);
                     }
                     else
                     {
@@ -165,7 +165,7 @@ namespace VierGewinnt.Hubs
                             PlayerNr = 0
 
                         }, Int32.Parse(currentcolumn));
-                        await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", currentcolumn, robotName);
+                        await _hubcontextPvE.Clients.All.SendAsync("AnimatePlayerMove", currentcolumn, robotName);
                     }
                     playerMoves.Remove(bpKey);
 
@@ -222,14 +222,14 @@ namespace VierGewinnt.Hubs
         {
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
-            await _hubContext.Clients.All.SendAsync("NotificateGameEnd", winnerId);
+            await _hubcontextPvE.Clients.All.SendAsync("NotificateGameEnd", winnerId);
             await UnsubscribeAndCloseFromFeedback();
         }
 
         public static async Task UnsubscribeAndCloseFromFeedback()
         {
             await hubMqttClient.UnsubscribeAsync("feedback");
-            await hubMqttClient.DisconnectAsync();
+            //await hubMqttClient.DisconnectAsync();
         }
 
 

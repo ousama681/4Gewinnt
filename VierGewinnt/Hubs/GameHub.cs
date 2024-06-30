@@ -16,7 +16,7 @@ namespace VierGewinnt.Hubs
     {
         //private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
-        private static IHubCallerClients _hubClients = null;
+        private static IHubContext<GameHub> _hubContextPvP = null;
 
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
         public static int[,] board = new int[6, 7];
@@ -26,9 +26,11 @@ namespace VierGewinnt.Hubs
         public static BoardPlayer playerTwo = new BoardPlayer();
 
 
+        private static IMqttClient hubMqttClient = null;
 
 
-        private BoardPlayer? currentMoveKey;
+
+        private static BoardPlayer? currentMoveKey;
 
         public async Task SendPlayerMove(string playerName, string gameId, string column)
         {
@@ -65,16 +67,16 @@ namespace VierGewinnt.Hubs
             playerMoves.Add(bp, columnNr);
 
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
-            await SubscribeAsync("feedback");
+            //await SubscribeToFeedbackAsync("feedback");
             // TestMethode um nicht mit Postman den RobotStatus zu simulieren
             //await MQTTBrokerService.PublishAsync("feedback", "1");
         }
 
-        public async Task GameIsOver(string winnerId, int gameId)
+        public static async Task GameIsOver(string winnerId, int gameId)
         {
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
-            await _hubClients.All.SendAsync("NotificateGameEnd", winnerId);
+            await _hubContextPvP.Clients.All.SendAsync("NotificateGameEnd", winnerId);
             await RobotVsRobotManager.UnsubscribeAndCloseFromFeedback();
         }
 
@@ -120,10 +122,10 @@ namespace VierGewinnt.Hubs
         //    }
         //}
 
-        public async Task SubscribeAsync(string topic)
+        public static async Task SubscribeToFeedbackAsync(string topic, IHubContext<GameHub> hubContextPvP)
         {
 
-            _hubClients = this.Clients;
+            _hubContextPvP = hubContextPvP;
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
@@ -145,7 +147,7 @@ namespace VierGewinnt.Hubs
             await ConnectToMQTTBroker(mqttClient, options, topic);
         }
 
-        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
+        private static async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
         {
             var connectResult = await mqttClient.ConnectAsync(options);
 
@@ -176,7 +178,7 @@ namespace VierGewinnt.Hubs
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
-                    await _hubClients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
+                    await _hubContextPvP.Clients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
                     playerMoves.Remove(bpKey);
 
                     int winnerNr = GameManager.CheckForWin(bpKey.GameId);
@@ -212,12 +214,12 @@ namespace VierGewinnt.Hubs
             }
         }
 
-        private async Task SendRobotGameFinishedMessage()
+        private static async Task SendRobotGameFinishedMessage()
         {
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "9");
         }
 
-        private async Task SetIsFinished(int gameId)
+        private static async Task SetIsFinished(int gameId)
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(DbUtility.connectionString);

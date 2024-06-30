@@ -17,7 +17,7 @@ namespace VierGewinnt.Services
     {
         private static IMqttClient mqttClient;
 
-        public static IHubContext<BoardPvEHub> hubContext;
+        public static IHubContext<BoardPvEHub> hubContextPvE;
 
         public static IDictionary<string, int> colDepth = new Dictionary<string, int>();
         public static int moveNr = 0;

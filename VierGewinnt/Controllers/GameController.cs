@@ -13,7 +13,8 @@ namespace VierGewinnt.Controllers
     {
         private readonly IGameRepository _gameRepository;
         private readonly IAccountRepository _accountRepository;
-        private readonly IHubContext<BoardPvEHub> _hubContext;
+        private readonly IHubContext<BoardPvEHub> _hubContextPvE;
+        private readonly IHubContext<GameHub> _hubContextPvP;
         //private static readonly IList<GameBoard> runningGames;
 
         private static string connectionstring = DbUtility.connectionString;
@@ -23,11 +24,13 @@ namespace VierGewinnt.Controllers
         //    runningGames = new List<GameBoard>();
         //}
 
-        public GameController(IGameRepository gameRepository, IHubContext<BoardPvEHub> hubContext,
+        public GameController(IGameRepository gameRepository, IHubContext<BoardPvEHub> hubContextPvE,
+            IHubContext<GameHub> hubContextPvP,
             IAccountRepository accountRepository)
         {
             _gameRepository = gameRepository;
-            _hubContext = hubContext;
+            _hubContextPvE = hubContextPvE;
+            _hubContextPvP = hubContextPvP;
             _accountRepository = accountRepository;
         }
 
@@ -43,8 +46,11 @@ namespace VierGewinnt.Controllers
             GameHub.playerOne = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerOneName, PlayerNr = 1};
             GameHub.playerTwo = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerTwoName, PlayerNr = 2};
 
+            RobotVsRobotManager.hubContextPvE = _hubContextPvE;
+
             GameManager.playerOneName = gameBoard.PlayerOneName;
             GameManager.playerTwoName = gameBoard.PlayerTwoName;
+            await GameHub.SubscribeToFeedbackAsync("feedback", _hubContextPvP);
 
             GameHub.board = new int[6,7];
             return View(gameViewModel);
@@ -55,13 +61,13 @@ namespace VierGewinnt.Controllers
         {
             GameViewModel gameViewModel = new GameViewModel();
             GameBoard gameBoard;
-            RobotVsRobotManager.hubContext = _hubContext;
+            RobotVsRobotManager.hubContextPvE = _hubContextPvE;
             gameBoard = await _gameRepository.GetByIdAsync(new GameBoard() { ID = gameId });
             gameViewModel.Board = gameBoard;
             BoardPvEHub.currentPlayer = gameBoard.PlayerOneName;
             BoardPvEHub.playerName = gameBoard.PlayerOneName;
             BoardPvEHub.robotName = gameBoard.PlayerTwoName;
-            await BoardPvEHub.SubscribeToFeedbackAsync("feedback", _hubContext);
+            await BoardPvEHub.SubscribeToFeedbackAsync("feedback", _hubContextPvE);
 
             RobotVsRobotManager.currPlayerNr = 1;
             RobotVsRobotManager.otherRobotNr = 2;
@@ -100,7 +106,7 @@ namespace VierGewinnt.Controllers
 
             // Roboter Vs Roboter funktioniert nicht.
 
-            //RobotVsRobotManager.hubContext = _hubContext;
+            //RobotVsRobotManager.hubContextPvE = _hubContextPvE;
             RobotVsRobotManager.board = new int[6, 7];
             RobotVsRobotManager.currentGame = gameBoard;
             RobotVsRobotManager.currentRobotMove = robotOne.Name;
@@ -242,7 +248,7 @@ namespace VierGewinnt.Controllers
 
         //private void AnimateMove(string robotName, int columnNR, int gameId, string color)
         //{
-        //    _hubContext.Clients.All.SendAsync("AnimateMove", robotName, columnNR, gameId, color);
+        //    _hubContextPvE.Clients.All.SendAsync("AnimateMove", robotName, columnNR, gameId, color);
         //}
 
         //private void SaveMoveToDB(string robotName, int columnNR, int gameId)

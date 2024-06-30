@@ -14,13 +14,13 @@ namespace VierGewinnt.Hubs
 
         public static async Task CallAnimateHandler(string currentColumn)
         {
-            await RobotVsRobotManager.hubContext.Clients.All.SendAsync("AnimateMove", currentColumn);
+            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimateMove", currentColumn);
         }
 
         public static async Task GameIsOver()
         {
             string text = "Roboter " + RobotVsRobotManager.winner + " hat gewonnen.";
-            await RobotVsRobotManager.hubContext.Clients.All.SendAsync("NotificateGameEnd", text);
+            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("NotificateGameEnd", text);
         }
 
         public static async Task PublishToCoordinate(string column)
