@@ -17,9 +17,8 @@ namespace VierGewinnt.Services
     {
         private static IMqttClient mqttClient;
 
-        public static IHubContext<BoardEvEHub> hubContext;
+        public static IHubContext<BoardPvEHub> hubContext;
 
-        //public static Move[,] board;
         public static IDictionary<string, int> colDepth = new Dictionary<string, int>();
         public static int moveNr = 0;
         public static GameBoard currentGame;
@@ -60,8 +59,8 @@ namespace VierGewinnt.Services
                 isBothFinished = value;
                 if (isBothFinished == true)
                 {
-                    CallAnimateHandler();
-                    int winner = CheckForWin();
+                    BoardEvEHub.CallAnimateHandler(currentColumn);
+                    int winner = GameManager.CheckForWinOrDraw(board);
                     if (winner != 0)
                     {
                         RobotVsRobotManager.robotMappingReversed.TryGetValue(winner, out RobotVsRobotManager.winner);
@@ -76,17 +75,23 @@ namespace VierGewinnt.Services
 
         private static async Task FinishGame()
         {
-            await GameIsOver();
+            await BoardEvEHub.GameIsOver();
         }
 
         public static async Task MakeNextMove()
         {
-            currentColumn = ConnectFourAIService.GetNextRandomMove(board).ToString();
+            // Hier falls noch Zeit ist morgen unbedingt eine AI einbauen, es muss kein ProAI sein
+            // Aber immerhin sollte sie fähig sein einen Siegerzug zu verhindern und einfache
+            // Steine zu verbinden.
 
-            //currentColumn = FindBestMove().ToString();
+            Game game = new Game();
+            game.board.board = board;
+
+            //currentColumn = ConnectFourAIService.GetNextRandomMove(board).ToString();
+            currentColumn = game.miniMax.GetBestMove(game.board).Column.ToString();
 
             // NextMove wird an beide Roboter verschickt.
-            await PublishToCoordinate(currentColumn);
+            await BoardPvEHub.PublishToCoordinate(currentColumn);
             moveNr++;
             await AddMoveToBoard();
         }
@@ -110,16 +115,6 @@ namespace VierGewinnt.Services
             {
                 currRobotNr = 1;
             }
-
-        }
-
-        private static void CallAnimateHandler()
-        {
-            hubContext.Clients.All.SendAsync("AnimateMove", currentColumn);
-        }
-
-        static RobotVsRobotManager()
-        {
         }
 
         public static async Task SubscribeToFeedbackTopic()
@@ -176,22 +171,13 @@ namespace VierGewinnt.Services
             }
         }
 
-        public static async Task GameIsOver()
-        {
-            string text = "Roboter " + winner + " hat gewonnen.";
-            await hubContext.Clients.All.SendAsync("NotificateGameEnd", text);
-        }
-
         public static async Task UnsubscribeAndCloseFromFeedback()
         {
             await mqttClient.UnsubscribeAsync("feedback");
             await mqttClient.DisconnectAsync();
         }
 
-        private static async Task PublishToCoordinate(string column)
-        {
-            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
-        }
+
 
 
         internal static void InitColDepth()
@@ -205,201 +191,6 @@ namespace VierGewinnt.Services
             colDepth.Add("5", 6);
             colDepth.Add("6", 6);
             colDepth.Add("7", 6);
-        }
-
-        private static int CheckForWin()
-        {
-            return CheckForWinOrDraw();
-        }
-
-        public static int CheckForWinOrDraw()
-        {
-            // Check horizontal
-            for (int row = 0; row < 6; row++)
-            {
-                for (int col = 0; col < 7 - 3; col++)
-                {
-                    if (board[row, col] != 0 &&
-                        board[row, col] == board[row, col + 1] &&
-                        board[row, col] == board[row, col + 2] &&
-                        board[row, col] == board[row, col + 3])
-                    {
-                        //robotMappingReversed.TryGetValue(board[row, col], out winner);
-                        return board[row, col];
-                    }
-                }
-            }
-
-            // Check vertical
-            for (int col = 0; col < 7; col++)
-            {
-                for (int row = 0; row < 6 - 3; row++)
-                {
-                    if (board[row, col] != 0 &&
-                        board[row, col] == board[row + 1, col] &&
-                        board[row, col] == board[row + 2, col] &&
-                        board[row, col] == board[row + 3, col])
-                    {
-                        return board[row, col];
-                    }
-                }
-            }
-
-            // Check positive diagonal (bottom-left to top-right)
-            for (int col = 0; col < 7 - 3; col++)
-            {
-                for (int row = 0; row < 6 - 3; row++)
-                {
-                    if (board[row, col] != 0 &&
-                        board[row, col] == board[row + 1, col + 1] &&
-                        board[row, col] == board[row + 2, col + 2] &&
-                        board[row, col] == board[row + 3, col + 3])
-                    {
-                        return board[row, col];
-                    }
-                }
-            }
-
-            // Check negative diagonal (top-left to bottom-right)
-            for (int col = 0; col < 7 - 3; col++)
-            {
-                for (int row = 3; row < 6; row++)
-                {
-                    if (board[row, col] != 0 &&
-                        board[row, col] == board[row - 1, col + 1] &&
-                        board[row, col] == board[row - 2, col + 2] &&
-                        board[row, col] == board[row - 3, col + 3])
-                    {
-                        return board[row, col];
-                    }
-                }
-            }
-
-            // Check for draw (if no empty cells)
-            foreach (var cell in board)
-            {
-                if (cell == 0)
-                {
-                    return 0; // No winner yet
-                }
-            }
-
-            return -1; // Draw
-        }
-
-        public static int FindBestMove()
-        {
-            int bestScore = int.MinValue;
-            int bestCol = -1;
-
-            for (int col = 0; col < 7; col++)
-            {
-                int row = GetNextOpenRow(col);
-                if (row != -1)
-                {
-                    board[row, col] = otherRobotNr;
-                    // Hier aufpassen eventuell überschreibe ich alles
-                    int score = Minimax(board, 5, false);
-                    board[row, col] = 0;
-
-                    if (score > bestScore)
-                    {
-                        bestScore = score;
-                        bestCol = col;
-                    }
-                }
-            }
-
-            return bestCol+1;
-        }
-
-        static int Minimax(int[,] board, int depth, bool isMaximizing)
-        {
-
-
-            int score = EvaluateBoard(board);
-            if (Math.Abs(score) == 1000 || depth == 0)
-            {
-                return score;
-            }
-
-            if (isMaximizing)
-            {
-                int bestScore = int.MinValue;
-                for (int col = 0; col < 7; col++)
-                {
-                    int row = GetNextOpenRow(col);
-                    if (row != -1)
-                    {
-                        //int otherRobotNr;
-                        //string otherRobot = currentRobotMove.Equals(currentGame.PlayerOneName) ? currentGame.PlayerOneName : currentGame.PlayerTwoName;
-                        //robotMappingNr.TryGetValue(otherRobot, out otherRobotNr);
-                        board[row, col] = otherRobotNr;
-                        int newScore = Minimax(board, depth - 1, false);
-                        board[row, col] = 0;
-                        bestScore = Math.Max(bestScore, newScore);
-                    }
-                }
-                return bestScore;
-            }
-            else
-            {
-                int bestScore = int.MaxValue;
-                for (int col = 0; col < 7; col++)
-                {
-                    int row = GetNextOpenRow(col);
-                    if (row != -1)
-                    {
-                        board[row, col] = currRobotNr;
-                        int newScore = Minimax(board, depth - 1, true);
-                        board[row, col] = 0;
-                        bestScore = Math.Min(bestScore, newScore);
-                    }
-                }
-                return bestScore;
-            }
-        }
-
-        static int EvaluateBoard(int[,] board)
-        {
-            // Simple evaluation: +1000 for AI win, -1000 for player win
-            if (CheckWin(otherRobotNr)) return 1000;
-            if (CheckWin(currRobotNr)) return -1000;
-            return 0; // Neutral
-        }
-
-        static bool CheckWin(int player)
-        {
-            // Check for 4 in a row for the given player
-            // Horizontal, vertical, diagonal checks
-            // Simplified for brevity
-            for (int r = 0; r < 6; r++)
-            {
-                for (int c = 0; c < 7; c++)
-                {
-                    if (c + 3 < 7 && board[r, c] == player && board[r, c + 1] == player && board[r, c + 2] == player && board[r, c + 3] == player)
-                        return true;
-                    if (r + 3 < 6 && board[r, c] == player && board[r + 1, c] == player && board[r + 2, c] == player && board[r + 3, c] == player)
-                        return true;
-                    if (r + 3 < 6 && c + 3 < 7 && board[r, c] == player && board[r + 1, c + 1] == player && board[r + 2, c + 2] == player && board[r + 3, c + 3] == player)
-                        return true;
-                    if (r - 3 >= 0 && c + 3 < 7 && board[r, c] == player && board[r - 1, c + 1] == player && board[r - 2, c + 2] == player && board[r - 3, c + 3] == player)
-                        return true;
-                }
-            }
-            return false;
-        }
-
-        static int GetNextOpenRow(int col)
-        {
-            for (int row = 5; row >= 0; row--)
-            {
-                if (board[row, col] == 0)
-                {
-                    return row;
-                }
-            }
-            return -1; // Column is full
         }
     }
 }
