@@ -71,6 +71,16 @@ namespace VierGewinnt.Hubs
             //await MQTTBrokerService.PublishAsync("feedback", "1");
         }
 
+        public async Task UpdateTimerPlayerOne(int time)
+        {
+            await Clients.All.SendAsync("updateTimerOne", time);
+        }
+
+        public async Task UpdateTimerPlayerTwo(int time)
+        {
+            await Clients.All.SendAsync("updateTimerTwo", time);
+        }
+
         public async Task GameIsOver(string winnerId, int gameId)
         {
             //runningGames.Remove(gameId);

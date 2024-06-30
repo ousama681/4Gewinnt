@@ -201,14 +201,59 @@ async function animate(column, endRow, color) {
     }
 }
 
+var timerPlayerOne;
+var timerPlayerTwo;
+var startTimePlayerOne;
+var startTimePlayerTwo;
+var elapsedTimePlayerOne = 0;
+var elapsedTimePlayerTwo = 0;
+
+connection.on("updateTimerOne", function (time) {
+    var timer = document.getElementById("timerPlayerOne");
+    timer.innerText = time;
+});
+
+connection.on("updateTimerTwo", function (time) {
+    var timer2 = document.getElementById("timerPlayerTwo");
+    timer2.innerText = time;
+});
+
 function disableButton(btnId) {
     var button = document.getElementById(btnId);
     button.disabled = true;
+
+    // Stop the timer for the corresponding player
+    if (btnId === "btnColRed") {
+        clearInterval(timerPlayerOne);
+        elapsedTimePlayerOne += Date.now() - startTimePlayerOne;
+        connection.invoke("UpdateTimerPlayerOne", elapsedTimePlayerOne);
+    } else if (btnId === "btnColYellow") {
+        clearInterval(timerPlayerTwo);
+        elapsedTimePlayerTwo += Date.now() - startTimePlayerTwo;
+        connection.invoke("UpdateTimerPlayerTwo", elapsedTimePlayerTwo);
+    }
 }
 
 function activateButton(btnId) {
     var button = document.getElementById(btnId);
     button.disabled = false;
+
+    // Start the timer for the corresponding player
+    if (btnId === "btnColRed") {
+        startTimePlayerOne = Date.now();
+        timerPlayerOne = setInterval(function () {
+            var currentTime = Date.now();
+            var timeElapsed = elapsedTimePlayerOne + (currentTime - startTimePlayerOne);
+            console.log("Player One (Red) Time: " + timeElapsed + " ms");
+        }, 100);
+    } else if (btnId === "btnColYellow") {
+        startTimePlayerTwo = Date.now();
+        timerPlayerTwo = setInterval(function () {
+            var currentTime = Date.now();
+            var timeElapsed = elapsedTimePlayerTwo + (currentTime - startTimePlayerTwo);
+            console.log("Player Two (Yellow) Time: " + timeElapsed + " ms");
+        }, 100);
+    }
 }
 
 //virtual board to check if a chip is already placed
