@@ -14,10 +14,10 @@
     <ul class="row mt-4">
         @foreach (GameBoard gb in Model.GameHistories)
         {
-            <li class="list-group-item" style="width:33%;">
+            <li class="list-group-item" style="width:33%; border:groove">
                 <div class="d-flex flex-column align-items-center">
                     <form class="d-flex flex-column align-items-center" method="post" asp-action="Replay" asp-controller="Home">
-                        <label class="fw-bold mb-2">GameNumber: @gb.ID</label>                       
+                        <label class="fw-bold mb-2">Game ID: @gb.ID</label>                       
                         <label class="fw-bold mb-2">@gb.PlayerOneName vs @gb.PlayerTwoName</label>                       
                         <button asp-action="Replay" asp-controller="Home" asp-route-gameId="@gb.ID" class="btn text-light" style="margin: 0">Spiel Rückblick</button>
                     </form>

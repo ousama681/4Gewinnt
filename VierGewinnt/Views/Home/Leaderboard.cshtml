@@ -17,26 +17,32 @@
         {
             var pr = playerRankings[i];
             string borderColor;
+            string border;
+            int rank = (i + 1);
 
             switch (i)
             {
                 case 0:
                     borderColor = "rgba(255, 215, 0, 1)"; // Gold
+                    border = "6mm ridge";
                     break;
                 case 1:
                     borderColor = "rgba(192, 192, 192, 1)"; // Silver
+                    border = "5mm ridge";
                     break;
                 case 2:
                     borderColor = "rgba(205, 127, 50, 1)"; // Bronze
+                    border = "4mm ridge";
                     break;
                 default:
-                    borderColor = "rgba(255, 220, 50, .6)"; // Default
+                    borderColor = "rgba(107, 164, 219, 0.8)"; // Default
+                    border = "3mm ridge";
                     break;
             }
 
-            <li class="list-group-item" style="width:100%; border:4mm ridge; border-color:@borderColor;">
+            <li class="list-group-item" style="width:100%; border:@border; border-color:@borderColor;">
                 <div class="d-flex flex-column align-items-center">
-                    <label class="fw-bold mb-2">Player: @pr.Player.UserName</label>
+                    <label class="fw-bold mb-2">Rank @rank: @pr.Player.UserName</label>
                     <label>Anzahl Siege: @pr.Wins</label>
                 </div>
             </li>

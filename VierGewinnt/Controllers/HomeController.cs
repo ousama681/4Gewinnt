@@ -139,13 +139,15 @@ namespace VierGewinnt.Controllers
         [HttpPost]
         public async Task<IActionResult> GameAborted(GameViewModel model)
         {
-            GameBoard board = await _gameRepository.GetByIdAsync(model.Board);
-            if (board != null)
+            if(model.Board.ID != 0)
             {
-                board.IsFinished = true;
-                _gameRepository.Update(board);
-            }
-
+                GameBoard board = await _gameRepository.GetByIdAsync(model.Board);
+                if (board != null)
+                {
+                    board.IsFinished = true;
+                    _gameRepository.Update(board);
+                }
+            }           
 
             if (!playersInHub.Contains(username))
             {
