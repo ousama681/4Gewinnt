@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using MQTTnet.Client;
 using MQTTnet;
+using MQTTnet.Client;
 using System.Diagnostics;
+using System.Text;
 using VierGewinnt.Controllers;
 using VierGewinnt.Data;
+using VierGewinnt.Data.Model;
+using VierGewinnt.Data.Models;
 using VierGewinnt.Services;
 using static VierGewinnt.Hubs.GameHub;
-using System.Text;
-using VierGewinnt.Data.Models;
-using VierGewinnt.Data.Model;
 
 namespace VierGewinnt.Hubs
 {
@@ -20,7 +20,10 @@ namespace VierGewinnt.Hubs
 
         private static BoardPlayer? currentMoveKey;
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
-        private static string currentPlayer = "";
+        public static string currentPlayer = "";
+        public static string currentcolumn;
+        public static string robotName = "";
+        public static string playerName = "";
 
 
         public async Task MakeFirstMove(string robotOneName)
@@ -137,11 +140,20 @@ namespace VierGewinnt.Hubs
                     }
 
                     BoardPlayer bpKey = currentMoveKey;
-                    currentPlayer = bpKey.PlayerName;
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
-                    await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
+ 
+                    if (currentPlayer.Equals(playerName))
+                    {
+                        currentPlayer = robotName;
+                        await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", column, playerName);
+                    }
+                    else
+                    {
+                        currentPlayer = playerName;
+                        await _hubContext.Clients.All.SendAsync("AnimatePlayerMove", currentcolumn, robotName);
+                    }
                     playerMoves.Remove(bpKey);
 
                     int winnerNr = GameManager.CheckForWin(bpKey.GameId);
@@ -166,24 +178,13 @@ namespace VierGewinnt.Hubs
                         await SetIsFinished(gameId);
                     }
 
-                    var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-                    optionsBuilder.UseSqlServer(DbUtility.connectionString);
 
-                    using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+
+                    if (currentPlayer.Equals(robotName))
                     {
-                        try
-                        {
-                            if (HomeController.GetUser(currentPlayer, dbContext).Result != null)
-                            {
-                                await RobotVsRobotManager.MakeNextMove();
-                            }
-                            return;
-                        }
-                        catch (Exception exception)
-                        {
-                            Debug.WriteLine(exception);
-                        }
+                        await RobotVsRobotManager.MakeNextMove();
                     }
+
                     //await mqttClient.UnsubscribeAsync(topic);
                     //await mqttClient.DisconnectAsync();
                     await Task.CompletedTask;

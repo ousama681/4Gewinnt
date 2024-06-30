@@ -89,6 +89,7 @@ namespace VierGewinnt.Services
 
             //currentColumn = ConnectFourAIService.GetNextRandomMove(board).ToString();
             currentColumn = game.miniMax.GetBestMove(game.board).Column.ToString();
+            BoardPvEHub.currentcolumn = currentColumn;
 
             // NextMove wird an beide Roboter verschickt.
             await BoardPvEHub.PublishToCoordinate(currentColumn);

@@ -2,14 +2,6 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/boardPvEHub").build();
 
-// Prepare Game
-connection.start()
-    .then(() => {
-        PlaceAlreadyPlayedMoves(movesToLoad); 
-        // Wenn playerOne immer Rot ist, dann heisst das, dass PlayerOne immer bei ungeraden Zahlen drann ist.
-        connection.invoke("RegisterGameInStaticProperty", playerOneName, playerTwoName, gameId)
-    }
-);
 
 let colDepth = {};
 
@@ -27,7 +19,7 @@ var nextPlayer;
 
 connection.start().then(function () {
     //var robotOne = document.getElementById("labelRobotOne");
-
+    PlaceAlreadyPlayedMoves(movesToLoad); 
     //var robotOneName = robotOne.textContent;
     //nextPlayer = document.getElementById("labelRobotOne").textContent;
     nextPlayer = playerOneName;
