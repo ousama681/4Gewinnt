@@ -84,7 +84,14 @@
         <button class="success-btn btn btn-primary mt-2" id="confirmButton">Zur Gamelobby</button>
     </div>
 </div>
-
+<div class="abort-button">
+    <form asp-controller="Home" asp-action="GameAborted" method="post">
+        <input type="hidden" asp-for="Board.PlayerOneName" />
+        <input type="hidden" asp-for="Board.PlayerTwoName" />
+        <input type="hidden" asp-for="Board.ID" />
+        <button class="btn text-light" type="submit">Abort Game</button>
+    </form>
+</div>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/boardEvE.js" asp-append-version="true"></script>
 

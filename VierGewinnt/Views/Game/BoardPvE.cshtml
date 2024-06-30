@@ -86,6 +86,14 @@
         <source src="/winSound.mp3" type="audio/mp3" />
     </audio>
 </div>
+<div class="abort-button">
+    <form asp-controller="Home" asp-action="GameAborted" method="post">
+        <input type="hidden" asp-for="Board.PlayerOneName" />
+        <input type="hidden" asp-for="Board.PlayerTwoName" />
+        <input type="hidden" asp-for="Board.ID" />
+        <button class="btn text-light" type="submit">Abort Game</button>
+    </form>
+</div>
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/GameAgainstRobot.js" asp-append-version="true"></script>
