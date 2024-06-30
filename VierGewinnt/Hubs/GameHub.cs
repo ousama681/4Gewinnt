@@ -16,7 +16,9 @@ namespace VierGewinnt.Hubs
     {
         //private static IDictionary<int, GameInfo> runningGames = new Dictionary<int, GameInfo>();
 
-        private static IHubCallerClients _hubContextPvP = null;
+        //private static IHubCallerClients _hubContextPvP = null;
+
+        public static IHubCallerClients _hubcontextPvP = null;
 
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
         public static int[,] board = new int[6, 7];
@@ -78,8 +80,15 @@ namespace VierGewinnt.Hubs
         {
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
-            await _hubContextPvP.All.SendAsync("NotificateGameEnd", winnerId);
+            await _hubcontextPvP.All.SendAsync("NotificateGameEnd", winnerId);
             await RobotVsRobotManager.UnsubscribeAndCloseFromFeedback();
+        }
+
+        public override Task OnConnectedAsync()
+        {
+
+            _hubcontextPvP = this.Clients;
+            return base.OnConnectedAsync();
         }
 
         private static async Task UpdatePlayerRanking(string winnerName)
@@ -124,10 +133,10 @@ namespace VierGewinnt.Hubs
         //    }
         //}
 
-        public static async Task SubscribeToFeedbackAsync(string topic, IHubCallerClients hubContextPvP)
+        public static async Task SubscribeToFeedbackAsync(string topic)
         {
 
-            _hubContextPvP = hubContextPvP;
+            //_hubContextPvP = hubContextPvP;
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
@@ -162,8 +171,6 @@ namespace VierGewinnt.Hubs
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
                     var message = e.ApplicationMessage;
-
-
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
 
                     if (payload.Equals("0"))
@@ -180,7 +187,7 @@ namespace VierGewinnt.Hubs
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
-                    await _hubContextPvP.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
+                    await _hubcontextPvP.All.SendAsync("AnimatePlayerMove", column, bpKey.PlayerName);
                     playerMoves.Remove(bpKey);
 
                     int winnerNr = GameManager.CheckForWin(bpKey.GameId);

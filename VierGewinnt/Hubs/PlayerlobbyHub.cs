@@ -69,14 +69,15 @@ namespace VierGewinnt.Hubs
 
         public async Task ConfirmChallenge(string payload, string playerOneId, string groupId)
         {
+
             // Challenge got confirmed from playerTwo, now we ask playerOne to accept the game as well
+            await GameHub.SubscribeToFeedbackAsync("feedback");
             await Clients.Client(playerOneId).SendAsync("AcceptChallenge", payload, groupId);           
         }
 
         public async Task StartGame(string payload)
         {
             //PlayerOne also has accepted the Challenge, we can now start the game
-            await GameHub.SubscribeToFeedbackAsync("feedback", this.Clients);
             await MQTTBrokerService.PublishAsync("Challenge", payload);
         }
 
