@@ -207,8 +207,8 @@ namespace VierGewinnt.Hubs
                         currentPlayer = playerName;
                     }
 
-                    //await mqttClient.UnsubscribeAsync(topic);
-                    //await mqttClient.DisconnectAsync();
+                    //await _mqttClient.UnsubscribeAsync(topic);
+                    //await _mqttClient.DisconnectAsync();
                     await Task.CompletedTask;
                 };
             }

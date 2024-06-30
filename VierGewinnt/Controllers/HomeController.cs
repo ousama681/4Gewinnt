@@ -252,7 +252,7 @@ namespace VierGewinnt.Controllers
                 await mqttClient.SubscribeAsync(topic);
 
                 // Hier adde ich den Client zur statischen Liste der clients
-                //connectedMqttClients.Add(mqttClient);
+                //connectedMqttClients.Add(_mqttClient);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
@@ -308,7 +308,7 @@ namespace VierGewinnt.Controllers
                 await mqttClient.SubscribeAsync(topic);
 
                 // Hier adde ich den Client zur statischen Liste der clients
-                //connectedMqttClients.Add(mqttClient);
+                //connectedMqttClients.Add(_mqttClient);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
@@ -401,7 +401,7 @@ namespace VierGewinnt.Controllers
         private async Task AfterStartingGame(IMqttClient mqttClient, string topic)
         {
 
-            //connectedMqttClients.Remove(mqttClient);
+            //connectedMqttClients.Remove(_mqttClient);
             playersInHub.Remove(this.username);
             this.username = null;
         }
@@ -513,7 +513,7 @@ namespace VierGewinnt.Controllers
                 await mqttClient.SubscribeAsync(topic);
 
                 // Hier adde ich den Client zur statischen Liste der clients
-                //connectedMqttClients.Add(mqttClient);
+                //connectedMqttClients.Add(_mqttClient);
 
                 // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>

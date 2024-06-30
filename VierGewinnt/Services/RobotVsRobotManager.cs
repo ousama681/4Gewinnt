@@ -15,7 +15,7 @@ namespace VierGewinnt.Services
 {
     public static class RobotVsRobotManager
     {
-        private static IMqttClient mqttClient;
+        public static IMqttClient _mqttClient;
 
         public static IHubContext<BoardPvEHub> hubContextPvE;
 
@@ -128,7 +128,7 @@ namespace VierGewinnt.Services
             string clientId = Guid.NewGuid().ToString();
             var factory = new MqttFactory();
 
-            mqttClient = factory.CreateMqttClient();
+            _mqttClient = factory.CreateMqttClient();
 
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(broker, port)
@@ -136,7 +136,7 @@ namespace VierGewinnt.Services
                 .WithCleanSession(true)
                 .Build();
 
-            await ConnectToMQTTBroker(mqttClient, options, topic);
+            await ConnectToMQTTBroker(_mqttClient, options, topic);
         }
 
         private static async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
@@ -176,8 +176,8 @@ namespace VierGewinnt.Services
 
         public static async Task UnsubscribeAndCloseFromFeedback()
         {
-            await mqttClient.UnsubscribeAsync("feedback");
-            await mqttClient.DisconnectAsync();
+            await _mqttClient.UnsubscribeAsync("feedback");
+            //await _mqttClient.DisconnectAsync();
         }
 
 

@@ -139,7 +139,7 @@ namespace VierGewinnt.Controllers
         //    var factory = new MqttFactory();
 
         //    // Create a MQTT client instance
-        //    IMqttClient mqttClient = factory.CreateMqttClient();
+        //    IMqttClient _mqttClient = factory.CreateMqttClient();
 
         //    // Create MQTT client options
         //    var options = new MqttClientOptionsBuilder()
@@ -148,23 +148,23 @@ namespace VierGewinnt.Controllers
         //        .WithCleanSession(true)
         //        .Build();
 
-        //        await ConnectToMQTTBroker(mqttClient, options, topic, gameId);
+        //        await ConnectToMQTTBroker(_mqttClient, options, topic, gameId);
         //}
 
-        //private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic, int gameId)
+        //private async Task ConnectToMQTTBroker(IMqttClient _mqttClient, MqttClientOptions options, string topic, int gameId)
         //{
         //    // Connect to MQTT broker
-        //    var connectResult = await mqttClient.ConnectAsync(options);
+        //    var connectResult = await _mqttClient.ConnectAsync(options);
 
         //    int currGameId = gameId;
 
         //    if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
         //    {
         //        // Subscribe to a topic
-        //        await mqttClient.SubscribeToFeedbackAsync(topic);
+        //        await _mqttClient.SubscribeToFeedbackAsync(topic);
 
         //        // Callback function when a message is received
-        //        mqttClient.ApplicationMessageReceivedAsync += async e =>
+        //        _mqttClient.ApplicationMessageReceivedAsync += async e =>
         //        {
         //            // Hier kommt man nur rein von Messages von /Challenge
         //            var message = e.ApplicationMessage;
@@ -212,8 +212,8 @@ namespace VierGewinnt.Controllers
         //            //SaveMoveToDB(robotName, columnNR, gameId);
         //            //AnimateMove(robotName, columnNR, gameId, color);
 
-        //            await mqttClient.UnsubscribeAsync(topic);
-        //            await mqttClient.DisconnectAsync();
+        //            await _mqttClient.UnsubscribeAsync(topic);
+        //            await _mqttClient.DisconnectAsync();
         //        };
 
         //    }

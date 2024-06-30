@@ -166,6 +166,7 @@ namespace VierGewinnt.Hubs
             {
                 // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
+                RobotVsRobotManager._mqttClient = mqttClient;
 
                 // Die Methode welche ausgeführt wird, wenn de Roboter auf "feedback" published.
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
@@ -212,8 +213,8 @@ namespace VierGewinnt.Hubs
                         await SetIsFinished(gameId);
                     }
 
-                    //await mqttClient.UnsubscribeAsync(topic);
-                    //await mqttClient.DisconnectAsync();
+                    //await _mqttClient.UnsubscribeAsync(topic);
+                    //await _mqttClient.DisconnectAsync();
                     await Task.CompletedTask;
                 };
             }
