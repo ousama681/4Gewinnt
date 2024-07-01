@@ -1,20 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using MQTTnet.Client;
-using MQTTnet;
-using MQTTnet.Protocol;
-using System.Text;
-using VierGewinnt.Data.Interfaces;
 using MQTTBroker;
-using System.Diagnostics;
 using VierGewinnt.Controllers;
 
 namespace VierGewinnt.Hubs
 {
     public class PlayerlobbyHub : Hub
     {
-        //static readonly IList<string> robots = new List<string>();
         static readonly IDictionary<string, string> onlineUsers = new Dictionary<string, string>();
-
         public static readonly IHubContext<GameHub> _hubContextPvP;
 
 
@@ -63,27 +55,22 @@ namespace VierGewinnt.Hubs
             string payload = $"{playerOne},{playerTwo}";
             string groupId = $"{playerOneId},{playerTwoId}";
             await Groups.AddToGroupAsync(playerOneId, groupId);
-            await Groups.AddToGroupAsync(playerTwoId, groupId);          
-            await Clients.Client(playerTwoId).SendAsync("ReceiveChallenge", payload, playerOneId, groupId); // send playerTwo a challenge request   
+            await Groups.AddToGroupAsync(playerTwoId, groupId);
+            await Clients.Client(playerTwoId).SendAsync("ReceiveChallenge", payload, playerOneId, groupId);
         }
 
         public async Task ConfirmChallenge(string payload, string playerOneId, string groupId)
         {
-
-            // Challenge got confirmed from playerTwo, now we ask playerOne to accept the game as well
-            //await GameHub.SubscribeToFeedbackAsync("feedback");
-            await Clients.Client(playerOneId).SendAsync("AcceptChallenge", payload, groupId);           
+            await Clients.Client(playerOneId).SendAsync("AcceptChallenge", payload, groupId);
         }
 
         public async Task StartGame(string payload)
         {
-            //PlayerOne also has accepted the Challenge, we can now start the game
             await MQTTBrokerService.PublishAsync("Challenge", payload);
         }
 
         public async Task AbortChallenge(string groupId, string playerName)
         {
-            // Send Message to both players, that the challenge request was not successfull
             await Clients.Group(groupId).SendAsync("ChallengeAborted", playerName, groupId);
         }
 
@@ -96,8 +83,6 @@ namespace VierGewinnt.Hubs
 
 
         // Player vs Robot
-
-        // Zum testen
         public async Task CreateRobot(string id)
         {
             await MQTTBrokerService.PublishAsync("SubscribeRobot", id);
@@ -105,37 +90,19 @@ namespace VierGewinnt.Hubs
 
         public async Task AddRobot(string robotID)
         {
-            //if (HomeController.robotsInHub.Contains(robotID))
-            //{
-            //    Debug.WriteLine("ID already exists. Robot could not be added.");
-            //    return;
-            //}
-            //else
-            //{
-            //    robots.Add(robotID);
             await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);
-            //}
             return;
         }
 
         public async Task RemoveRobot(string robotID)
         {
-            //if (robots.Contains(robotID))
-            //{
-            //    Debug.WriteLine("ID already exists. Robot could not be added.");
-            //    return;
-            //}
-            //else
-            //{
-                //robots.Add(robotID);
-                await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);
-            //}
+            await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);
             return;
         }
 
         public async Task FillRobotLobby()
         {
-            await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);           
+            await Clients.All.SendAsync("UpdateRobotLobby", HomeController.robotsInHub);
         }
 
         public async Task SendNotificationRobot(string robot)
@@ -153,16 +120,6 @@ namespace VierGewinnt.Hubs
             string payload = $"{playerOne},{robot}";
             await MQTTBrokerService.PublishAsync("ChallengeRobot", payload);
         }
-
-        //public async Task LeaveLobbyRobot(string robot)
-        //{
-        //    if (robots.Contains(robot))
-        //    {
-        //        robots.Remove(robot);
-        //        await Clients.Others.SendAsync("RobotLeft", robot);
-        //        return;
-        //    }
-        //}
 
         public async Task ShowAvailableRobots()
         {
