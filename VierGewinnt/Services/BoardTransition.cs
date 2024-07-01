@@ -28,17 +28,5 @@
             keys[index] = key;
             values[index] = value;
         }
-
-        //public void Reset()
-        //{
-        //    Conflicts = 0;
-        //    Array.Clear(keys, 0, keys.Length);
-        //    Array.Clear(values, 0, values.Length);
-        //}
-
-        //public long Size()
-        //{
-        //    return (long)(keys.Length * sizeof(long) + values.Length * sizeof(int));
-        //}
     }
 }

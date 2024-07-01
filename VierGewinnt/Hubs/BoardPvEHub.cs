@@ -16,17 +16,13 @@ namespace VierGewinnt.Hubs
 {
     public class BoardPvEHub : Hub
     {
-
-        //private static IHubContext<BoardPvEHub> _hubcontextPvE = null;
-
         private static BoardPlayer? currentMoveKey;
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
         public static string currentPlayer = "";
-        public static string currentcolumn;
+        public static string currentcolumn = "";
         public static string robotName = "";
         public static string playerName = "";
         public static int currGameId = 0;
-        private static IMqttClient hubMqttClient = null;
 
 
         public async Task MakeFirstMove(string robotOneName)
@@ -55,7 +51,6 @@ namespace VierGewinnt.Hubs
 
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(DbUtility.connectionString);
-            // Save the Moves to execute in Dictionary in Case the MQTTService somehow fails. We probably also need to save it in some File. In case the power goes off.
             string playerId = null;
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
@@ -86,48 +81,36 @@ namespace VierGewinnt.Hubs
 
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
             await SubscribeToFeedbackAsync("feedback");
-            // TestMethode um nicht mit Postman den RobotStatus zu simulieren
-            //await MQTTBrokerService.PublishAsync("feedback", "1");
         }
 
         public async Task SubscribeToFeedbackAsync(string topic)
         {
-
-            //_hubcontextPvE = hubContextPvE;
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
 
-            // Create a MQTT client factory
             var factory = new MqttFactory();
 
-            // Create a MQTT client instance
             IMqttClient mqttClient = factory.CreateMqttClient();
             
-
-            // Create MQTT client options
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(broker, port)
                 .WithClientId(clientId)
                 .WithCleanSession()
                 .Build();
 
-            // Connect to MQTT broker
-            await ConnectToMQTTBroker(mqttClient, options, topic, this);
+            await ConnectToMQTTBroker(mqttClient, options, topic);
         }
 
-        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic, BoardPvEHub boardPvEHub)
+        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
         {
             RobotVsRobotManager.boardPvEhub = this;
             var connectResult = await mqttClient.ConnectAsync(options);
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
             {
-                // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
-                hubMqttClient = mqttClient;
 
-                // Die Methode welche ausgeführt wird, wenn de Roboter auf "feedback" published.
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
                     var message = e.ApplicationMessage;
@@ -221,18 +204,9 @@ namespace VierGewinnt.Hubs
 
         public async Task GameIsOver(string winnerId, int gameId)
         {
-            //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
             await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("NotificateGameEnd", winnerId);
-            //await UnsubscribeAndCloseFromFeedback();
         }
-
-        //public static async Task UnsubscribeAndCloseFromFeedback()
-        //{
-        //    await hubMqttClient.UnsubscribeAsync("feedback");
-        //    //await hubMqttClient.DisconnectAsync();
-        //}
-
 
         private static async Task SendRobotGameFinishedMessage()
         {
@@ -267,12 +241,8 @@ namespace VierGewinnt.Hubs
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionsBuilder.UseSqlServer(DbUtility.connectionString);
 
-
             using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
             {
-
-
-
                 try
                 {
                     PlayerRanking pr = dbContext.PlayerRankings.Where(pr => pr.PlayerName.Equals(winnerName)).FirstOrDefault();
@@ -289,7 +259,6 @@ namespace VierGewinnt.Hubs
 
                     await dbContext.SaveChangesAsync();
                     return;
-                    // Hier mal die Prüfung für den Win machen. 
                 }
                 catch (Exception e)
                 {

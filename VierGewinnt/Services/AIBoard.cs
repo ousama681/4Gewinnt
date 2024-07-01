@@ -33,49 +33,6 @@ namespace VierGewinnt.Services
 
         public bool IsFull() => moves == 42;
 
-        //public void PrintBoard(bool shouldClear = false)
-        //{
-        //    if (shouldClear) Console.Clear();
-
-        //    Console.WriteLine(" 1 2 3 4 5 6 7");
-        //    for (int i = 0; i < 6; i++)
-        //    {
-        //        Console.Write("|");
-        //        for (int j = 0; j < 7; j++)
-        //        {
-        //            if (board[i, j] == 0) Console.Write(" |");
-        //            else if (board[i, j] == 1)
-        //            {
-        //                Console.ForegroundColor = ConsoleColor.Red;
-        //                Console.Write("X");
-        //                Console.ResetColor();
-        //                Console.Write("|");
-        //            }
-        //            else if (board[i, j] == 2)
-        //            {
-        //                Console.ForegroundColor = ConsoleColor.Blue;
-        //                Console.Write("O");
-        //                Console.ResetColor();
-        //                Console.Write("|");
-        //            }
-        //        }
-        //        Console.WriteLine();
-        //    }
-        //    Console.WriteLine("---------------");
-        //}
-
-        //public List<List<int>> GetBoard()
-        //{
-        //    List<List<int>> boardList = new List<List<int>>();
-        //    for (int i = 0; i < ROW_COUNT; i++)
-        //    {
-        //        List<int> row = new List<int>();
-        //        for (int j = 0; j < COL_COUNT; j++) row.Add(board[i, j]);
-        //        boardList.Add(row);
-        //    }
-        //    return boardList;
-        //}
-
         public ulong GetCoordinateValue()
         {
             ulong coordinateValue = 0;
@@ -108,9 +65,6 @@ namespace VierGewinnt.Services
             return true;
         }
 
-        //public bool PlaceMove(int column) => PlaceMove(column, currentPlayerTurn);
-
-        //public bool ValidMove(int column) => board[0, column - 1] == 0;
         public int ColumnOfBestMove(AIBoard board)
         {
             for (int i = 0; i < 6; i++)
@@ -180,7 +134,6 @@ namespace VierGewinnt.Services
         public int NextBestMove(AIBoard board)
         {
             int returnValue = -1;
-            //int targetPlayer = board.currentPlayerTurn;
 
             Parallel.For(1, 7, (i, state) =>
             {
