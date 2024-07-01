@@ -71,7 +71,7 @@ namespace VierGewinnt.Hubs
         {
 
             // Challenge got confirmed from playerTwo, now we ask playerOne to accept the game as well
-            await GameHub.SubscribeToFeedbackAsync("feedback");
+            //await GameHub.SubscribeToFeedbackAsync("feedback");
             await Clients.Client(playerOneId).SendAsync("AcceptChallenge", payload, groupId);           
         }
 
