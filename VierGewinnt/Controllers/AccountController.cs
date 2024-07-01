@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VierGewinnt.Data.Interfaces;
+using VierGewinnt.Data.Models;
 using VierGewinnt.Models;
 
 namespace VierGewinnt.Controllers
@@ -28,7 +29,16 @@ namespace VierGewinnt.Controllers
             if (ModelState.IsValid)
             {
                 // Code ob user existiert
-                signInModel.Username = _accountRepository.GetUserByEmailAsync(signInModel.Email).Result.UserName;
+                ApplicationUser user = _accountRepository.GetUserByEmailAsync(signInModel.Email).Result;
+
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Invalid credentials");
+                    return View(new SignInUpModel() { SignInModel = signInModel });
+                }
+
+
+                signInModel.Username = user.UserName;
                 var result = await _accountRepository.PasswordSignInAsync(signInModel);
                 if (result.Succeeded)
                 {
