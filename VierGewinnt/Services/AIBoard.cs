@@ -33,64 +33,63 @@ namespace VierGewinnt.Services
 
         public bool IsFull() => moves == 42;
 
-        public void PrintBoard(bool shouldClear = false)
-        {
-            if (shouldClear) Console.Clear();
+        //public void PrintBoard(bool shouldClear = false)
+        //{
+        //    if (shouldClear) Console.Clear();
 
-            Console.WriteLine(" 1 2 3 4 5 6 7");
-            for (int i = 0; i < 6; i++)
-            {
-                Console.Write("|");
-                for (int j = 0; j < 7; j++)
-                {
-                    if (board[i, j] == 0) Console.Write(" |");
-                    else if (board[i, j] == 1)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write("X");
-                        Console.ResetColor();
-                        Console.Write("|");
-                    }
-                    else if (board[i, j] == 2)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.Write("O");
-                        Console.ResetColor();
-                        Console.Write("|");
-                    }
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine("---------------");
-        }
+        //    Console.WriteLine(" 1 2 3 4 5 6 7");
+        //    for (int i = 0; i < 6; i++)
+        //    {
+        //        Console.Write("|");
+        //        for (int j = 0; j < 7; j++)
+        //        {
+        //            if (board[i, j] == 0) Console.Write(" |");
+        //            else if (board[i, j] == 1)
+        //            {
+        //                Console.ForegroundColor = ConsoleColor.Red;
+        //                Console.Write("X");
+        //                Console.ResetColor();
+        //                Console.Write("|");
+        //            }
+        //            else if (board[i, j] == 2)
+        //            {
+        //                Console.ForegroundColor = ConsoleColor.Blue;
+        //                Console.Write("O");
+        //                Console.ResetColor();
+        //                Console.Write("|");
+        //            }
+        //        }
+        //        Console.WriteLine();
+        //    }
+        //    Console.WriteLine("---------------");
+        //}
 
-        //Returns the board as a 2d array
-        public List<List<int>> GetBoard()
-        {
-            List<List<int>> boardList = new List<List<int>>();
-            for (int i = 0; i < ROW_COUNT; i++)
-            {
-                List<int> row = new List<int>();
-                for (int j = 0; j < COL_COUNT; j++) row.Add(board[i, j]);
-                boardList.Add(row);
-            }
-            return boardList;
-        }
+        //public List<List<int>> GetBoard()
+        //{
+        //    List<List<int>> boardList = new List<List<int>>();
+        //    for (int i = 0; i < ROW_COUNT; i++)
+        //    {
+        //        List<int> row = new List<int>();
+        //        for (int j = 0; j < COL_COUNT; j++) row.Add(board[i, j]);
+        //        boardList.Add(row);
+        //    }
+        //    return boardList;
+        //}
 
-        public ulong GetHash()
+        public ulong GetCoordinateValue()
         {
-            ulong hash = 0;
+            ulong coordinateValue = 0;
             for (int i = 0; i < ROW_COUNT; i++)
             {
                 for (int j = 0; j < COL_COUNT; j++)
                 {
-                    hash = hash * 3 + (ulong)board[i, j];
+                    coordinateValue = coordinateValue * 3 + (ulong)board[i, j];
                 }
             }
-            return hash;
+            return coordinateValue;
         }
 
-        public bool MakeMove(int column, int player)
+        public bool PlaceMove(int column, int player)
         {
             if (column < 1 || column > 7) return false;
             if (board[0, column - 1] != 0) return false;
@@ -109,15 +108,11 @@ namespace VierGewinnt.Services
             return true;
         }
 
-        public bool MakeMove(int column) => MakeMove(column, currentPlayerTurn);
+        //public bool PlaceMove(int column) => PlaceMove(column, currentPlayerTurn);
 
-        //Checks if a move is valid
-        public bool ValidMove(int column) => board[0, column - 1] == 0;
-
-        //Find the next winning move and returns the column, if no winning move is found, returns 0. If it is a draw, returns -1
-        public int WinningMove(AIBoard board)
+        //public bool ValidMove(int column) => board[0, column - 1] == 0;
+        public int ColumnOfBestMove(AIBoard board)
         {
-            //Check Horizontal
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -142,7 +137,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Vertical
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 7; j++)
@@ -155,7 +149,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Diagonal (top left to bottom right)
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -168,7 +161,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Diagonal (top right to bottom left)
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 3; j < 7; j++)
@@ -185,23 +177,19 @@ namespace VierGewinnt.Services
             return 0;
         }
 
-        public int NextWinningMove(AIBoard board)
+        public int NextBestMove(AIBoard board)
         {
             int returnValue = -1;
-            int targetPlayer = board.currentPlayerTurn;
-
-            //if the target can win in the next move, return that move
-            //else if the opponent can win in the next move, block that move
+            //int targetPlayer = board.currentPlayerTurn;
 
             Parallel.For(1, 7, (i, state) =>
             {
-                //Loop over both players
                 for (int j = 1; j <= 2; j++)
                 {
-                    AIBoard tempBoard = new AIBoard(board);
-                    if (tempBoard.MakeMove(i, j))
+                    AIBoard temporaryB = new AIBoard(board);
+                    if (temporaryB.PlaceMove(i, j))
                     {
-                        if (WinningMove(tempBoard) == j)
+                        if (ColumnOfBestMove(temporaryB) == j)
                         {
                             returnValue = i;
                             state.Stop();
@@ -213,11 +201,10 @@ namespace VierGewinnt.Services
             return returnValue;
         }
 
-        public int OpenFourInARowLines()
+        public int TryFourInALine()
         {
             int returnValue = 0;
 
-            //Check Horizontal
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -230,7 +217,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Vertical
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 7; j++)
@@ -243,7 +229,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Diagonal (top left to bottom right)
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 4; j++)
@@ -256,7 +241,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Diagonal (top right to bottom left)
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 3; j < 7; j++)
@@ -272,11 +256,10 @@ namespace VierGewinnt.Services
             return returnValue;
         }
 
-        public int OpenThreeInARowLines()
+        public int TryThreeInALine()
         {
             int returnValue = 0;
 
-            //Check Horizontal
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 5; j++)
@@ -288,7 +271,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Vertical
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 7; j++)
@@ -300,7 +282,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Diagonal (top left to bottom right)
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 5; j++)
@@ -312,7 +293,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            //Check Diagonal (top right to bottom left)
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 2; j < 7; j++)
