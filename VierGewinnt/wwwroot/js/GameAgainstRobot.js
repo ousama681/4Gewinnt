@@ -18,16 +18,11 @@ var movecounter = 0;
 var nextPlayer;
 
 connection.start().then(function () {
-    //var robotOne = document.getElementById("labelRobotOne");
     PlaceAlreadyPlayedMoves(movesToLoad); 
-    //var robotOneName = robotOne.textContent;
-    //nextPlayer = document.getElementById("labelRobotOne").textContent;
     nextPlayer = playerOneName;
-    //connection.invoke("MakeFirstMove", player);
 });
 
 connection.on("AnimateMove", function (columnNr) {
-    // wie finde ich heraus wer playeROne ist?
     movecounter++;
 
     var color = movecounter % 2 != 0 ? "red" : "yellow";
@@ -80,24 +75,6 @@ async function showGameOverModal(winnerId) {
 }
 
 window.onload = function () {
-    //var YellowBtn = document.getElementById("btnColYellow");
-    //YellowBtn.onclick = function () {
-    //    event.preventDefault();
-    //    disableButton("btnColYellow");
-    //    var arr = $('form').serializeArray();
-    //    var dataObj = {};
-
-    //    $(arr).each(function (i, field) {
-    //        dataObj[field.name] = field.value;
-    //    });
-
-    //    var playerIdOne = dataObj['userIdTwo'];
-    //    var boardIdOne = dataObj['boardIdTwo'];
-    //    var columnYellow = dataObj['colNumberYel'];
-
-    //    connection.invoke("SendPlayerMove", playerIdOne, boardIdOne, columnYellow);
-    //}
-
     var RedBtn = document.getElementById("btnColRed");
 
     RedBtn.onclick = function () {

@@ -24,12 +24,6 @@ namespace VierGewinnt.Hubs
         public static string playerName = "";
         public static int currGameId = 0;
 
-
-        public async Task MakeFirstMove(string robotOneName)
-        {
-            await RobotVsRobotManager.MakeNextMove();
-        }
-
         public static async Task CallAnimateHandler(string currentColumn)
         {
             await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimateMove", currentColumn);

@@ -21,15 +21,11 @@ var robotTwoName = document.getElementById("labelRobotTwo").textContent;
 
 
 connection.start().then(function () {
-    //var robotOne = document.getElementById("labelRobotOne");
-
-    //var robotOneName = robotOne.textContent;
     nextPlayer = document.getElementById("labelRobotOne").textContent;
     connection.invoke("MakeFirstMove", robotOneName);
 });
 
 connection.on("AnimateMove", function (columnNr) {
-    // wie finde ich heraus wer playeROne ist?
     movecounter++;
 
     var color = movecounter % 2 != 0 ? "red" : "yellow";
@@ -73,7 +69,6 @@ async function showGameOverModal(winnerId) {
     label.innerText = label.innerText + winnerId;
     modal.style.display = "block";
 
-    // When player wants to go back to lobby
     document.getElementById("confirmButton").onclick = function () {
         modal.style.display = "none";
         const baseUrl = "https://localhost:7102/Home/GameLobby";

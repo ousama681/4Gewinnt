@@ -6,11 +6,11 @@ using VierGewinnt.Services;
 namespace VierGewinnt.Hubs
 {
     public class BoardEvEHub : Hub
-    { 
-        //public async Task MakeFirstMove(string robotOneName)
-        //{
-        //    await RobotVsRobotManager.MakeNextMove();
-        //}
+    {
+        public async Task MakeFirstMove(string robotOneName)
+        {
+            await RobotVsRobotManager.MakeNextMove();
+        }
 
         public static async Task CallAnimateHandler(string currentColumn)
         {
