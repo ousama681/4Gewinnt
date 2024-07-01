@@ -88,7 +88,7 @@ namespace VierGewinnt.Services
             // Aber immerhin sollte sie fähig sein einen Siegerzug zu verhindern und einfache
             // Steine zu verbinden.
 
-            Game game = new Game();
+            BoardGame game = new BoardGame();
             game.board.board = board;
 
             //currentColumn = ConnectFourAIService.GetNextRandomMove(board).ToString();

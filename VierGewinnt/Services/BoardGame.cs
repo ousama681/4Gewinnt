@@ -2,9 +2,9 @@
 
 namespace VierGewinnt.Services
 {
-    public class Game
+    public class BoardGame
     {
         public AIBoard board = new AIBoard();
-        public BoardMiniMax miniMax = new MiniMaxAlgorithm(11, true, true);
+        public BoardMiniMax miniMax = new BoardMiniMax(11);
     }
 }
