@@ -273,11 +273,18 @@ namespace VierGewinnt.Controllers
 
                     GameBoard game = await CheckForExistingGame(playerOne, playerTwo);
 
+                    ApplicationUser playerOneUser = GetUser(playerOne);
+                    ApplicationUser playerTwoUser = GetUser(playerTwo);
+                    List<string> userIds = new List<string>();
+                    userIds.Add(playerOneUser.Id);
+                    userIds.Add(playerTwoUser.Id);
+
+
                     if (game != null)
                     {
                         game.playerNames.PlayerOneName = playerOne;
                         game.playerNames.PlayerTwoName = playerTwo;
-                        await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
+                        await _hubContext.Clients.Users(userIds).SendAsync("NavigateToGame", game.ID);
                         return;
                     }
 
@@ -286,7 +293,7 @@ namespace VierGewinnt.Controllers
                     game.playerNames.PlayerOneName = playerOne;
                     game.playerNames.PlayerTwoName = playerTwo;
 
-                    await _hubContext.Clients.All.SendAsync("NavigateToGame", game.ID);
+                    await _hubContext.Clients.Users(userIds).SendAsync("NavigateToGame", game.ID);
                     await AfterStartingGame(mqttClient, topic);
                 };
 
