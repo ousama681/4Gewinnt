@@ -139,7 +139,7 @@ namespace VierGewinnt.Controllers
         [HttpPost]
         public async Task<IActionResult> GameAborted(GameViewModel model)
         {
-            if(model.Board.ID != 0)
+            if (model.Board.ID != 0)
             {
                 GameBoard board = await _gameRepository.GetByIdAsync(model.Board);
                 if (board != null)
@@ -147,7 +147,7 @@ namespace VierGewinnt.Controllers
                     board.IsFinished = true;
                     _gameRepository.Update(board);
                 }
-            }           
+            }
 
             if (!playersInHub.Contains(username))
             {
@@ -326,13 +326,24 @@ namespace VierGewinnt.Controllers
 
                     GameBoard game = await CheckForExistingGameAgainstRobot(playerOne, robotID);
 
+                    ApplicationUser playerOneUser = GetUser(playerOne);
+
                     if (game != null)
                     {
-                        await _hubContext.Clients.All.SendAsync("NavigateToGameAgainstRobot", game.ID);
+
+                        if (playerOneUser != null)
+                        {
+                            //await _hubContext.Clients.User(playerOneUser.Id).SendAsync("NavigateToGameAgainstRobot", game.ID);
+
+                        }
                         return;
                     }
                     game = await CreateBoardEntityAgainstRobotAsync(playerOne, robotID);
-                    await _hubContext.Clients.All.SendAsync("NavigateToGameAgainstRobot", game.ID);
+
+                    if (playerOneUser != null)
+                    {
+                        await _hubContext.Clients.User(playerOneUser.Id).SendAsync("NavigateToGameAgainstRobot", game.ID);
+                    }
                     await AfterStartingGame(mqttClient, topic);
                 };
 
@@ -341,6 +352,25 @@ namespace VierGewinnt.Controllers
             {
                 Console.WriteLine($"Failed to connect to MQTT broker: {connectResult.ResultCode}");
             }
+        }
+
+        private ApplicationUser GetUser(string playerOne)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    var userOne = GetUser(playerOne, dbContext).Result;
+                    return userOne;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+            return null;
         }
 
         private async Task<GameBoard> CheckForExistingGame(string playerOne, string playerTwo)
@@ -529,8 +559,9 @@ namespace VierGewinnt.Controllers
                     if (!robotsInHub.Contains(robotID))
                     {
                         robotsInHub.Add(robotID);
-                    await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
-                    } else
+                        await _hubContext.Clients.All.SendAsync("AddRobot", robotID);
+                    }
+                    else
                     {
                         robotsInHub.Remove(robotID);
                         await _hubContext.Clients.All.SendAsync("RemoveRobot", robotID);
