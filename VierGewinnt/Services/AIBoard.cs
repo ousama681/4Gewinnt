@@ -8,12 +8,12 @@ namespace VierGewinnt.Services
         public int currentPlayerTurn = 1;
         public int moves = 0;
 
-        public int NUM_COL
+        public int COL_COUNT
         {
             get => board.GetLength(1);
         }
 
-        public int NUM_ROW
+        public int ROW_COUNT
         {
             get => board.GetLength(0);
         }
@@ -22,9 +22,9 @@ namespace VierGewinnt.Services
 
         public AIBoard(AIBoard b)
         {
-            for (int i = 0; i < NUM_ROW; i++)
+            for (int i = 0; i < ROW_COUNT; i++)
             {
-                for (int j = 0; j < NUM_COL; j++) board[i, j] = b.board[i, j];
+                for (int j = 0; j < COL_COUNT; j++) board[i, j] = b.board[i, j];
             }
 
             currentPlayerTurn = b.currentPlayerTurn;
@@ -68,10 +68,10 @@ namespace VierGewinnt.Services
         public List<List<int>> GetBoard()
         {
             List<List<int>> boardList = new List<List<int>>();
-            for (int i = 0; i < NUM_ROW; i++)
+            for (int i = 0; i < ROW_COUNT; i++)
             {
                 List<int> row = new List<int>();
-                for (int j = 0; j < NUM_COL; j++) row.Add(board[i, j]);
+                for (int j = 0; j < COL_COUNT; j++) row.Add(board[i, j]);
                 boardList.Add(row);
             }
             return boardList;
@@ -80,9 +80,9 @@ namespace VierGewinnt.Services
         public ulong GetHash()
         {
             ulong hash = 0;
-            for (int i = 0; i < NUM_ROW; i++)
+            for (int i = 0; i < ROW_COUNT; i++)
             {
-                for (int j = 0; j < NUM_COL; j++)
+                for (int j = 0; j < COL_COUNT; j++)
                 {
                     hash = hash * 3 + (ulong)board[i, j];
                 }

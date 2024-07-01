@@ -40,7 +40,7 @@ namespace VierGewinnt.Services
         {
             List<int> validMoves = new List<int>();
 
-            for (int i = 0; i < board.NUM_COL; i++)
+            for (int i = 0; i < board.COL_COUNT; i++)
             {
                 if (board.board[0, i] == 0) validMoves.Add(i + 1);
             }
@@ -239,18 +239,18 @@ namespace VierGewinnt.Services
             if (quickMove.Column != -1) return quickMove;
 
             //Check the cache for the cached board and the reverse of the board
-            if (UseCache)
-            {
-                ReturnMove cachedMove = MoveCache.CacheLookup(board);
-                if (cachedMove.Column != -1)
-                {
-                    if (DebugMode) Debug.WriteLine("Cache Hit! Col: " + cachedMove.Column, "DEBUG", ConsoleColor.Green);
+            //if (UseCache)
+            //{
+            //    ReturnMove cachedMove = MoveCache.CacheLookup(board);
+            //    if (cachedMove.Column != -1)
+            //    {
+            //        if (DebugMode) Debug.WriteLine("Cache Hit! Col: " + cachedMove.Column, "DEBUG", ConsoleColor.Green);
 
-                    Thread.Sleep(new Random().Next(500, 3000));
+            //        Thread.Sleep(new Random().Next(500, 3000));
 
-                    return cachedMove;
-                }
-            }
+            //        return cachedMove;
+            //    }
+            //}
 
             //Check the 7 columns for the best move
             Parallel.ForEach(ValidMoves(ref board), move =>
