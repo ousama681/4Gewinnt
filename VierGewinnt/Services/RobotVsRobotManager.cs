@@ -19,6 +19,8 @@ namespace VierGewinnt.Services
 
         public static IHubContext<BoardPvEHub> hubContextPvE;
 
+        public static BoardPvEHub boardPvEhub = null;
+
 
         public static IDictionary<string, int> colDepth = new Dictionary<string, int>();
         public static int moveNr = 0;
@@ -95,6 +97,7 @@ namespace VierGewinnt.Services
 
             // NextMove wird an beide Roboter verschickt.
             await BoardPvEHub.PublishToCoordinate(currentColumn);
+            await boardPvEhub.SubscribeToFeedbackAsync("feedback");
             moveNr++;
             await AddMoveToBoard();
         }

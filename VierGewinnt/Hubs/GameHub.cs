@@ -72,6 +72,7 @@ namespace VierGewinnt.Hubs
 
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
             //await SubscribeToFeedbackAsync("feedback");
+            await SubscribeToFeedbackAsync("feedback");
             // TestMethode um nicht mit Postman den RobotStatus zu simulieren
             //await MQTTBrokerService.PublishAsync("feedback", "1");
         }
@@ -81,7 +82,7 @@ namespace VierGewinnt.Hubs
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
             await _hubcontextPvP.All.SendAsync("NotificateGameEnd", winnerId);
-            await RobotVsRobotManager.UnsubscribeAndCloseFromFeedback();
+            //await RobotVsRobotManager.UnsubscribeAndCloseFromFeedback();
         }
 
         public override Task OnConnectedAsync()
@@ -213,8 +214,8 @@ namespace VierGewinnt.Hubs
                         await SetIsFinished(gameId);
                     }
 
-                    //await _mqttClient.UnsubscribeAsync(topic);
-                    //await _mqttClient.DisconnectAsync();
+                    await mqttClient.UnsubscribeAsync(topic);
+                    await mqttClient.DisconnectAsync();
                     await Task.CompletedTask;
                 };
             }

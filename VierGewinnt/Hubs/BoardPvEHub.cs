@@ -17,7 +17,7 @@ namespace VierGewinnt.Hubs
     public class BoardPvEHub : Hub
     {
 
-        private static IHubContext<BoardPvEHub> _hubcontextPvE = null;
+        //private static IHubContext<BoardPvEHub> _hubcontextPvE = null;
 
         private static BoardPlayer? currentMoveKey;
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
@@ -85,15 +85,15 @@ namespace VierGewinnt.Hubs
             playerMoves.Add(bp, columnNr);
 
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
-            //await SubscribeToFeedbackAsync("feedback");
+            await SubscribeToFeedbackAsync("feedback");
             // TestMethode um nicht mit Postman den RobotStatus zu simulieren
             //await MQTTBrokerService.PublishAsync("feedback", "1");
         }
 
-        public static async Task SubscribeToFeedbackAsync(string topic, IHubContext<BoardPvEHub> hubContextPvE)
+        public async Task SubscribeToFeedbackAsync(string topic)
         {
 
-            _hubcontextPvE = hubContextPvE;
+            //_hubcontextPvE = hubContextPvE;
             string broker = "localhost";
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
@@ -113,11 +113,12 @@ namespace VierGewinnt.Hubs
                 .Build();
 
             // Connect to MQTT broker
-            await ConnectToMQTTBroker(mqttClient, options, topic);
+            await ConnectToMQTTBroker(mqttClient, options, topic, this);
         }
 
-        private static async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
+        private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic, BoardPvEHub boardPvEHub)
         {
+            RobotVsRobotManager.boardPvEhub = this;
             var connectResult = await mqttClient.ConnectAsync(options);
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
@@ -153,7 +154,7 @@ namespace VierGewinnt.Hubs
                     {
                         RobotVsRobotManager.currentColumn = column.ToString();
                         await RobotVsRobotManager.AddMoveToBoard();
-                        await _hubcontextPvE.Clients.All.SendAsync("AnimatePlayerMove", column, playerName);
+                        await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimatePlayerMove", column, playerName);
                     }
                     else
                     {
@@ -165,7 +166,7 @@ namespace VierGewinnt.Hubs
                             PlayerNr = 0
 
                         }, Int32.Parse(currentcolumn));
-                        await _hubcontextPvE.Clients.All.SendAsync("AnimatePlayerMove", currentcolumn, robotName);
+                        await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimatePlayerMove", currentcolumn, robotName);
                     }
                     playerMoves.Remove(bpKey);
 
@@ -207,8 +208,8 @@ namespace VierGewinnt.Hubs
                         currentPlayer = playerName;
                     }
 
-                    //await _mqttClient.UnsubscribeAsync(topic);
-                    //await _mqttClient.DisconnectAsync();
+                    await mqttClient.UnsubscribeAsync(topic);
+                    await mqttClient.DisconnectAsync();
                     await Task.CompletedTask;
                 };
             }
@@ -218,19 +219,19 @@ namespace VierGewinnt.Hubs
             }
         }
 
-        public static async Task GameIsOver(string winnerId, int gameId)
+        public async Task GameIsOver(string winnerId, int gameId)
         {
             //runningGames.Remove(gameId);
             await UpdatePlayerRanking(winnerId);
-            await _hubcontextPvE.Clients.All.SendAsync("NotificateGameEnd", winnerId);
-            await UnsubscribeAndCloseFromFeedback();
+            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("NotificateGameEnd", winnerId);
+            //await UnsubscribeAndCloseFromFeedback();
         }
 
-        public static async Task UnsubscribeAndCloseFromFeedback()
-        {
-            await hubMqttClient.UnsubscribeAsync("feedback");
-            //await hubMqttClient.DisconnectAsync();
-        }
+        //public static async Task UnsubscribeAndCloseFromFeedback()
+        //{
+        //    await hubMqttClient.UnsubscribeAsync("feedback");
+        //    //await hubMqttClient.DisconnectAsync();
+        //}
 
 
         private static async Task SendRobotGameFinishedMessage()
@@ -296,6 +297,5 @@ namespace VierGewinnt.Hubs
                 }
             }
         }
-
     }
 }

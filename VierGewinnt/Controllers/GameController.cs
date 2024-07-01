@@ -17,6 +17,8 @@ namespace VierGewinnt.Controllers
         private readonly IHubContext<GameHub> _hubContextPvP;
         //private static readonly IList<GameBoard> runningGames;
 
+        private readonly IHubContext<BoardPvEHub> _hubContextPvEStatic = null;
+
         private static string connectionstring = DbUtility.connectionString;
 
         //static GameController()
@@ -66,7 +68,7 @@ namespace VierGewinnt.Controllers
             BoardPvEHub.currentPlayer = gameBoard.PlayerOneName;
             BoardPvEHub.playerName = gameBoard.PlayerOneName;
             BoardPvEHub.robotName = gameBoard.PlayerTwoName;
-            await BoardPvEHub.SubscribeToFeedbackAsync("feedback", _hubContextPvE);
+            //await BoardPvEHub.SubscribeToFeedbackAsync("feedback", _hubContextPvE);
 
             RobotVsRobotManager.currPlayerNr = 1;
             RobotVsRobotManager.otherRobotNr = 2;
@@ -80,6 +82,9 @@ namespace VierGewinnt.Controllers
 
             GameManager.playerOneName = gameBoard.PlayerOneName;
             GameManager.playerTwoName = gameBoard.PlayerTwoName;
+
+
+            RobotVsRobotManager.board = new int[6, 7];
 
             RobotVsRobotManager.InitColDepth();
             return View(gameViewModel);
@@ -101,7 +106,7 @@ namespace VierGewinnt.Controllers
             gameBoard.PlayerTwoName = robotTwo.Name;
             gameViewModel.Board = gameBoard;
 
-            await RobotVsRobotManager.SubscribeToFeedbackTopic();
+            //await RobotVsRobotManager.SubscribeToFeedbackTopic();
 
             // Roboter Vs Roboter funktioniert nicht.
 
