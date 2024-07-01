@@ -204,7 +204,7 @@ namespace VierGewinnt.Hubs
 
         private static async Task SendRobotGameFinishedMessage()
         {
-            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "9");
+            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "e");
         }
 
         private static async Task SetIsFinished(int gameId)

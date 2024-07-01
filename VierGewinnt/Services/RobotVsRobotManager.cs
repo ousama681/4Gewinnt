@@ -26,8 +26,7 @@ namespace VierGewinnt.Services
         public static int moveNr = 0;
         public static GameBoard currentGame;
         public static string currentRobotMove;
-        //public static IDictionary<string, int> robotsInGame = new Dictionary<string, int>();
-        public static IDictionary<string, int> robotMappingNr = new Dictionary<string, int>();
+        //public static IDictionary<string, int> robotMappingNr = new Dictionary<string, int>();
         public static IDictionary<int, string> robotMappingReversed = new Dictionary<int, string>();
         public static string winner;
         public static bool firstMove = false;
@@ -84,20 +83,30 @@ namespace VierGewinnt.Services
 
         public static async Task MakeNextMove()
         {
-            // Hier falls noch Zeit ist morgen unbedingt eine AI einbauen, es muss kein ProAI sein
-            // Aber immerhin sollte sie fähig sein einen Siegerzug zu verhindern und einfache
-            // Steine zu verbinden.
-
             BoardGame game = new BoardGame();
             game.board.board = board;
 
-            //currentColumn = ConnectFourAIService.GetNextRandomMove(board).ToString();
             currentColumn = game.miniMax.GetBestMove(game.board).Column.ToString();
             BoardPvEHub.currentcolumn = currentColumn;
 
             // NextMove wird an beide Roboter verschickt.
             await BoardPvEHub.PublishToCoordinate(currentColumn);
             await boardPvEhub.SubscribeToFeedbackAsync("feedback");
+            moveNr++;
+            await AddMoveToBoard();
+        }
+
+        public static async Task MakeNextMoveEvE()
+        {
+            BoardGame game = new BoardGame();
+            game.board.board = board;
+
+            currentColumn = game.miniMax.GetBestMove(game.board).Column.ToString();
+            BoardPvEHub.currentcolumn = currentColumn;
+
+            // NextMove wird an beide Roboter verschickt.
+            await BoardPvEHub.PublishToCoordinate(currentColumn);
+            await SubscribeToFeedbackTopic();
             moveNr++;
             await AddMoveToBoard();
         }
@@ -180,11 +189,7 @@ namespace VierGewinnt.Services
         public static async Task UnsubscribeAndCloseFromFeedback()
         {
             await _mqttClient.UnsubscribeAsync("feedback");
-            //await _mqttClient.DisconnectAsync();
         }
-
-
-
 
         internal static void InitColDepth()
         {

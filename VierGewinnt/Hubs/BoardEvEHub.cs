@@ -9,7 +9,7 @@ namespace VierGewinnt.Hubs
     {
         public async Task MakeFirstMove(string robotOneName)
         {
-            await RobotVsRobotManager.MakeNextMove();
+            await RobotVsRobotManager.MakeNextMoveEvE();
         }
 
         public static async Task CallAnimateHandler(string currentColumn)

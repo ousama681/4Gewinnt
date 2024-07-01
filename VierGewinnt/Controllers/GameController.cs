@@ -74,8 +74,8 @@ namespace VierGewinnt.Controllers
             RobotVsRobotManager.otherRobotNr = 2;
             BoardPvEHub.currGameId = gameId;
 
-            RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerOneName, 1);
-            RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerTwoName, 2);
+            //RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerOneName, 1);
+            //RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerTwoName, 2);
 
             RobotVsRobotManager.robotMappingReversed.TryAdd(1, gameBoard.PlayerOneName);
             RobotVsRobotManager.robotMappingReversed.TryAdd(2, gameBoard.PlayerTwoName);
@@ -117,8 +117,8 @@ namespace VierGewinnt.Controllers
             RobotVsRobotManager.currPlayerNr = 1;
             RobotVsRobotManager.otherRobotNr = 2;
 
-            RobotVsRobotManager.robotMappingNr.TryAdd(robotOne.Name, 1);
-            RobotVsRobotManager.robotMappingNr.TryAdd(robotTwo.Name, 2);
+            //RobotVsRobotManager.robotMappingNr.TryAdd(robotOne.Name, 1);
+            //RobotVsRobotManager.robotMappingNr.TryAdd(robotTwo.Name, 2);
 
             RobotVsRobotManager.robotMappingReversed.TryAdd(1, robotOne.Name);
             RobotVsRobotManager.robotMappingReversed.TryAdd(2, robotTwo.Name);
