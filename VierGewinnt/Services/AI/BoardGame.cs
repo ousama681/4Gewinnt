@@ -1,6 +1,6 @@
 ﻿using static VierGewinnt.Data.Models.GameBoard;
 
-namespace VierGewinnt.Services
+namespace VierGewinnt.Services.AI
 {
     public class BoardGame
     {

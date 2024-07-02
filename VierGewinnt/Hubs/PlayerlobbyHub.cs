@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using MQTTBroker;
 using VierGewinnt.Controllers;
+using VierGewinnt.Services;
 
 namespace VierGewinnt.Hubs
 {
@@ -66,6 +67,8 @@ namespace VierGewinnt.Hubs
 
         public async Task StartGame(string payload)
         {
+            //string[] players = payload.Split(",");
+            //await GameManager.CreateBoardEntityAsync(players[0], players[1]);
             await MQTTBrokerService.PublishAsync("Challenge", payload);
         }
 

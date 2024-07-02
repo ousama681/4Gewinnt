@@ -12,6 +12,7 @@ using VierGewinnt.Data.Model;
 using VierGewinnt.Data.Models;
 using VierGewinnt.Hubs;
 using VierGewinnt.Models;
+using VierGewinnt.Services;
 using VierGewinnt.ViewModels;
 
 namespace VierGewinnt.Controllers
@@ -25,7 +26,6 @@ namespace VierGewinnt.Controllers
         private readonly IPlayerInfoRepository _playerInfoRepo;
         private readonly IGameRepository _gameRepository;
         private readonly IAccountRepository _accountRepository;
-        //private static List<IMqttClient> connectedMqttClients = new List<IMqttClient>();
         private static IList<string> playersInHub = new List<string>();
         public static IList<string> robotsInHub = new List<string>();
         private static int countInstances = 0;
@@ -59,7 +59,6 @@ namespace VierGewinnt.Controllers
             }
             if (countInstances == 0)
             {
-                // Wir könnten das eigentlich in den Konstruktor packen.
                 await SubscribeRobotAsync("SubscribeRobot");
                 await SubscribeAsync("Challenge");
                 await SubscribeAsync("ChallengeRobot");
@@ -81,52 +80,35 @@ namespace VierGewinnt.Controllers
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
 
-            // Create a MQTT client factory
             var factory = new MqttFactory();
 
-            // Create a MQTT client instance
             var mqttClient = factory.CreateMqttClient();
 
-            // Create MQTT client options
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(broker, port)
                 .WithClientId(clientId)
                 .WithCleanSession()
                 .Build();
 
-            // Connect to MQTT broker
             var connectResult = await mqttClient.ConnectAsync(options);
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
             {
                 Console.WriteLine("Connected to MQTT broker successfully.");
 
-                // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
 
-                // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += e =>
                 {
                     var message = e.ApplicationMessage;
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
 
-                    if (payload.Equals("0"))
+                    if (payload.Equals("0") || message.Retain)
                     {
                         return Task.CompletedTask;
                     }
-
-
-                    if (message.Retain) // Ignore retained messages
-                    {
-                        return Task.CompletedTask;
-                    }
-
-
 
                     _hubContext.Clients.All.SendAsync("SendRobotFeedback");
-
-
-                    Console.WriteLine($"Received message: {Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment)}");
                     return Task.CompletedTask;
                 };
             }
@@ -208,10 +190,6 @@ namespace VierGewinnt.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        // MQTT METHODS
-
-        // Challenge, ChallengeRobot
-
         public async Task SubscribeAsync(string topic)
         {
 
@@ -219,13 +197,10 @@ namespace VierGewinnt.Controllers
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
 
-            // Create a MQTT client factory
             var factory = new MqttFactory();
 
-            // Create a MQTT client instance
             this.mqttClient = factory.CreateMqttClient();
 
-            // Create MQTT client options
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(broker, port)
                 .WithClientId(clientId)
@@ -243,23 +218,16 @@ namespace VierGewinnt.Controllers
 
         private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
         {
-            // Connect to MQTT broker
             var connectResult = await mqttClient.ConnectAsync(options);
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
             {
-                // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
 
-                // Hier adde ich den Client zur statischen Liste der clients
-                //connectedMqttClients.Add(_mqttClient);
-
-                // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
-                    // Hier kommt man nur rein von Messages von /Challenge
                     var message = e.ApplicationMessage;
-                    if (message.Retain) // Ignore retained messages
+                    if (message.Retain)
                     {
                         return;
                     }
@@ -267,14 +235,13 @@ namespace VierGewinnt.Controllers
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
                     string[] players = payload.Split(',');
 
-                    // Search for Gameboard that has both player in it with gamefinished == 0.
                     string playerOne = players[0];
                     string playerTwo = players[1];
 
-                    GameBoard game = await CheckForExistingGame(playerOne, playerTwo);
+                    GameBoard game = await GameManager.CheckForExistingGame(playerOne, playerTwo);
 
-                    ApplicationUser playerOneUser = GetUser(playerOne);
-                    ApplicationUser playerTwoUser = GetUser(playerTwo);
+                    ApplicationUser playerOneUser = DbUtility.GetUser(playerOne);
+                    ApplicationUser playerTwoUser = DbUtility.GetUser(playerTwo);
                     List<string> userIds = new List<string>();
                     userIds.Add(playerOneUser.Id);
                     userIds.Add(playerTwoUser.Id);
@@ -288,13 +255,13 @@ namespace VierGewinnt.Controllers
                         return;
                     }
 
-                    game = await CreateBoardEntityAsync(playerOne, playerTwo);
+                    game = await GameManager.CreateBoardEntityAsync(playerOne, playerTwo);
 
                     game.playerNames.PlayerOneName = playerOne;
                     game.playerNames.PlayerTwoName = playerTwo;
 
                     await _hubContext.Clients.Users(userIds).SendAsync("NavigateToGame", game.ID);
-                    await AfterStartingGame(mqttClient, topic);
+                    await AfterStartingGame();
                 };
 
             }
@@ -331,27 +298,27 @@ namespace VierGewinnt.Controllers
                     string playerOne = players[0];
                     string robotID = players[1];
 
-                    GameBoard game = await CheckForExistingGameAgainstRobot(playerOne, robotID);
+                    GameBoard game = await GameManager.CheckForExistingGame(playerOne, robotID);
 
-                    ApplicationUser playerOneUser = GetUser(playerOne);
+                    ApplicationUser playerOneUser = DbUtility.GetUser(playerOne);
 
                     if (game != null)
                     {
 
                         if (playerOneUser != null)
                         {
-                            //await _hubContext.Clients.User(playerOneUser.Id).SendAsync("NavigateToGameAgainstRobot", game.ID);
+                            await _hubContext.Clients.User(playerOneUser.Id).SendAsync("NavigateToGameAgainstRobot", game.ID);
 
                         }
                         return;
                     }
-                    game = await CreateBoardEntityAgainstRobotAsync(playerOne, robotID);
+                    game = await GameManager.CreateBoardEntityAsync(playerOne, robotID);
 
                     if (playerOneUser != null)
                     {
                         await _hubContext.Clients.User(playerOneUser.Id).SendAsync("NavigateToGameAgainstRobot", game.ID);
                     }
-                    await AfterStartingGame(mqttClient, topic);
+                    await AfterStartingGame();
                 };
 
             }
@@ -361,158 +328,10 @@ namespace VierGewinnt.Controllers
             }
         }
 
-        private ApplicationUser GetUser(string playerOne)
+        private async Task AfterStartingGame()
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    var userOne = GetUser(playerOne, dbContext).Result;
-                    return userOne;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-            return null;
-        }
-
-        private async Task<GameBoard> CheckForExistingGame(string playerOne, string playerTwo)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            // Or you can also instantiate inside using
-            GameBoard game = new GameBoard();
-
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    string playerOneID = GetUser(playerOne, dbContext).Result.Id;
-                    string playerTwoID = GetUser(playerTwo, dbContext).Result.Id;
-
-                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(playerTwo) && gb.IsFinished.Equals(false)) ||
-                    (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(playerTwo) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
-                    return existingGame;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-            return game;
-        }
-
-        private async Task<GameBoard> CheckForExistingGameAgainstRobot(string playerOne, string robotID)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            // Or you can also instantiate inside using
-            GameBoard game = new GameBoard();
-
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    string playerOneID = GetUser(playerOne, dbContext).Result.Id;
-
-                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(robotID) && gb.IsFinished.Equals(false)) ||
-                    (gb.PlayerOneName.Equals(robotID) && gb.PlayerTwoName.Equals(playerOne) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
-                    return existingGame;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-            return game;
-        }
-
-        private async Task AfterStartingGame(IMqttClient mqttClient, string topic)
-        {
-
-            //connectedMqttClients.Remove(_mqttClient);
             playersInHub.Remove(this.username);
             this.username = null;
-        }
-
-        private static async Task<GameBoard> CreateBoardEntityAsync(string playerOne, string playerTwo)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            // Or you can also instantiate inside using
-            GameBoard game = new GameBoard();
-
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    var userOne = GetUser(playerOne, dbContext).Result;
-                    var userTwo = GetUser(playerTwo, dbContext).Result;
-
-                    game.PlayerOneID = userOne.Id;
-                    game.PlayerTwoID = userTwo.Id;
-                    game.PlayerOneName = userOne.UserName;
-                    game.PlayerTwoName = userTwo.UserName;
-
-                    //BoardPvEHub.robotName = playerTwo;
-                    //BoardPvEHub.playerName = playerOne;
-                    //BoardPvEHub.currentPlayer = playerOne;
-
-                    await dbContext.GameBoards.AddAsync(game);
-                    await dbContext.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-            return game;
-        }
-        private static async Task<GameBoard> CreateBoardEntityAgainstRobotAsync(string playerOne, string robotID)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            // Or you can also instantiate inside using
-            GameBoard game = new GameBoard();
-
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    var userOne = GetUser(playerOne, dbContext).Result;
-
-                    game.PlayerOneID = userOne.Id;
-                    game.PlayerOneName = userOne.UserName;
-
-                    game.PlayerTwoID = robotID;
-                    game.PlayerTwoName = robotID;
-
-                    await dbContext.GameBoards.AddAsync(game);
-                    await dbContext.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-            return game;
-        }
-
-        public static async Task<ApplicationUser> GetUser(string playerName, AppDbContext context)
-        {
-            return await context.Accounts.FirstAsync(u => u.UserName.Equals(playerName));
         }
 
         // SubscribeRobot   
@@ -523,13 +342,10 @@ namespace VierGewinnt.Controllers
             int port = 1883;
             string clientId = Guid.NewGuid().ToString();
 
-            // Create a MQTT client factory
             var factory = new MqttFactory();
 
-            // Create a MQTT client instance
             mqttClient = factory.CreateMqttClient();
 
-            // Create MQTT client options
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(broker, port)
                 .WithClientId(clientId)
@@ -541,27 +357,21 @@ namespace VierGewinnt.Controllers
 
         private async Task ReceiveRobotSubscription(IMqttClient mqttClient, MqttClientOptions options, string topic)
         {
-            // Connect to MQTT broker
             var connectResult = await mqttClient.ConnectAsync(options);
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
             {
-                // Subscribe to a topic
                 await mqttClient.SubscribeAsync(topic);
 
-                // Hier adde ich den Client zur statischen Liste der clients
-                //connectedMqttClients.Add(_mqttClient);
-
-                // Callback function when a message is received
                 mqttClient.ApplicationMessageReceivedAsync += async e =>
                 {
                     var message = e.ApplicationMessage;
-                    if (message.Retain) // Ignore retained messages
+                    if (message.Retain)
                     {
                         return;
                     }
 
-                    string robotID = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment); // nur Roboter ID wird gesendet
+                    string robotID = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
 
                     if (!robotsInHub.Contains(robotID))
                     {

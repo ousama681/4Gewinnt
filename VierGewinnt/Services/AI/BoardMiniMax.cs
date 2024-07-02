@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using static VierGewinnt.Data.Models.GameBoard;
 
-namespace VierGewinnt.Services
+namespace VierGewinnt.Services.AI
 {
     public struct BestCalculatedMove
     {

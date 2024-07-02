@@ -5,7 +5,6 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 connection.start()
     .then(() => {
         PlaceAlreadyPlayedMoves(movesToLoad);
-        connection.invoke("RegisterGameInStaticProperty", playerOneName, playerTwoName, gameId);
         DisableComponentsForOtherPlayer();
     }
     );

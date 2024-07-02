@@ -10,11 +10,12 @@ using VierGewinnt.Data;
 using VierGewinnt.Data.Model;
 using VierGewinnt.Data.Models;
 using VierGewinnt.Services;
+using VierGewinnt.Services.AI;
 using static VierGewinnt.Hubs.GameHub;
 
 namespace VierGewinnt.Hubs
 {
-    public class BoardPvEHub : Hub
+    public class BoardPvEHub : BoardHubBase
     {
         private static BoardPlayer? currentMoveKey;
         private static IDictionary<BoardPlayer, int> playerMoves = new Dictionary<BoardPlayer, int>();
@@ -23,19 +24,16 @@ namespace VierGewinnt.Hubs
         public static string robotName = "";
         public static string playerName = "";
         public static int currGameId = 0;
+        public static int moveNr = 0;
 
-        //public static async Task CallAnimateHandler(string currentColumn)
-        //{
-        //    await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimateMove", currentColumn);
-        //}
+        public static int currPlayerNr = 0;
+        public static IDictionary<string, int> colDepth = new Dictionary<string, int>();
+        public static IDictionary<int, string> robotMappingReversed = new Dictionary<int, string>();
 
-        public static async Task GameIsOver()
-        {
-            string text = "Roboter " + RobotVsRobotManager.winner + " hat gewonnen.";
-            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("NotificateGameEnd", text);
-        }
+        public static int[,] board = new int[6, 7];
+        public static IHubCallerClients _hubcontextPvE;
 
-        public static async Task PublishToCoordinate(string column)
+        public async Task PublishToCoordinate(string column)
         {
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
         }
@@ -50,7 +48,7 @@ namespace VierGewinnt.Hubs
             {
                 try
                 {
-                    playerId = HomeController.GetUser(playerName, dbContext).Result.Id;
+                    playerId = DbUtility.GetUser(playerName, dbContext).Result.Id;
                 }
                 catch (Exception e)
                 {
@@ -66,6 +64,7 @@ namespace VierGewinnt.Hubs
                 GameId = Int32.Parse(gameId)
             };
 
+            currentcolumn = column;
             int columnNr = Int32.Parse(column);
 
             currentMoveKey = bp;
@@ -73,8 +72,23 @@ namespace VierGewinnt.Hubs
             await GameManager.SaveMove(bp, columnNr);
             playerMoves.Add(bp, columnNr);
 
+            AddMoveToBoard();
             await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", column);
             await SubscribeToFeedbackAsync("feedback");
+        }
+
+        public async Task MakeNextMove()
+        {
+            BoardGame game = new BoardGame();
+            game.board.board = board;
+
+             currentcolumn = game.miniMax.GetBestMove(game.board).Column.ToString();
+
+            // NextMove wird an beide Roboter verschickt.
+            await PublishToCoordinate(currentcolumn);
+            await SubscribeToFeedbackAsync("feedback");
+            moveNr++;
+            AddMoveToBoard();
         }
 
         public async Task SubscribeToFeedbackAsync(string topic)
@@ -98,7 +112,6 @@ namespace VierGewinnt.Hubs
 
         private async Task ConnectToMQTTBroker(IMqttClient mqttClient, MqttClientOptions options, string topic)
         {
-            RobotVsRobotManager.boardPvEhub = this;
             var connectResult = await mqttClient.ConnectAsync(options);
 
             if (connectResult.ResultCode == MqttClientConnectResultCode.Success)
@@ -112,12 +125,7 @@ namespace VierGewinnt.Hubs
 
                     string payload = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
 
-                    if (payload.Equals("0"))
-                    {
-                        return;
-                    }
-
-                    if (message.Retain)
+                    if (payload.Equals("0") || message.Retain)
                     {
                         return;
                     }
@@ -126,12 +134,13 @@ namespace VierGewinnt.Hubs
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
+                    //AddMoveToBoard();
 
                     if (currentPlayer.Equals(playerName))
                     {
-                        RobotVsRobotManager.currentColumn = column.ToString();
-                        await RobotVsRobotManager.AddMoveToBoard();
-                        await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimatePlayerMove", column, playerName);
+                        currentcolumn = column.ToString();
+                        //AddMoveToBoard();
+                        await SendAnimatePlayerMove(currentcolumn, currentPlayer,_hubcontextPvE);
                     }
                     else
                     {
@@ -143,11 +152,13 @@ namespace VierGewinnt.Hubs
                             PlayerNr = 0
 
                         }, Int32.Parse(currentcolumn));
-                        await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimatePlayerMove", currentcolumn, robotName);
+                        await SendAnimatePlayerMove(currentcolumn, currentPlayer, _hubcontextPvE);
                     }
                     playerMoves.Remove(bpKey);
 
-                    int winnerNr = GameManager.CheckForWin(bpKey.GameId);
+                    // noch schauen warum board nicht stimmt.
+
+                    int winnerNr = GameManager.CheckForWin(board);
 
                     if (winnerNr != 0)
                     {
@@ -155,16 +166,16 @@ namespace VierGewinnt.Hubs
                         int gameId = 0;
                         if (winnerNr == 1)
                         {
-                            winnername = GameManager.playerOneName;
+                            winnername = playerName;
                             gameId = bpKey.GameId;
                         }
                         else if (winnerNr == 2)
                         {
-                            winnername = GameManager.playerTwoName;
+                            winnername = robotName;
                             gameId = bpKey.GameId;
 
                         }
-                        await GameIsOver(winnername, gameId);
+                        await GameIsOver(winnername, _hubcontextPvE);
                         await SendRobotGameFinishedMessage();
                         await SetIsFinished(gameId);
                     }
@@ -173,7 +184,7 @@ namespace VierGewinnt.Hubs
 
                     if (!currentPlayer.Equals(robotName))
                     {
-                        await RobotVsRobotManager.MakeNextMove();
+                        await MakeNextMove();
                     }
 
                     if (currentPlayer.Equals(playerName))
@@ -196,69 +207,47 @@ namespace VierGewinnt.Hubs
             }
         }
 
-        public async Task GameIsOver(string winnerId, int gameId)
+
+        internal static void InitColDepth()
         {
-            await UpdatePlayerRanking(winnerId);
-            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("NotificateGameEnd", winnerId);
+            colDepth = new Dictionary<string, int>();
+
+            colDepth.Add("1", 6);
+            colDepth.Add("2", 6);
+            colDepth.Add("3", 6);
+            colDepth.Add("4", 6);
+            colDepth.Add("5", 6);
+            colDepth.Add("6", 6);
+            colDepth.Add("7", 6);
         }
 
-        private static async Task SendRobotGameFinishedMessage()
+        public override void AddMoveToBoard()
         {
-            await MQTTBroker.MQTTBrokerService.PublishAsync("coordinate", "e");
-        }
+            int columnInt = int.Parse(currentcolumn);
+            int depth;
 
-        private static async Task SetIsFinished(int gameId)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(DbUtility.connectionString);
 
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            colDepth.TryGetValue(currentcolumn, out depth);
+            colDepth[currentcolumn] = depth - 1;
+
+            board[depth - 1, columnInt - 1] = currPlayerNr;
+
+            if (currPlayerNr == 1)
             {
-                try
-                {
-                    GameBoard gameboard = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).Single();
-                    gameboard.IsFinished = true;
-                    dbContext.GameBoards.Update(gameboard);
-                    await dbContext.SaveChangesAsync();
-                    return;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
+                currPlayerNr = 2;
             }
+            else if (currPlayerNr == 2)
+            {
+                currPlayerNr = 1;
+            }
+
+            return;
         }
 
-
-        private static async Task UpdatePlayerRanking(string winnerName)
+        public override Task OnConnectedAsync()
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(DbUtility.connectionString);
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    PlayerRanking pr = dbContext.PlayerRankings.Where(pr => pr.PlayerName.Equals(winnerName)).FirstOrDefault();
-
-                    if (pr == null)
-                    {
-                        PlayerRanking newPr = new PlayerRanking() { PlayerName = winnerName, Wins = 1 };
-                        await dbContext.AddAsync(newPr);
-                    }
-                    else
-                    {
-                        pr.Wins = pr.Wins + 1;
-                    }
-
-                    await dbContext.SaveChangesAsync();
-                    return;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
+            _hubcontextPvE = this.Clients;
+            return base.OnConnectedAsync();
         }
     }
 }

@@ -4,7 +4,6 @@ using VierGewinnt.Controllers;
 using VierGewinnt.Data;
 using VierGewinnt.Data.Model;
 using VierGewinnt.Data.Models;
-using VierGewinnt.Hubs;
 using static VierGewinnt.Hubs.GameHub;
 
 namespace VierGewinnt.Services
@@ -15,6 +14,7 @@ namespace VierGewinnt.Services
         public static string playerTwoName = "";
         public static int playerOneNr = 1;
         public static int playerTwoNr = 2;
+        public static string currentColumn = "";
 
 
 
@@ -53,18 +53,13 @@ namespace VierGewinnt.Services
                     try
                     {
 
-                user = HomeController.GetUser(move.PlayerName, dbContext).Result;
+                        user = DbUtility.GetUser(move.PlayerName, dbContext).Result;
 
                     }
                     catch (Exception e)
                     {
                         Debug.WriteLine(e);
                     }
-                }
-
-                if (user != null)
-                {
-                //move.Player = user.Id;
                 }
 
                 if (move.PlayerName.Equals(playerOneName))
@@ -85,7 +80,6 @@ namespace VierGewinnt.Services
 
         public static int CheckForWinOrDraw(int[,] board)
         {
-            // Check horizontal
             for (int row = 0; row < 6; row++)
             {
                 for (int col = 0; col < 7 - 3; col++)
@@ -95,13 +89,11 @@ namespace VierGewinnt.Services
                         board[row, col] == board[row, col + 2] &&
                         board[row, col] == board[row, col + 3])
                     {
-                        //robotMappingReversed.TryGetValue(board[row, col], out winner);
                         return board[row, col];
                     }
                 }
             }
 
-            // Check vertical
             for (int col = 0; col < 7; col++)
             {
                 for (int row = 0; row < 6 - 3; row++)
@@ -116,7 +108,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            // Check positive diagonal (bottom-left to top-right)
             for (int col = 0; col < 7 - 3; col++)
             {
                 for (int row = 0; row < 6 - 3; row++)
@@ -131,7 +122,6 @@ namespace VierGewinnt.Services
                 }
             }
 
-            // Check negative diagonal (top-left to bottom-right)
             for (int col = 0; col < 7 - 3; col++)
             {
                 for (int row = 3; row < 6; row++)
@@ -146,42 +136,21 @@ namespace VierGewinnt.Services
                 }
             }
 
-            // Check for draw (if no empty cells)
             foreach (var cell in board)
             {
                 if (cell == 0)
                 {
-                    return 0; // No winner yet
+                    return 0; 
                 }
             }
 
-            return -1; // Draw
+            return -1;
         }
 
 
-        public static int CheckForWin(int gameId)
+        public static int CheckForWin(int[,] board)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(DbUtility.connectionString);
-            ICollection<Move> moves = new List<Move>();
-
-            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
-            {
-                try
-                {
-                    moves = dbContext.Moves.Where(m => m.GameBoardID.Equals(gameId)).ToList();
-                    //board = new int[6, 7];
-                    //FillBoard(moves);
-                    board = GameManager.FillBoard(moves);
-                    return GameManager.CheckForWinOrDraw(board);
-
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                }
-            }
-            return 0;
+            return GameManager.CheckForWinOrDraw(board);
         }
 
 
@@ -210,6 +179,135 @@ namespace VierGewinnt.Services
             return move;
         }
 
+        public static async Task<GameBoard> CreateBoardEntityAsync(string playerOne, string playerTwo)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(DbUtility.connectionString);
 
+            GameBoard game = new GameBoard();
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    var userOne = DbUtility.GetUser(playerOne, dbContext).Result;
+                    var userTwo = DbUtility.GetUser(playerTwo, dbContext).Result;
+
+                    if (userOne != null && userTwo != null)
+                    {
+                        game.PlayerOneID = userOne.Id;
+                        game.PlayerOneName = userOne.UserName;
+                        game.PlayerTwoID = userTwo.Id;
+                        game.PlayerTwoName = userTwo.UserName;
+                    }
+                    else if (userOne != null)
+                    {
+                        game.PlayerOneID = userOne.Id;
+                        game.PlayerOneName = userOne.UserName;
+                        game.PlayerTwoID = playerTwo;
+                        game.PlayerTwoName = playerTwo;
+                    }
+                    else
+                    {
+                        game.PlayerOneID = playerOne;
+                        game.PlayerOneName = playerOne;
+                        game.PlayerTwoID = playerTwo;
+                        game.PlayerTwoName = playerTwo;
+                    }
+                    await dbContext.GameBoards.AddAsync(game);
+                    await dbContext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("Game already exists!");
+                }
+            }
+            return game;
+        }
+
+        public static async Task<GameBoard> CheckForExistingGame(string playerOne, string playerTwo)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(DbUtility.connectionString);
+
+            GameBoard game = new GameBoard();
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    //string playerOneID = DbUtility.GetUser(playerOne, dbContext).Result.Id;
+                    //string playerTwoID = DbUtility.GetUser(playerTwo, dbContext).Result.Id;
+
+
+
+                    GameBoard existingGame = await dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(playerTwo) && gb.IsFinished.Equals(false)) ||
+                    (gb.PlayerOneName.Equals(playerOne) && gb.PlayerTwoName.Equals(playerTwo) && gb.IsFinished.Equals(false))).FirstOrDefaultAsync();
+                    return existingGame;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+            return game;
+        }
+
+
+        public static async Task UpdatePlayerRanking(string winnerName)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(DbUtility.connectionString);
+
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                string playerID = DbUtility.GetUser(winnerName, dbContext).Result.Id;
+                try
+                {
+                    PlayerRanking pr = dbContext.PlayerRankings.Where(pr => pr.PlayerName.Equals(winnerName)).FirstOrDefault();
+
+                    if (pr == null)
+                    {
+                        PlayerRanking newPr = new PlayerRanking() { PlayerName = winnerName, Wins = 1 };
+                        await dbContext.AddAsync(newPr);
+                    }
+                    else
+                    {
+                        pr.Wins = pr.Wins + 1;
+                    }
+
+                    await dbContext.SaveChangesAsync();
+                    return;
+                    // Hier mal die Prüfung für den Win machen. 
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+        }
+
+        public static async Task SetIsFinished(int gameId)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseSqlServer(DbUtility.connectionString);
+
+            using (AppDbContext dbContext = new AppDbContext(optionsBuilder.Options))
+            {
+                try
+                {
+                    GameBoard gameboard = dbContext.GameBoards.Include(gb => gb.Moves).Where(gb => gb.ID.Equals(gameId)).Single();
+                    gameboard.IsFinished = true;
+                    dbContext.GameBoards.Update(gameboard);
+                    await dbContext.SaveChangesAsync();
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            }
+        }
     }
 }

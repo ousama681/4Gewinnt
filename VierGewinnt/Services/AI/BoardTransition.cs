@@ -1,4 +1,4 @@
-﻿namespace VierGewinnt.Services
+﻿namespace VierGewinnt.Services.AI
 {
     public class BoardTransition
     {

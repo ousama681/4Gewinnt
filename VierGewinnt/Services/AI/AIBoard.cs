@@ -1,6 +1,6 @@
 ﻿using static VierGewinnt.Data.Models.GameBoard;
 
-namespace VierGewinnt.Services
+namespace VierGewinnt.Services.AI
 {
     public class AIBoard
     {
@@ -61,7 +61,7 @@ namespace VierGewinnt.Services
             }
 
             moves++;
-            currentPlayerTurn = (currentPlayerTurn == 1) ? 2 : 1;
+            currentPlayerTurn = currentPlayerTurn == 1 ? 2 : 1;
             return true;
         }
 
