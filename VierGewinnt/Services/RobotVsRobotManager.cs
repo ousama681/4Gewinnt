@@ -20,6 +20,7 @@ namespace VierGewinnt.Services
         public static IHubContext<BoardPvEHub> hubContextPvE;
 
         public static BoardPvEHub boardPvEhub = null;
+        public static BoardEvEHub boardEvEHub = null;
 
 
         public static IDictionary<string, int> colDepth = new Dictionary<string, int>();
@@ -70,6 +71,8 @@ namespace VierGewinnt.Services
                         FinishGame();
                         return;
                     }
+                    //isBothFinished = false;
+                    BoardEvEHub.MakeNextMove();
                     //MakeNextMove();
                 }
             }
@@ -78,7 +81,7 @@ namespace VierGewinnt.Services
 
         private static async Task FinishGame()
         {
-            await BoardPvEHub.GameIsOver();
+            await BoardEvEHub.GameIsOver();
         }
 
         public static async Task MakeNextMove()
@@ -126,7 +129,8 @@ namespace VierGewinnt.Services
             if (currPlayerNr == 1)
             {
                 currPlayerNr = 2;
-            } else if (currPlayerNr == 2)
+            }
+            else if (currPlayerNr == 2)
             {
                 currPlayerNr = 1;
             }
@@ -177,7 +181,14 @@ namespace VierGewinnt.Services
                     if (payload.Equals("1"))
                     {
                         FeedBackCounter = FeedBackCounter + 1;
+                        if (FeedBackCounter == 0)
+                        {
+                            await UnsubscribeAndCloseFromFeedback();
+                        }
+                        return;
                     }
+
+                    //await UnsubscribeAndCloseFromFeedback();
                 };
             }
             else

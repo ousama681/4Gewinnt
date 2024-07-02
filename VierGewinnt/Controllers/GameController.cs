@@ -15,9 +15,10 @@ namespace VierGewinnt.Controllers
         private readonly IAccountRepository _accountRepository;
         private readonly IHubContext<BoardPvEHub> _hubContextPvE;
         private readonly IHubContext<GameHub> _hubContextPvP;
+        public readonly IHubContext<BoardEvEHub> _hubContextEvE;
         //private static readonly IList<GameBoard> runningGames;
 
-        private readonly IHubContext<BoardPvEHub> _hubContextPvEStatic = null;
+        //private readonly IHubContext<BoardPvEHub> _hubContextPvEStatic = null;
 
         private static string connectionstring = DbUtility.connectionString;
 
@@ -28,12 +29,14 @@ namespace VierGewinnt.Controllers
 
         public GameController(IGameRepository gameRepository, IHubContext<BoardPvEHub> hubContextPvE,
             IHubContext<GameHub> hubContextPvP,
+            IHubContext<BoardEvEHub> hubContextEvE,
             IAccountRepository accountRepository)
         {
             _gameRepository = gameRepository;
             _hubContextPvE = hubContextPvE;
             _hubContextPvP = hubContextPvP;
             _accountRepository = accountRepository;
+            _hubContextEvE = hubContextEvE;
         }
 
         [HttpGet]
@@ -45,15 +48,15 @@ namespace VierGewinnt.Controllers
             gameBoard.playerNames.PlayerTwoName = _accountRepository.GetByIdAsync(new ApplicationUser() { Id = gameBoard.PlayerTwoID }).Result.UserName;
             gameViewModel.Board = gameBoard;
 
-            GameHub.playerOne = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerOneName, PlayerNr = 1};
-            GameHub.playerTwo = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerTwoName, PlayerNr = 2};
+            GameHub.playerOne = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerOneName, PlayerNr = 1 };
+            GameHub.playerTwo = new GameHub.BoardPlayer() { PlayerName = gameBoard.PlayerTwoName, PlayerNr = 2 };
 
             //RobotVsRobotManager.hubContextPvE = _hubContextPvE;
 
             GameManager.playerOneName = gameBoard.PlayerOneName;
             GameManager.playerTwoName = gameBoard.PlayerTwoName;
 
-            GameHub.board = new int[6,7];
+            GameHub.board = new int[6, 7];
             return View(gameViewModel);
         }
 
@@ -76,6 +79,7 @@ namespace VierGewinnt.Controllers
 
             //RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerOneName, 1);
             //RobotVsRobotManager.robotMappingNr.TryAdd(gameBoard.PlayerTwoName, 2);
+
 
             RobotVsRobotManager.robotMappingReversed.TryAdd(1, gameBoard.PlayerOneName);
             RobotVsRobotManager.robotMappingReversed.TryAdd(2, gameBoard.PlayerTwoName);
@@ -124,6 +128,9 @@ namespace VierGewinnt.Controllers
             RobotVsRobotManager.robotMappingReversed.TryAdd(2, robotTwo.Name);
 
             RobotVsRobotManager.FeedBackCounter = 0;
+
+
+            BoardEvEHub.hubContext = _hubContextEvE;
 
 
             RobotVsRobotManager.InitColDepth();
@@ -183,7 +190,7 @@ namespace VierGewinnt.Controllers
         //            string robotName = payload;
         //            int gameId = currGameId;
         //            // besten Move berechnen für Roboter
-                    
+
         //            Robot robot = await GetRobotByName(robotName);
 
 

@@ -22,7 +22,7 @@ var robotTwoName = document.getElementById("labelRobotTwo").textContent;
 
 connection.start().then(function () {
     nextPlayer = document.getElementById("labelRobotOne").textContent;
-    connection.invoke("MakeFirstMove", robotOneName);
+    connection.invoke("MakeFirstMove");
 });
 
 connection.on("AnimateMove", function (columnNr) {

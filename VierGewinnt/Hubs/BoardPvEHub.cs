@@ -24,10 +24,10 @@ namespace VierGewinnt.Hubs
         public static string playerName = "";
         public static int currGameId = 0;
 
-        public static async Task CallAnimateHandler(string currentColumn)
-        {
-            await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimateMove", currentColumn);
-        }
+        //public static async Task CallAnimateHandler(string currentColumn)
+        //{
+        //    await RobotVsRobotManager.hubContextPvE.Clients.All.SendAsync("AnimateMove", currentColumn);
+        //}
 
         public static async Task GameIsOver()
         {
@@ -86,7 +86,7 @@ namespace VierGewinnt.Hubs
             var factory = new MqttFactory();
 
             IMqttClient mqttClient = factory.CreateMqttClient();
-            
+
             var options = new MqttClientOptionsBuilder()
                 .WithTcpServer(broker, port)
                 .WithClientId(clientId)
@@ -126,7 +126,7 @@ namespace VierGewinnt.Hubs
                     int column = 0;
                     playerMoves.TryGetValue(bpKey, out column);
 
- 
+
                     if (currentPlayer.Equals(playerName))
                     {
                         RobotVsRobotManager.currentColumn = column.ToString();
